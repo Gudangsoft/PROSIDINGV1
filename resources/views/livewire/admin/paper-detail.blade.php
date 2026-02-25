@@ -699,6 +699,15 @@
                         Lihat Artikel
                     </a>
                     @endif
+                    @if($paper->video_presentation_url)
+                    <a href="{{ $paper->video_presentation_url }}" target="_blank" rel="noopener noreferrer"
+                       class="mt-2 flex items-center justify-center gap-1.5 text-xs text-red-600 hover:text-red-800 font-medium">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                        Lihat Video Pemaparan
+                    </a>
+                    @endif
                     <div class="mt-2">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Link Artikel</label>
                         <div class="flex gap-1">
@@ -903,6 +912,43 @@
                         @endif
                     </div>
                 </div>
+
+                {{-- Video Pemaparan --}}
+                @if($paper->video_presentation_url)
+                <div class="border border-red-200 rounded">
+                    <div class="px-3 py-2 bg-red-50 border-b border-red-200 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                        <h3 class="text-xs font-bold text-red-700 uppercase tracking-wide">Video Pemaparan</h3>
+                    </div>
+                    <div class="p-3">
+                        @php
+                            $adminVidUrl = $paper->video_presentation_url;
+                            $adminEmbedUrl = null;
+                            if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/', $adminVidUrl, $m)) {
+                                $adminEmbedUrl = 'https://www.youtube.com/embed/' . $m[1];
+                            }
+                        @endphp
+                        @if($adminEmbedUrl)
+                        <div class="relative rounded overflow-hidden bg-black mb-2" style="padding-top:56.25%">
+                            <iframe class="absolute inset-0 w-full h-full"
+                                src="{{ $adminEmbedUrl }}"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        @endif
+                        <a href="{{ $adminVidUrl }}" target="_blank" rel="noopener noreferrer"
+                           class="flex items-center gap-1.5 text-xs text-red-600 hover:text-red-800 font-medium break-all">
+                            <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                            Buka Link
+                        </a>
+                    </div>
+                </div>
+                @endif
+
             </div>
         </div>
     </div>

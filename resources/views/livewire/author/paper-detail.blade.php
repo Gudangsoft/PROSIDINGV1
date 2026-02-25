@@ -202,6 +202,72 @@
             </div>
             @endif
             @endif
+
+            {{-- Video Pemaparan --}}
+            @if(in_array($paper->status, ['payment_verified', 'deliverables_pending', 'completed']))
+            <div id="video-section" class="bg-white rounded-xl shadow-sm border p-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 text-lg">Video Pemaparan</h3>
+                </div>
+
+                @if($paper->video_presentation_url)
+                <div class="mb-4">
+                    @php
+                        $videoUrlRaw = $paper->video_presentation_url;
+                        // Convert YouTube watch URL to embed
+                        $embedUrl = null;
+                        if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/', $videoUrlRaw, $m)) {
+                            $embedUrl = 'https://www.youtube.com/embed/' . $m[1];
+                        }
+                    @endphp
+                    @if($embedUrl)
+                    <div class="relative rounded-lg overflow-hidden bg-black" style="padding-top:56.25%">
+                        <iframe class="absolute inset-0 w-full h-full"
+                            src="{{ $embedUrl }}"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    @else
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
+                        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                        <a href="{{ $videoUrlRaw }}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline text-sm truncate">{{ $videoUrlRaw }}</a>
+                    </div>
+                    @endif
+                    <p class="text-xs text-gray-400 mt-2">Link yang tersimpan. Anda dapat menggantinya kapan saja.</p>
+                </div>
+                @endif
+
+                <form wire:submit="submitVideoUrl" class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            {{ $paper->video_presentation_url ? 'Ganti Link Video' : 'Submit Link Video' }}
+                            <span class="text-gray-400 font-normal">(YouTube, Google Drive, dll.)</span>
+                        </label>
+                        <input wire:model="videoUrl"
+                               type="url"
+                               placeholder="https://www.youtube.com/watch?v=..."
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition">
+                        @error('videoUrl') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <button type="submit"
+                        class="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-2.5 rounded-lg hover:bg-red-700 text-sm font-semibold transition"
+                        wire:loading.attr="disabled" wire:loading.class="opacity-60">
+                        <span wire:loading.remove wire:target="submitVideoUrl">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            {{ $paper->video_presentation_url ? 'Perbarui Video' : 'Submit Video' }}
+                        </span>
+                        <span wire:loading wire:target="submitVideoUrl">Menyimpan...</span>
+                    </button>
+                </form>
+            </div>
+            @endif
         </div>
 
         {{-- Sidebar --}}
@@ -316,6 +382,14 @@
                     @endif
                     @if(in_array($paper->status, ['payment_verified','deliverables_pending','completed']))
                         <a href="{{ route('author.paper.deliverables', $paper) }}" class="block w-full text-center bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 text-sm font-medium">Upload Luaran</a>
+                    @endif
+                    @if(in_array($paper->status, ['payment_verified','deliverables_pending','completed']))
+                        <a href="#video-section"
+                           onclick="document.getElementById('video-section').scrollIntoView({behavior:'smooth'}); return false;"
+                           class="flex items-center justify-center gap-2 w-full text-center bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 text-sm font-medium">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                            {{ $paper->video_presentation_url ? 'Perbarui Video' : 'Submit Video Pemaparan' }}
+                        </a>
                     @endif
                 </div>
             </div>

@@ -14,7 +14,7 @@ class Paper extends Model
 
     protected $fillable = [
         'user_id', 'conference_id', 'assigned_editor_id', 'title', 'abstract', 'keywords', 'topic',
-        'authors_meta', 'status', 'editor_notes', 'loa_link', 'loa_number', 'article_link', 'submitted_at', 'accepted_at',
+        'authors_meta', 'status', 'editor_notes', 'loa_link', 'loa_number', 'article_link', 'video_presentation_url', 'submitted_at', 'accepted_at',
     ];
 
     protected $casts = [

@@ -15,6 +15,7 @@ class PaperDetail extends Component
     public Paper $paper;
     public $revisionFile;
     public string $revisionNotes = '';
+    public string $videoUrl = '';
 
     public function mount(Paper $paper)
     {
@@ -22,6 +23,7 @@ class PaperDetail extends Component
             abort(403);
         }
         $this->paper = $paper;
+        $this->videoUrl = $paper->video_presentation_url ?? '';
     }
 
     public function submitRevision()
@@ -59,6 +61,32 @@ class PaperDetail extends Component
         $this->paper->refresh();
 
         session()->flash('success', 'Revisi berhasil diunggah!');
+    }
+
+    public function submitVideoUrl()
+    {
+        $this->validate([
+            'videoUrl' => 'required|url|max:500',
+        ], [
+            'videoUrl.required' => 'Link video wajib diisi.',
+            'videoUrl.url'      => 'Format link video tidak valid.',
+        ]);
+
+        $this->paper->update(['video_presentation_url' => $this->videoUrl]);
+        $this->paper->refresh();
+
+        // Notify admins/editors
+        $adminIds = \App\Models\User::whereIn('role', ['admin', 'editor'])->pluck('id');
+        \App\Models\Notification::createForUsers(
+            $adminIds,
+            'info',
+            'Video Pemaparan Disubmit',
+            'Author telah mengirimkan link video pemaparan untuk paper "' . \Illuminate\Support\Str::limit($this->paper->title, 50) . '"',
+            route('admin.paper.detail', $this->paper),
+            'Lihat Paper'
+        );
+
+        session()->flash('success', 'Link video pemaparan berhasil disimpan!');
     }
 
     public function render()
