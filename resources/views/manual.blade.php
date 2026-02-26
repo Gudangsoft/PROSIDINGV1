@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 @php
-    $siteName  = \App\Models\Setting::getValue('site_name', 'Sistem Prosiding');
-    $siteLogo  = \App\Models\Setting::getValue('site_logo');
+    try { $siteName = \App\Models\Setting::getValue('site_name', 'Sistem Prosiding'); } catch(\Throwable $e){ $siteName = 'Sistem Prosiding'; }
+    try { $siteLogo = \App\Models\Setting::getValue('site_logo'); } catch(\Throwable $e){ $siteLogo = null; }
     $activeConf = null;
     try { $activeConf = \App\Models\Conference::where('is_active', true)->first(); } catch(\Throwable $e){}
     $role      = Auth::user()->role ?? 'author';
