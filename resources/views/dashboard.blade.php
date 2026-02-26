@@ -44,7 +44,7 @@
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="open=false; dismissPopup({{ $popupAnn->id }})"></div>
 
     {{-- Modal card --}}
-    <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden z-10"
+    <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden z-10 max-h-[90vh] flex flex-col"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -77,7 +77,7 @@
         </div>
 
         {{-- Body --}}
-        <div class="px-6 py-5">
+        <div class="px-6 py-5 overflow-y-auto flex-1">
             @if($popupAnn->attachment)
             <div class="mb-4">
                 <img src="{{ Storage::url($popupAnn->attachment) }}" alt="Attachment"
