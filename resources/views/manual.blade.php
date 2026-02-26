@@ -1,9 +1,27 @@
 <!DOCTYPE html>
+@php
+    $siteName  = \App\Models\Setting::getValue('site_name', 'Sistem Prosiding');
+    $siteLogo  = \App\Models\Setting::getValue('site_logo');
+    $activeConf = null;
+    try { $activeConf = \App\Models\Conference::where('is_active', true)->first(); } catch(\Throwable $e){}
+    $role      = Auth::user()->role ?? 'author';
+    $isAuthor  = $role === 'author';
+    $isPart    = $role === 'participant';
+    $isRev     = $role === 'reviewer';
+    $isAdmin   = in_array($role, ['admin', 'editor']);
+    $rc = match($role) {
+        'participant' => ['grad'=>'from-teal-700 via-teal-600 to-emerald-600','label'=>'Peserta','emoji'=>'🎟️','hdr'=>'teal'],
+        'reviewer'    => ['grad'=>'from-indigo-700 via-indigo-600 to-blue-600','label'=>'Reviewer','emoji'=>'🔍','hdr'=>'indigo'],
+        'admin'       => ['grad'=>'from-red-700 via-red-600 to-rose-600','label'=>'Admin','emoji'=>'⚙️','hdr'=>'red'],
+        'editor'      => ['grad'=>'from-purple-700 via-purple-600 to-indigo-600','label'=>'Editor','emoji'=>'✏️','hdr'=>'purple'],
+        default       => ['grad'=>'from-blue-700 via-blue-600 to-indigo-700','label'=>'Pemakalah','emoji'=>'✍️','hdr'=>'blue'],
+    };
+@endphp
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buku Panduan — {{ \App\Models\Setting::getValue('site_name', 'Sistem Prosiding') }}</title>
+    <title>Buku Panduan {{ $rc['emoji'] }} {{ $rc['label'] }} — {{ $siteName }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
@@ -31,7 +49,7 @@
             Kembali ke Dashboard
         </a>
         <span class="text-gray-300">|</span>
-        <span class="text-sm font-semibold text-gray-700">📖 Buku Panduan Sistem</span>
+        <span class="text-sm font-semibold text-gray-700">📖 Buku Panduan — {{ $rc['emoji'] }} {{ $rc['label'] }}</span>
     </div>
     <button onclick="window.print()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
@@ -44,13 +62,7 @@
 {{-- ═══════════════════════════════════════════════════════════
      COVER PAGE
 ════════════════════════════════════════════════════════════ --}}
-<div class="bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 rounded-2xl text-white px-10 py-16 mb-10 text-center shadow-xl">
-    @php
-        $siteName = \App\Models\Setting::getValue('site_name', 'Sistem Prosiding');
-        $siteLogo = \App\Models\Setting::getValue('site_logo');
-        $activeConf = null;
-        try { $activeConf = \App\Models\Conference::where('is_active', true)->first(); } catch(\Throwable $e){}
-    @endphp
+<div class="bg-gradient-to-br {{ $rc['grad'] }} rounded-2xl text-white px-10 py-16 mb-10 text-center shadow-xl">
     @if($siteLogo)
     <img src="{{ asset('storage/'.$siteLogo) }}" alt="Logo" class="h-20 w-20 object-contain rounded-2xl mx-auto mb-6 bg-white/20 p-2">
     @else
@@ -58,23 +70,20 @@
         <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
     </div>
     @endif
-    <p class="text-blue-200 text-sm font-semibold uppercase tracking-widest mb-2">Buku Panduan Pengguna</p>
+    <p class="text-white/70 text-sm font-semibold uppercase tracking-widest mb-2">Buku Panduan Pengguna</p>
     <h1 class="text-4xl font-black mb-3">{{ $siteName }}</h1>
     @if($activeConf)
-    <p class="text-blue-100 text-lg font-medium mb-1">{{ $activeConf->title }}</p>
+    <p class="text-white/80 text-lg font-medium mb-1">{{ $activeConf->title }}</p>
     @endif
-    <p class="text-blue-200 text-sm mt-4">{{ url('/') }}</p>
-    <div class="mt-8 flex flex-wrap justify-center gap-3 text-sm">
-        <span class="bg-white/15 px-4 py-1.5 rounded-full">✍️ Pemakalah (Author)</span>
-        <span class="bg-white/15 px-4 py-1.5 rounded-full">🎟️ Peserta</span>
-        <span class="bg-white/15 px-4 py-1.5 rounded-full">🔍 Reviewer</span>
-        <span class="bg-white/15 px-4 py-1.5 rounded-full">⚙️ Admin / Editor</span>
+    <div class="mt-6 inline-flex items-center gap-2 bg-white/20 px-5 py-2 rounded-full text-lg font-bold">
+        {{ $rc['emoji'] }} Panduan untuk: {{ $rc['label'] }}
     </div>
-    <p class="text-blue-300 text-xs mt-8">Dicetak: {{ now()->isoFormat('D MMMM Y') }}</p>
+    <div class="mt-3 text-white/60 text-sm">Login sebagai: <strong class="text-white">{{ Auth::user()->name }}</strong></div>
+    <p class="text-white/50 text-xs mt-6">{{ url('/') }} &nbsp;|  Dicetak: {{ now()->isoFormat('D MMMM Y') }}</p>
 </div>
 
 {{-- ═══════════════════════════════════════════════════════════
-     DAFTAR ISI
+     DAFTAR ISI (ROLE-AWARE)
 ════════════════════════════════════════════════════════════ --}}
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-8 py-7 mb-8">
     <h2 class="text-xl font-bold text-gray-800 mb-5 flex items-center gap-2">
@@ -82,66 +91,46 @@
         Daftar Isi
     </h2>
     <div class="space-y-1 text-sm">
-        <a href="#sec-overview" class="toc-entry flex items-center justify-between px-3 py-2 rounded-lg transition text-gray-700">
-            <span>1. Gambaran Umum Sistem</span><span class="text-gray-400">Halaman ini</span>
-        </a>
-        <a href="#sec-register" class="toc-entry flex items-center justify-between px-3 py-2 rounded-lg transition text-gray-700">
-            <span>2. Cara Mendaftar & Login</span><span class="text-gray-400">Semua pengguna</span>
-        </a>
-        <a href="#sec-author" class="toc-entry flex items-center justify-between px-3 py-2 rounded-lg transition text-gray-700">
-            <span class="font-semibold text-blue-700">3. Dashboard Pemakalah (Author)</span><span class="text-gray-400">✍️</span>
-        </a>
-        <a href="#sec-author-paper" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>3.1 Submit & Kelola Paper</span>
-        </a>
-        <a href="#sec-author-payment" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>3.2 Pembayaran & Upload Bukti</span>
-        </a>
-        <a href="#sec-author-deliverable" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>3.3 Upload Berkas / Deliverables</span>
-        </a>
-        <a href="#sec-author-video" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>3.4 Submit Video Presentasi</span>
-        </a>
-        <a href="#sec-author-loa" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>3.5 Download LOA & Sertifikat</span>
-        </a>
-        <a href="#sec-participant" class="toc-entry flex items-center justify-between px-3 py-2 rounded-lg transition text-gray-700">
-            <span class="font-semibold text-teal-700">4. Dashboard Peserta (Participant)</span><span class="text-gray-400">🎟️</span>
-        </a>
-        <a href="#sec-reviewer" class="toc-entry flex items-center justify-between px-3 py-2 rounded-lg transition text-gray-700">
-            <span class="font-semibold text-indigo-700">5. Dashboard Reviewer</span><span class="text-gray-400">🔍</span>
-        </a>
-        <a href="#sec-admin" class="toc-entry flex items-center justify-between px-3 py-2 rounded-lg transition text-gray-700">
-            <span class="font-semibold text-red-700">6. Dashboard Admin / Editor</span><span class="text-gray-400">⚙️</span>
-        </a>
-        <a href="#sec-admin-conference" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>6.1 Kelola Konferensi</span>
-        </a>
-        <a href="#sec-admin-paper" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>6.2 Kelola Paper & Review</span>
-        </a>
-        <a href="#sec-admin-payment" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>6.3 Verifikasi Pembayaran</span>
-        </a>
-        <a href="#sec-admin-cert" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>6.4 Generate LOA & Sertifikat</span>
-        </a>
-        <a href="#sec-admin-content" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>6.5 Kelola Konten & Pengumuman</span>
-        </a>
-        <a href="#sec-admin-users" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>6.6 Kelola Pengguna & Impersonasi</span>
-        </a>
-        <a href="#sec-admin-settings" class="toc-entry flex items-center justify-between px-3 py-2 pl-8 rounded-lg transition text-gray-600">
-            <span>6.7 Pengaturan Sistem</span>
-        </a>
-        <a href="#sec-helpdesk" class="toc-entry flex items-center justify-between px-3 py-2 rounded-lg transition text-gray-700">
-            <span>7. Helpdesk & Bantuan</span>
-        </a>
-        <a href="#sec-verify" class="toc-entry flex items-center justify-between px-3 py-2 rounded-lg transition text-gray-700">
-            <span>8. Verifikasi Dokumen (LOA / Sertifikat)</span>
-        </a>
+        <a href="#sec-overview" class="toc-entry flex justify-between px-3 py-2 rounded-lg text-gray-700 transition"><span>1. Gambaran Umum Sistem</span></a>
+        <a href="#sec-register" class="toc-entry flex justify-between px-3 py-2 rounded-lg text-gray-700 transition"><span>2. Cara Login &amp; Kelola Profil</span></a>
+
+        @if($isAuthor)
+        <a href="#sec-author" class="toc-entry flex justify-between px-3 py-2 rounded-lg font-semibold text-blue-700 transition"><span>3. Dashboard Pemakalah (Author) ✍️</span></a>
+        <a href="#sec-author-paper" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.1 Submit &amp; Pantau Status Paper</span></a>
+        <a href="#sec-author-payment" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.2 Pembayaran Registrasi</span></a>
+        <a href="#sec-author-deliverable" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.3 Upload Berkas Pendukung</span></a>
+        <a href="#sec-author-video" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.4 Submit Video Presentasi</span></a>
+        <a href="#sec-author-loa" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.5 Download LOA &amp; Sertifikat</span></a>
+        @endif
+
+        @if($isPart)
+        <a href="#sec-participant" class="toc-entry flex justify-between px-3 py-2 rounded-lg font-semibold text-teal-700 transition"><span>3. Dashboard Peserta 🎟️</span></a>
+        <a href="#sec-part-payment" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.1 Pembayaran Registrasi</span></a>
+        <a href="#sec-part-materials" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.2 Download Materi &amp; Sertifikat</span></a>
+        @endif
+
+        @if($isRev)
+        <a href="#sec-reviewer" class="toc-entry flex justify-between px-3 py-2 rounded-lg font-semibold text-indigo-700 transition"><span>3. Dashboard Reviewer 🔍</span></a>
+        <a href="#sec-rev-review" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.1 Melakukan Review Paper</span></a>
+        @endif
+
+        @if($isAdmin)
+        <a href="#sec-admin" class="toc-entry flex justify-between px-3 py-2 rounded-lg font-semibold text-red-700 transition"><span>3. Dashboard {{ $role==='editor'?'Editor':'Admin' }} ⚙️</span></a>
+        <a href="#sec-admin-conference" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.1 Kelola Konferensi</span></a>
+        <a href="#sec-admin-paper" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.2 Kelola Paper &amp; Review</span></a>
+        <a href="#sec-admin-payment" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.3 Verifikasi Pembayaran</span></a>
+        <a href="#sec-admin-cert" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.4 Generate LOA &amp; Sertifikat</span></a>
+        <a href="#sec-admin-content" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.5 Kelola Konten &amp; Pengumuman</span></a>
+        @if($role==='admin')
+        <a href="#sec-admin-users" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.6 Kelola Pengguna &amp; Impersonasi</span></a>
+        <a href="#sec-admin-settings" class="toc-entry flex justify-between px-3 py-2 pl-8 rounded-lg text-gray-600 transition"><span>3.7 Pengaturan Sistem</span></a>
+        @endif
+        @endif
+
+        @if(!$isAdmin)
+        <a href="#sec-helpdesk" class="toc-entry flex justify-between px-3 py-2 rounded-lg text-gray-700 transition"><span>4. Helpdesk &amp; Bantuan</span></a>
+        @endif
+        <a href="#sec-verify" class="toc-entry flex justify-between px-3 py-2 rounded-lg text-gray-700 transition"><span>{{ $isAdmin ? '4' : '5' }}. Verifikasi Keaslian Dokumen</span></a>
     </div>
 </div>
 
@@ -157,25 +146,29 @@
         <strong>{{ $siteName }}</strong> adalah platform manajemen prosiding konferensi ilmiah yang mengelola seluruh proses mulai dari pendaftaran peserta, pengiriman dan review paper, pembayaran registrasi, hingga penerbitan sertifikat dan prosiding digital.
     </p>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
+        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center {{ $isAuthor ? 'ring-2 ring-blue-400' : '' }}">
             <div class="text-2xl mb-1">✍️</div>
             <p class="text-sm font-bold text-blue-800">Pemakalah</p>
             <p class="text-xs text-blue-600 mt-1">Submit & presentasi paper ilmiah</p>
+            @if($isAuthor)<p class="text-xs font-bold text-blue-700 mt-1">← Peran Anda</p>@endif
         </div>
-        <div class="bg-teal-50 border border-teal-100 rounded-xl p-4 text-center">
+        <div class="bg-teal-50 border border-teal-100 rounded-xl p-4 text-center {{ $isPart ? 'ring-2 ring-teal-400' : '' }}">
             <div class="text-2xl mb-1">🎟️</div>
             <p class="text-sm font-bold text-teal-800">Peserta</p>
             <p class="text-xs text-teal-600 mt-1">Daftar & akses materi konferensi</p>
+            @if($isPart)<p class="text-xs font-bold text-teal-700 mt-1">← Peran Anda</p>@endif
         </div>
-        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 text-center">
+        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 text-center {{ $isRev ? 'ring-2 ring-indigo-400' : '' }}">
             <div class="text-2xl mb-1">🔍</div>
             <p class="text-sm font-bold text-indigo-800">Reviewer</p>
             <p class="text-xs text-indigo-600 mt-1">Menilai paper yang masuk</p>
+            @if($isRev)<p class="text-xs font-bold text-indigo-700 mt-1">← Peran Anda</p>@endif
         </div>
-        <div class="bg-red-50 border border-red-100 rounded-xl p-4 text-center">
+        <div class="bg-red-50 border border-red-100 rounded-xl p-4 text-center {{ $isAdmin ? 'ring-2 ring-red-400' : '' }}">
             <div class="text-2xl mb-1">⚙️</div>
             <p class="text-sm font-bold text-red-800">Admin / Editor</p>
             <p class="text-xs text-red-600 mt-1">Mengelola seluruh sistem</p>
+            @if($isAdmin)<p class="text-xs font-bold text-red-700 mt-1">← Peran Anda</p>@endif
         </div>
     </div>
     <div class="mt-5 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
@@ -199,6 +192,9 @@
         <div class="flex gap-3 items-start"><div class="step-num bg-blue-600 text-white mt-0.5">1</div><p class="text-sm text-gray-700 leading-relaxed pt-1">Buka halaman utama website, klik tombol <strong>Register</strong> di pojok kanan atas navigasi.</p></div>
         <div class="flex gap-3 items-start"><div class="step-num bg-blue-600 text-white mt-0.5">2</div><p class="text-sm text-gray-700 leading-relaxed pt-1">Isi formulir: <strong>Nama Lengkap</strong> (sesuai ijazah), <strong>Email</strong>, <strong>Institusi</strong>, <strong>Nomor HP/WhatsApp</strong>, <strong>Password</strong> (min. 8 karakter), lalu konfirmasi password.</p></div>
         <div class="flex gap-3 items-start"><div class="step-num bg-blue-600 text-white mt-0.5">3</div><p class="text-sm text-gray-700 leading-relaxed pt-1">Pilih <strong>Peran</strong>: <em>Pemakalah (Author)</em> atau <em>Peserta (Participant)</em>. Akun Reviewer dan Admin dibuat oleh panitia.</p></div>
+        @if($isRev || $isAdmin)
+        <div class="mt-2 bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-xs text-indigo-800"><strong>ℹ️ Catatan untuk {{ $rc['label'] }}:</strong> Akun Anda ({{ Auth::user()->email }}) telah dibuat oleh Admin. Segera ganti password bawaan melalui menu <strong>Edit Profile → Ganti Password</strong>.</div>
+        @endif
         <div class="flex gap-3 items-start"><div class="step-num bg-blue-600 text-white mt-0.5">4</div><p class="text-sm text-gray-700 leading-relaxed pt-1">Klik <strong>Daftar</strong>. Anda akan langsung diarahkan ke Dashboard sesuai peran yang dipilih.</p></div>
     </div>
 
@@ -215,8 +211,9 @@
 </div>
 
 {{-- ═══════════════════════════════════════════════════════════
-     3. DASHBOARD AUTHOR
+     3. DASHBOARD AUTHOR (pemakalah only)
 ════════════════════════════════════════════════════════════ --}}
+@if($isAuthor)
 <div id="sec-author" class="bg-white rounded-2xl shadow-sm border border-blue-100 px-8 py-7 mb-6">
     <div class="flex items-center gap-3 mb-2">
         <span class="w-9 h-9 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black text-lg">3</span>
@@ -358,10 +355,12 @@
         </div>
     </div>
 </div>
+@endif {{-- end isAuthor --}}
 
 {{-- ═══════════════════════════════════════════════════════════
-     4. DASHBOARD PARTICIPANT
+     4. DASHBOARD PARTICIPANT (participant only)
 ════════════════════════════════════════════════════════════ --}}
+@if($isPart)
 <div id="sec-participant" class="bg-white rounded-2xl shadow-sm border border-teal-100 px-8 py-7 mb-6">
     <div class="flex items-center gap-3 mb-5">
         <span class="w-9 h-9 bg-teal-600 text-white rounded-xl flex items-center justify-center font-black text-lg">4</span>
@@ -409,10 +408,12 @@
         </div>
     </div>
 </div>
+@endif {{-- end isPart --}}
 
 {{-- ═══════════════════════════════════════════════════════════
-     5. DASHBOARD REVIEWER
+     5. DASHBOARD REVIEWER (reviewer only)
 ════════════════════════════════════════════════════════════ --}}
+@if($isRev)
 <div id="sec-reviewer" class="bg-white rounded-2xl shadow-sm border border-indigo-100 px-8 py-7 mb-6">
     <div class="flex items-center gap-3 mb-5">
         <span class="w-9 h-9 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-lg">5</span>
@@ -440,10 +441,12 @@
         <strong>⚠️ Kerahasiaan:</strong> Identitas reviewer bersifat rahasia (double-blind review). Jangan mengungkapkan identitas Anda kepada penulis paper yang Anda review.
     </div>
 </div>
+@endif {{-- end isRev --}}
 
 {{-- ═══════════════════════════════════════════════════════════
-     6. DASHBOARD ADMIN / EDITOR
+     6. DASHBOARD ADMIN / EDITOR (admin/editor only)
 ════════════════════════════════════════════════════════════ --}}
+@if($isAdmin)
 <div id="sec-admin" class="bg-white rounded-2xl shadow-sm border border-red-100 px-8 py-7 mb-6">
     <div class="flex items-center gap-3 mb-5">
         <span class="w-9 h-9 bg-red-600 text-white rounded-xl flex items-center justify-center font-black text-lg">6</span>
@@ -557,7 +560,8 @@
         </div>
     </div>
 
-    {{-- 6.6 Users --}}
+    {{-- 6.6 Users (admin only) --}}
+    @if($role==='admin')
     <div id="sec-admin-users" class="mb-8">
         <h3 class="flex items-center gap-2 font-bold text-gray-700 text-base mb-3">
             <span class="w-6 h-6 bg-red-100 text-red-700 rounded-md flex items-center justify-center text-xs font-black">6.6</span>
@@ -573,7 +577,7 @@
         </div>
     </div>
 
-    {{-- 6.7 Settings --}}
+    {{-- 6.7 Settings (admin only) --}}
     <div id="sec-admin-settings" class="mb-2">
         <h3 class="flex items-center gap-2 font-bold text-gray-700 text-base mb-3">
             <span class="w-6 h-6 bg-red-100 text-red-700 rounded-md flex items-center justify-center text-xs font-black">6.7</span>
@@ -602,11 +606,14 @@
             </div>
         </div>
     </div>
+    @endif {{-- end role===admin for 6.7 --}}
 </div>
+@endif {{-- end isAdmin --}}
 
 {{-- ═══════════════════════════════════════════════════════════
-     7. HELPDESK
+     7. HELPDESK (non-admin only)
 ════════════════════════════════════════════════════════════ --}}
+@if(!$isAdmin)
 <div id="sec-helpdesk" class="bg-white rounded-2xl shadow-sm border border-gray-100 px-8 py-7 mb-6">
     <div class="flex items-center gap-3 mb-5">
         <span class="w-9 h-9 bg-gray-700 text-white rounded-xl flex items-center justify-center font-black text-lg">7</span>
@@ -639,13 +646,14 @@
         </div>
     </div>
 </div>
+@endif {{-- end !isAdmin helpdesk --}}
 
 {{-- ═══════════════════════════════════════════════════════════
-     8. VERIFIKASI DOKUMEN
+     VERIFIKASI DOKUMEN
 ════════════════════════════════════════════════════════════ --}}
 <div id="sec-verify" class="bg-white rounded-2xl shadow-sm border border-gray-100 px-8 py-7 mb-10">
     <div class="flex items-center gap-3 mb-5">
-        <span class="w-9 h-9 bg-gray-700 text-white rounded-xl flex items-center justify-center font-black text-lg">8</span>
+        <span class="w-9 h-9 bg-gray-700 text-white rounded-xl flex items-center justify-center font-black text-lg">{{ $isAdmin ? '4' : '5' }}</span>
         <h2 class="text-xl font-bold text-gray-800">Verifikasi Keaslian Dokumen</h2>
     </div>
     <p class="text-sm text-gray-600 mb-5">Semua LOA dan Sertifikat yang diterbitkan sistem dilengkapi QR Code dan nomor unik untuk verifikasi keaslian dokumen.</p>
@@ -673,8 +681,8 @@
      FOOTER
 ════════════════════════════════════════════════════════════ --}}
 <div class="text-center text-xs text-gray-400 mb-6">
-    <p>Buku Panduan {{ $siteName }} — Dicetak {{ now()->isoFormat('D MMMM Y') }}</p>
-    <p class="mt-1">{{ url('/') }} | Untuk pertanyaan teknis, gunakan fitur Helpdesk di dalam sistem.</p>
+    <p>Buku Panduan {{ $siteName }} — {{ $rc['emoji'] }} {{ $rc['label'] }} — Dicetak {{ now()->isoFormat('D MMMM Y') }}</p>
+    <p class="mt-1">{{ url('/') }}@if(!$isAdmin) | Untuk pertanyaan teknis, gunakan fitur Helpdesk di dalam sistem.@endif</p>
 </div>
 
 </div>{{-- /max-w-4xl --}}
