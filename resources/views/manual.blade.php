@@ -146,19 +146,6 @@
 </div>
 
 {{-- ═══════════════════════════════════════════════════════════
-     SECTION HELPER MACRO
-════════════════════════════════════════════════════════════ --}}
-@php
-function stepItem(string $n, string $text): string {
-    $colors = ['1'=>'bg-blue-600','2'=>'bg-blue-600','3'=>'bg-blue-600','4'=>'bg-blue-600','5'=>'bg-blue-600'];
-    return '<div class="flex gap-3 items-start">
-        <div class="step-num bg-blue-600 text-white mt-0.5">'.$n.'</div>
-        <p class="text-gray-700 text-sm leading-relaxed pt-1">'.$text.'</p>
-    </div>';
-}
-@endphp
-
-{{-- ═══════════════════════════════════════════════════════════
      1. GAMBARAN UMUM
 ════════════════════════════════════════════════════════════ --}}
 <div id="sec-overview" class="bg-white rounded-2xl shadow-sm border border-gray-100 px-8 py-7 mb-6">
