@@ -18,7 +18,6 @@ use App\Livewire\Admin\NewsList;
 use App\Livewire\Admin\NewsForm;
 use App\Livewire\Admin\AnnouncementList;
 use App\Livewire\Admin\AnnouncementForm;
-use App\Livewire\Admin\CertificateManager;
 use App\Livewire\Admin\GeneralSettings;
 use App\Livewire\Admin\EmailSettings;
 use App\Livewire\Admin\SliderList;
@@ -189,7 +188,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/news/{news}/edit', NewsForm::class)->name('admin.news.edit');
 
         // Sertifikat
-        Route::get('/certificates', CertificateManager::class)->name('admin.certificates');
+        if (class_exists('App\\Livewire\\Admin\\CertificateManager')) {
+            Route::get('/certificates', 'App\\Livewire\\Admin\\CertificateManager')->name('admin.certificates');
+        }
 
         // Pengumuman
         Route::get('/announcements', AnnouncementList::class)->name('admin.announcements');
