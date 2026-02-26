@@ -9,6 +9,7 @@ use App\Livewire\Author\PaymentUpload;
 use App\Livewire\Author\DeliverableUpload;
 use App\Livewire\Author\LoaList;
 use App\Livewire\Author\VideoSubmission;
+use App\Livewire\Author\CertificateList as AuthorCertificateList;
 use App\Livewire\Admin\PaperManagement;
 use App\Livewire\Admin\PaperDetail as AdminPaperDetail;
 use App\Livewire\Admin\PaymentList;
@@ -164,6 +165,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/papers/{paper}/deliverables', DeliverableUpload::class)->name('author.paper.deliverables');
         Route::get('/loa', LoaList::class)->name('author.loa');
         Route::get('/video', VideoSubmission::class)->name('author.video');
+        Route::get('/certificates', AuthorCertificateList::class)->name('author.certificates');
     });
 
     // ─── Reviewer Routes ───
