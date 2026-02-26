@@ -201,9 +201,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/news/{news}/edit', NewsForm::class)->name('admin.news.edit');
 
         // Sertifikat
-        if (class_exists('App\\Livewire\\Admin\\CertificateManager')) {
-            Route::get('/certificates', 'App\\Livewire\\Admin\\CertificateManager')->name('admin.certificates');
-        }
+        Route::get('/certificates', \App\Livewire\Admin\CertificateManager::class)->name('admin.certificates');
 
         // Pengumuman
         Route::get('/announcements', AnnouncementList::class)->name('admin.announcements');
