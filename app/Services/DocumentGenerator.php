@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Certificate;
 use App\Models\Paper;
 use App\Models\User;
 use App\Models\Conference;
@@ -97,6 +98,21 @@ class DocumentGenerator
         $path = "certificates/" . now()->year . "/{$filename}";
         
         Storage::disk('public')->put($path, $pdf->output());
+
+        // 7. Store certificate record in DB for verification
+        try {
+            Certificate::create([
+                'cert_number'   => $certNumber,
+                'type'          => $type,
+                'user_id'       => $user->id,
+                'paper_id'      => $paper?->id,
+                'conference_id' => $conference?->id,
+                'file_path'     => $path,
+                'generated_at'  => now(),
+            ]);
+        } catch (\Throwable $e) {
+            \Log::warning('Could not save certificate record: ' . $e->getMessage());
+        }
         
         return $path;
     }
@@ -133,10 +149,18 @@ class DocumentGenerator
     {
         $year = now()->year;
         $typeCode = strtoupper(substr($type, 0, 3)); // AUT, PAR, REV, COM
-        
-        // Simple counter (could be improved with database tracking)
-        $count = rand(100, 999); // Temporary - should use database counter
-        
+
+        // Use DB-based sequential counter
+        $count = 1;
+        try {
+            $count = Certificate::where('type', $type)
+                ->whereYear('generated_at', $year)
+                ->count() + 1;
+        } catch (\Throwable) {
+            // certificates table may not exist yet; fall back to random
+            $count = rand(100, 999);
+        }
+
         return sprintf("CERT/%s/%03d/%d", $typeCode, $count, $year);
     }
     

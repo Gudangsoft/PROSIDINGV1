@@ -68,7 +68,17 @@ Route::get('/verify-loa/{code}', function ($code) {
 })->name('verify-loa');
 
 Route::get('/verify-certificate/{code}', function ($code) {
-    return view('verify.certificate', compact('code'));
+    $certificate = null;
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('certificates')) {
+            $certificate = \App\Models\Certificate::where('cert_number', $code)
+                ->with(['user', 'conference', 'paper'])
+                ->first();
+        }
+    } catch (\Throwable $e) {
+        // table not yet migrated — just pass null
+    }
+    return view('verify.certificate', compact('code', 'certificate'));
 })->name('verify-certificate');
 
 Route::middleware(['auth'])->group(function () {
