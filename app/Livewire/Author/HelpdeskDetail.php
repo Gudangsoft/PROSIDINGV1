@@ -14,8 +14,9 @@ class HelpdeskDetail extends Component
 
     public function mount(HelpdeskTicket $ticket)
     {
-        // Ensure user can only view their own tickets
-        if ($ticket->user_id !== Auth::id()) {
+        $isAdmin = Auth::user()?->role === 'admin';
+        $isImpersonating = session()->has('impersonating_from');
+        if (! $isAdmin && ! $isImpersonating && (int) $ticket->user_id !== (int) Auth::id()) {
             abort(403);
         }
         $this->ticket = $ticket;

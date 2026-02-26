@@ -19,7 +19,9 @@ class DeliverableUpload extends Component
 
     public function mount(Paper $paper)
     {
-        if ($paper->user_id !== Auth::id()) abort(403);
+        $isAdmin = Auth::user()?->role === 'admin';
+        $isImpersonating = session()->has('impersonating_from');
+        if (! $isAdmin && ! $isImpersonating && (int) $paper->user_id !== (int) Auth::id()) abort(403);
         $this->paper = $paper;
     }
 
