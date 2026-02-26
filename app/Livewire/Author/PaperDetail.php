@@ -7,6 +7,7 @@ use App\Models\PaperFile;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class PaperDetail extends Component
 {
@@ -23,7 +24,10 @@ class PaperDetail extends Component
             abort(403);
         }
         $this->paper = $paper;
-        $this->videoUrl = $paper->video_presentation_url ?? '';
+        // Guard against missing column if migration not yet run on production
+        $this->videoUrl = Schema::hasColumn('papers', 'video_presentation_url')
+            ? ($paper->video_presentation_url ?? '')
+            : '';
     }
 
     public function submitRevision()
@@ -65,6 +69,11 @@ class PaperDetail extends Component
 
     public function submitVideoUrl()
     {
+        if (! Schema::hasColumn('papers', 'video_presentation_url')) {
+            session()->flash('error', 'Fitur ini belum tersedia. Hubungi administrator.');
+            return;
+        }
+
         $this->validate([
             'videoUrl' => 'required|url|max:500',
         ], [
@@ -91,7 +100,17 @@ class PaperDetail extends Component
 
     public function render()
     {
-        $this->paper->load(['files', 'reviews.reviewer', 'payment', 'deliverables']);
+        $relations = ['files', 'reviews.reviewer', 'payment'];
+        if (Schema::hasTable('deliverables')) {
+            $relations[] = 'deliverables';
+        }
+        $this->paper->load($relations);
+
+        // Ensure deliverables is always a collection to avoid undefined errors in view
+        if (! $this->paper->relationLoaded('deliverables')) {
+            $this->paper->setRelation('deliverables', collect());
+        }
+
         return view('livewire.author.paper-detail')->layout('layouts.app');
     }
 }
