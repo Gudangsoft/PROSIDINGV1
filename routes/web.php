@@ -385,6 +385,11 @@ Route::get('/publikasi/{conference}', function (\App\Models\Conference $conferen
     ));
 })->name('proceedings.show');
 
+// ─── Manual Book (authenticated) ───
+Route::get('/manual', function () {
+    return view('manual');
+})->middleware('auth')->name('manual');
+
 // ─── Public Tutorial ───
 Route::get('/tutorial', function () {
     $tutorials = collect();
