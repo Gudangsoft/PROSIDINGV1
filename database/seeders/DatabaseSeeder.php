@@ -33,9 +33,6 @@ class DatabaseSeeder extends Seeder
         // Seed settings (email, theme, general)
         $this->call(SettingsSeeder::class);
 
-        // Seed tutorial content for all dashboard roles
-        $this->call(TutorialSeeder::class);
-
         // Admin
         User::create([
             'name' => 'Admin Prosiding',
