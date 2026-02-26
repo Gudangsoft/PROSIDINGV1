@@ -1,7 +1,7 @@
 ﻿<div class="max-w-5xl mx-auto py-8 px-4">
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Materi & Benefit Peserta</h1>
-        <p class="text-gray-500 text-sm mt-1">Download sertifikat, materi, dan presentasi dari konferensi yang Anda ikuti</p>
+        <h1 class="text-2xl font-bold text-gray-800">Participant Materials &amp; Benefits</h1>
+        <p class="text-gray-500 text-sm mt-1">Download certificates, materials, and presentations from the conference you attended</p>
     </div>
 
     @if(!$hasAccess)
@@ -9,16 +9,16 @@
         <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <svg class="w-7 h-7 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
         </div>
-        <h3 class="font-semibold text-orange-800 mb-1">Akses Terkunci</h3>
-        <p class="text-sm text-orange-700">Materi dan sertifikat hanya tersedia setelah pembayaran registrasi Anda diverifikasi.</p>
-        <a href="{{ route('participant.payment') }}" class="inline-block mt-3 px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition">Upload Bukti Pembayaran</a>
+        <h3 class="font-semibold text-orange-800 mb-1">Access Locked</h3>
+        <p class="text-sm text-orange-700">Materials and certificates are only available after your registration payment is verified.</p>
+        <a href="{{ route('participant.payment') }}" class="inline-block mt-3 px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition">Upload Payment Proof</a>
     </div>
 
     @elseif($conferenceGroups->isEmpty())
     <div class="bg-white rounded-xl shadow-sm border p-12 text-center text-gray-400">
         <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-        <p class="font-medium">Belum ada materi yang tersedia</p>
-        <p class="text-sm mt-1">Panitia akan segera mengupload materi konferensi.</p>
+        <p class="font-medium">No materials available yet</p>
+        <p class="text-sm mt-1">The committee will soon upload conference materials.</p>
     </div>
 
     @else
@@ -35,23 +35,23 @@
             <div>
                 <h2 class="text-lg font-bold text-gray-800">{{ $conference->name }}</h2>
                 <p class="text-xs text-gray-500">
-                    {{ $conference->start_date ? \Carbon\Carbon::parse($conference->start_date)->translatedFormat('d F Y') : '' }}
+                    {{ $conference->start_date ? \Carbon\Carbon::parse($conference->start_date)->format('d F Y') : '' }}
                     @if($conference->end_date && $conference->end_date != $conference->start_date)
-                        &mdash; {{ \Carbon\Carbon::parse($conference->end_date)->translatedFormat('d F Y') }}
+                        &mdash; {{ \Carbon\Carbon::parse($conference->end_date)->format('d F Y') }}
                     @endif
-                    &nbsp;&middot;&nbsp; {{ $total }} file tersedia
+                    &nbsp;&middot;&nbsp; {{ $total }} files available
                 </p>
             </div>
         </div>
 
         @if($materials->isEmpty())
-        <p class="text-sm text-gray-400 italic pl-2">Belum ada materi yang diupload untuk kegiatan ini.</p>
+        <p class="text-sm text-gray-400 italic pl-2">No materials have been uploaded for this event yet.</p>
         @else
 
         {{-- Sertifikat --}}
         @if($materials->has('sertifikat'))
         <div class="mb-5">
-            <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">&#127942; Sertifikat</h3>
+            <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">&#127942; Certificates</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 @foreach($materials['sertifikat'] as $mat)
                 <div class="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl p-4 flex items-start gap-3">
@@ -77,7 +77,7 @@
         {{-- PPT --}}
         @if($materials->has('ppt'))
         <div class="mb-5">
-            <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">&#128202; Presentasi (PPT)</h3>
+            <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">&#128202; Presentation (PPT)</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 @foreach($materials['ppt'] as $mat)
                 <div class="bg-white border border-blue-100 rounded-xl p-4 flex items-start gap-3 hover:shadow-sm transition">
@@ -92,7 +92,7 @@
                                 Download
                             </a>
                             <a href="{{ asset('storage/'.$mat->file_path) }}" target="_blank"
-                                class="inline-flex items-center gap-1 px-2.5 py-1 border border-gray-200 text-gray-600 rounded text-xs font-medium hover:bg-gray-50 transition">Lihat</a>
+                                class="inline-flex items-center gap-1 px-2.5 py-1 border border-gray-200 text-gray-600 rounded text-xs font-medium hover:bg-gray-50 transition">View</a>
                             @if($mat->file_size)<span class="text-xs text-gray-400">{{ $mat->file_size }}</span>@endif
                         </div>
                     </div>
@@ -105,7 +105,7 @@
         {{-- Materi --}}
         @if($materials->has('materi'))
         <div class="mb-5">
-            <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">&#128196; Materi</h3>
+            <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">&#128196; Materials</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 @foreach($materials['materi'] as $mat)
                 <div class="bg-white border border-teal-100 rounded-xl p-4 flex items-start gap-3 hover:shadow-sm transition">
@@ -120,7 +120,7 @@
                                 Download
                             </a>
                             <a href="{{ asset('storage/'.$mat->file_path) }}" target="_blank"
-                                class="inline-flex items-center gap-1 px-2.5 py-1 border border-gray-200 text-gray-600 rounded text-xs font-medium hover:bg-gray-50 transition">Lihat</a>
+                                class="inline-flex items-center gap-1 px-2.5 py-1 border border-gray-200 text-gray-600 rounded text-xs font-medium hover:bg-gray-50 transition">View</a>
                             @if($mat->file_size)<span class="text-xs text-gray-400">{{ $mat->file_size }}</span>@endif
                         </div>
                     </div>
@@ -133,7 +133,7 @@
         {{-- Lainnya --}}
         @if($materials->has('lainnya'))
         <div class="mb-5">
-            <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">&#128206; Lainnya</h3>
+            <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">&#128206; Others</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 @foreach($materials['lainnya'] as $mat)
                 <div class="bg-white border rounded-xl p-4 flex items-start gap-3 hover:shadow-sm transition">

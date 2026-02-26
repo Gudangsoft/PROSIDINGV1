@@ -121,6 +121,31 @@
                 </div>
                 @endif
 
+                {{-- Participant Menu --}}
+                @if(Auth::user()->isParticipant())
+                <div class="pt-4">
+                    <p class="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Participant</p>
+                    <a href="{{ route('participant.info') }}"
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
+                       {{ request()->routeIs('participant.info') ? 'bg-teal-50 text-teal-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        My Information
+                    </a>
+                    <a href="{{ route('participant.payment') }}"
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
+                       {{ request()->routeIs('participant.payment') ? 'bg-teal-50 text-teal-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                        Payment
+                    </a>
+                    <a href="{{ route('participant.materials') }}"
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
+                       {{ request()->routeIs('participant.materials') ? 'bg-teal-50 text-teal-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        Materials &amp; Certificates
+                    </a>
+                </div>
+                @endif
+
                 {{-- Editor Menu (limited) --}}
                 @if(Auth::user()->isEditor())
                 <div class="pt-4">
@@ -277,7 +302,7 @@
                    class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition mb-1
                    {{ request()->routeIs('profile') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    Edit Profil
+                    Edit Profile
                 </a>
                 <form method="POST" action="{{ route('logout') }}" wire:ignore>
                     @csrf
@@ -325,8 +350,8 @@
                         {{-- Dropdown --}}
                         <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50" style="display: none;">
                             <div class="p-4 border-b border-gray-200 flex items-center justify-between">
-                                <h3 class="font-semibold text-gray-800">Notifikasi</h3>
-                                <button @click="markAllAsRead()" x-show="unreadCount > 0" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Tandai Semua Dibaca</button>
+                                <h3 class="font-semibold text-gray-800">Notifications</h3>
+                                <button @click="markAllAsRead()" x-show="unreadCount > 0" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Mark All as Read</button>
                             </div>
                             
                             <div class="max-h-96 overflow-y-auto">
@@ -336,7 +361,7 @@
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        <p class="text-sm text-gray-500 mt-2">Memuat...</p>
+                                        <p class="text-sm text-gray-500 mt-2">Loading...</p>
                                     </div>
                                 </template>
                                 
@@ -345,7 +370,7 @@
                                         <svg class="w-16 h-16 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
                                         </svg>
-                                        <p class="text-sm">Tidak ada notifikasi</p>
+                                        <p class="text-sm">No notifications</p>
                                     </div>
                                 </template>
                                 
@@ -424,7 +449,7 @@
                                     <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                     </svg>
-                                    Edit Profil
+                                    Edit Profile
                                 </a>
                                 <a href="{{ url('/') }}" target="_blank"
                                    @click="open = false"
@@ -432,7 +457,7 @@
                                     <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                     </svg>
-                                    Lihat Website
+                                    View Website
                                 </a>
                             </div>
 

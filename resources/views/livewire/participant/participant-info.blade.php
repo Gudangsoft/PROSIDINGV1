@@ -1,13 +1,13 @@
 <div class="max-w-4xl mx-auto py-8 px-4">
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Informasi Partisipan</h1>
-        <p class="text-gray-500 text-sm mt-1">Ringkasan data pendaftaran dan status Anda</p>
+        <h1 class="text-2xl font-bold text-gray-800">Participant Information</h1>
+        <p class="text-gray-500 text-sm mt-1">Summary of your registration data and status</p>
     </div>
 
     {{-- Profile Card --}}
     <div class="bg-white rounded-xl shadow-sm border overflow-hidden mb-6">
         <div class="px-6 py-4 border-b bg-gray-50">
-            <h2 class="font-semibold text-gray-800">Data Diri</h2>
+            <h2 class="font-semibold text-gray-800">Personal Data</h2>
         </div>
         <div class="p-6">
             <div class="flex items-start gap-6">
@@ -25,7 +25,7 @@
                 {{-- Info Grid --}}
                 <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Lengkap</p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</p>
                         <p class="text-sm text-gray-800 mt-0.5 font-medium">{{ $user->name }}</p>
                     </div>
                     <div>
@@ -33,19 +33,19 @@
                         <p class="text-sm text-gray-800 mt-0.5">{{ $user->email }}</p>
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis Kelamin</p>
-                        <p class="text-sm text-gray-800 mt-0.5">{{ $user->gender === 'male' ? 'Laki-laki' : ($user->gender === 'female' ? 'Perempuan' : '-') }}</p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</p>
+                        <p class="text-sm text-gray-800 mt-0.5">{{ $user->gender === 'male' ? 'Male' : ($user->gender === 'female' ? 'Female' : '-') }}</p>
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">No. Telepon</p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</p>
                         <p class="text-sm text-gray-800 mt-0.5">{{ $user->phone ?? '-' }}</p>
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Institusi</p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Institution</p>
                         <p class="text-sm text-gray-800 mt-0.5">{{ $user->institution ?? '-' }}</p>
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Negara</p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Country</p>
                         <p class="text-sm text-gray-800 mt-0.5">{{ $user->country ?? '-' }}</p>
                     </div>
                     <div>
@@ -53,7 +53,7 @@
                         <p class="text-sm text-gray-800 mt-0.5">{{ $user->research_interest ?? '-' }}</p>
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Informasi Lainnya</p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Other Information</p>
                         <p class="text-sm text-gray-800 mt-0.5">{{ $user->other_info ?? '-' }}</p>
                     </div>
                 </div>
@@ -62,15 +62,15 @@
             {{-- Signature --}}
             @if($user->signature)
             <div class="mt-6 pt-4 border-t">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Tanda Tangan</p>
-                <img src="{{ asset('storage/'.$user->signature) }}" alt="Tanda Tangan" class="max-h-24 border rounded bg-gray-50 p-2">
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Signature</p>
+                <img src="{{ asset('storage/'.$user->signature) }}" alt="Signature" class="max-h-24 border rounded bg-gray-50 p-2">
             </div>
             @endif
 
             <div class="mt-4 pt-4 border-t">
                 <a href="{{ route('profile') }}" class="inline-flex items-center gap-2 text-sm text-teal-600 hover:text-teal-800 font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    Edit Profil
+                    Edit Profile
                 </a>
             </div>
         </div>
@@ -79,7 +79,7 @@
     {{-- Payment Status --}}
     <div class="bg-white rounded-xl shadow-sm border overflow-hidden mb-6">
         <div class="px-6 py-4 border-b bg-gray-50">
-            <h2 class="font-semibold text-gray-800">Status Pembayaran</h2>
+            <h2 class="font-semibold text-gray-800">Payment Status</h2>
         </div>
         <div class="p-6">
             @if($payment)
@@ -105,10 +105,10 @@
                 </div>
                 <div class="flex-1">
                     <p class="font-medium text-gray-800">
-                        @if($payment->status === 'verified') Pembayaran Lunas
-                        @elseif($payment->status === 'uploaded') Menunggu Verifikasi
-                        @elseif($payment->status === 'rejected') Pembayaran Ditolak
-                        @else Belum Upload Bukti @endif
+                        @if($payment->status === 'verified') Payment Verified
+                        @elseif($payment->status === 'uploaded') Awaiting Verification
+                        @elseif($payment->status === 'rejected') Payment Rejected
+                        @else Proof Not Yet Uploaded @endif
                     </p>
                     <div class="text-sm text-gray-500 mt-0.5 space-y-0.5">
                         <p>Invoice: <span class="font-mono">{{ $payment->invoice_number }}</span></p>
@@ -117,13 +117,13 @@
                                 Paket: <strong class="text-teal-600">{{ $payment->registrationPackage->name }}</strong>
                             </p>
                         @endif
-                        <p>Nominal: <strong>Rp {{ number_format($payment->amount, 0, ',', '.') }}</strong></p>
+                        <p>Amount: <strong>Rp {{ number_format($payment->amount, 0, ',', '.') }}</strong></p>
                         @if($payment->payment_method)
-                            <p>Metode: {{ $payment->payment_method }}</p>
+                            <p>Method: {{ $payment->payment_method }}</p>
                         @endif
                     </div>
                 </div>
-                <a href="{{ route('participant.payment') }}" class="text-sm text-teal-600 hover:text-teal-800 font-medium">Lihat Detail →</a>
+                <a href="{{ route('participant.payment') }}" class="text-sm text-teal-600 hover:text-teal-800 font-medium">View Details →</a>
             </div>
             @else
             <div class="flex items-center gap-4">
@@ -131,8 +131,8 @@
                     <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                 </div>
                 <div class="flex-1">
-                    <p class="font-medium text-gray-800">Belum ada data pembayaran</p>
-                    <p class="text-sm text-gray-500 mt-0.5">Silakan upload bukti pembayaran Anda.</p>
+                    <p class="font-medium text-gray-800">No payment data yet</p>
+                    <p class="text-sm text-gray-500 mt-0.5">Please upload your payment proof.</p>
                 </div>
                 <a href="{{ route('participant.payment') }}" class="text-sm text-teal-600 hover:text-teal-800 font-medium">Upload →</a>
             </div>
@@ -144,7 +144,7 @@
     @if($conference)
     <div class="bg-white rounded-xl shadow-sm border overflow-hidden mb-6">
         <div class="px-6 py-4 border-b bg-gray-50">
-            <h2 class="font-semibold text-gray-800">Informasi Kegiatan</h2>
+            <h2 class="font-semibold text-gray-800">Event Information</h2>
         </div>
         <div class="p-6">
             <h3 class="text-lg font-semibold text-gray-800">{{ $conference->name }}</h3>
@@ -175,7 +175,7 @@
             @php $dates = $conference->importantDates()->orderBy('date')->get(); @endphp
             @if($dates->count())
             <div class="mt-5 pt-4 border-t">
-                <h4 class="text-sm font-semibold text-gray-700 mb-3">Tanggal Penting</h4>
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">Important Dates</h4>
                 <div class="space-y-2">
                     @foreach($dates as $d)
                     <div class="flex items-center gap-3 text-sm {{ $d->is_past ? 'text-gray-400' : 'text-gray-700' }}">
@@ -194,24 +194,24 @@
     {{-- Registration Date --}}
     <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
         <div class="px-6 py-4 border-b bg-gray-50">
-            <h2 class="font-semibold text-gray-800">Informasi Akun</h2>
+            <h2 class="font-semibold text-gray-800">Account Information</h2>
         </div>
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div>
-                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Registrasi</p>
+                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Registration Date</p>
                     <p class="text-gray-800 mt-0.5">{{ $user->created_at->format('d M Y, H:i') }}</p>
                 </div>
                 <div>
                     <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Role</p>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700 mt-0.5">Partisipan</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700 mt-0.5">Participant</span>
                 </div>
                 <div>
-                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Status Akun</p>
+                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Account Status</p>
                     @if($payment && $payment->status === 'verified')
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 mt-0.5">Aktif</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 mt-0.5">Active</span>
                     @else
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 mt-0.5">Menunggu Verifikasi</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 mt-0.5">Awaiting Verification</span>
                     @endif
                 </div>
             </div>

@@ -23,8 +23,8 @@
                 </svg>
             </div>
             <div>
-                <h1 class="text-2xl font-bold">Formulir Pendaftaran</h1>
-                <p class="text-orange-100 text-sm mt-0.5">Lengkapi data diri Anda untuk membuat akun</p>
+                <h1 class="text-2xl font-bold">Registration Form</h1>
+                <p class="text-orange-100 text-sm mt-0.5">Fill in your details to create an account</p>
             </div>
         </div>
 
@@ -34,7 +34,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             <div>
-                <span class="text-xs text-orange-100 font-semibold uppercase tracking-wider">Paket Dipilih</span>
+                <span class="text-xs text-orange-100 font-semibold uppercase tracking-wider">Selected Package</span>
                 <p class="font-bold text-white">{{ $preselectedPackage->name }} &mdash; {{ $preselectedPackage->formatted_price }}</p>
             </div>
         </div>
@@ -57,7 +57,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                         </svg>
                     </div>
-                    <h3 class="font-semibold text-gray-800">Kategori Pendaftaran</h3>
+                    <h3 class="font-semibold text-gray-800">Registration Category</h3>
                 </div>
 
                 @if($preselectedPackage)
@@ -69,10 +69,10 @@
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <p class="font-bold text-gray-800">Partisipan</p>
-                        <p class="text-xs text-teal-600 mt-0.5">Terdaftar pada paket <strong>{{ $preselectedPackage->name }}</strong></p>
+                        <p class="font-bold text-gray-800">Participant</p>
+                        <p class="text-xs text-teal-600 mt-0.5">Registered for package <strong>{{ $preselectedPackage->name }}</strong></p>
                     </div>
-                    <span class="text-xs text-teal-700 bg-teal-100 border border-teal-200 px-3 py-1 rounded-full font-semibold">🔒 Terkunci</span>
+                    <span class="text-xs text-teal-700 bg-teal-100 border border-teal-200 px-3 py-1 rounded-full font-semibold">🔒 Locked</span>
                 </div>
                 @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -86,8 +86,8 @@
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <p class="font-semibold text-gray-800">Author / Penulis</p>
-                            <p class="text-xs text-gray-500 mt-0.5">Submit paper & presentasi</p>
+                            <p class="font-semibold text-gray-800">Author / Writer</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Submit paper & presentation</p>
                         </div>
                         <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition"
                             :class="role === 'author' ? 'border-blue-500' : 'border-gray-300'">
@@ -104,8 +104,8 @@
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <p class="font-semibold text-gray-800">Partisipan</p>
-                            <p class="text-xs text-gray-500 mt-0.5">Mengikuti kegiatan seminar</p>
+                            <p class="font-semibold text-gray-800">Participant</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Attend seminar activities</p>
                         </div>
                         <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition"
                             :class="role === 'participant' ? 'border-teal-500' : 'border-gray-300'">
@@ -127,36 +127,36 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
-                    <h3 class="font-semibold text-gray-800">Data Pribadi</h3>
+                    <h3 class="font-semibold text-gray-800">Personal Information</h3>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {{-- Name --}}
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1.5">Full Name <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             </span>
                             <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus
                                 class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition @error('name') border-red-400 bg-red-50 @enderror"
-                                placeholder="Masukkan nama lengkap">
+                                placeholder="Enter full name">
                         </div>
                         @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
 
                     {{-- Gender --}}
                     <div>
-                        <label for="gender" class="block text-sm font-medium text-gray-700 mb-1.5">Jenis Kelamin <span class="text-red-500">*</span></label>
+                        <label for="gender" class="block text-sm font-medium text-gray-700 mb-1.5">Gender <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                             </span>
                             <select id="gender" name="gender" required
                                 class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition bg-white appearance-none @error('gender') border-red-400 bg-red-50 @enderror">
-                                <option value="">-- Pilih --</option>
-                                <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Laki-laki</option>
-                                <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Perempuan</option>
+                                <option value="">-- Select --</option>
+                                <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
+                                <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
                             </select>
                         </div>
                         @error('gender')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
@@ -164,28 +164,28 @@
 
                     {{-- Institution --}}
                     <div>
-                        <label for="institution" class="block text-sm font-medium text-gray-700 mb-1.5">Institusi / Universitas <span class="text-red-500">*</span></label>
+                        <label for="institution" class="block text-sm font-medium text-gray-700 mb-1.5">Institution / University <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                             </span>
                             <input id="institution" type="text" name="institution" value="{{ old('institution') }}" required
                                 class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition @error('institution') border-red-400 bg-red-50 @enderror"
-                                placeholder="Nama institusi/universitas">
+                                placeholder="Institution/university name">
                         </div>
                         @error('institution')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
 
                     {{-- Country --}}
                     <div>
-                        <label for="country" class="block text-sm font-medium text-gray-700 mb-1.5">Negara <span class="text-red-500">*</span></label>
+                        <label for="country" class="block text-sm font-medium text-gray-700 mb-1.5">Country <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </span>
                             <select id="country" name="country" required
                                 class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition bg-white appearance-none @error('country') border-red-400 bg-red-50 @enderror">
-                                <option value="">-- Pilih Negara --</option>
+                                <option value="">-- Select Country --</option>
                                 <option value="Indonesia" {{ old('country', 'Indonesia') == 'Indonesia' ? 'selected' : '' }}>🇮🇩 Indonesia</option>
                                 <option value="" disabled>─────────────────</option>
                                 @php
@@ -236,7 +236,7 @@
 
                     {{-- Phone --}}
                     <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1.5">No. Telepon / WhatsApp <span class="text-red-500">*</span></label>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1.5">Phone / WhatsApp Number <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
@@ -263,9 +263,9 @@
 
                     {{-- Other Information --}}
                     <div class="md:col-span-2">
-                        <label for="other_info" class="block text-sm font-medium text-gray-700 mb-1.5">Informasi Lainnya <span class="text-gray-400 font-normal">(opsional)</span></label>
+                        <label for="other_info" class="block text-sm font-medium text-gray-700 mb-1.5">Other Information <span class="text-gray-400 font-normal">(optional)</span></label>
                         <textarea id="other_info" name="other_info" rows="2"
-                            placeholder="Informasi tambahan yang ingin Anda sampaikan"
+                            placeholder="Additional information you'd like to share"
                             class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition resize-none @error('other_info') border-red-400 bg-red-50 @enderror">{{ old('other_info') }}</textarea>
                         @error('other_info')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
@@ -280,7 +280,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                         </svg>
                     </div>
-                    <h3 class="font-semibold text-gray-800">Keamanan Akun</h3>
+                    <h3 class="font-semibold text-gray-800">Account Security</h3>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -293,21 +293,21 @@
                             </span>
                             <input id="password" type="password" name="password" required
                                 class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition @error('password') border-red-400 bg-red-50 @enderror"
-                                placeholder="Minimal 8 karakter">
+                                placeholder="Minimum 8 characters">
                         </div>
                         @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
 
                     {{-- Confirm Password --}}
                     <div>
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1.5">Konfirmasi Password <span class="text-red-500">*</span></label>
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                             </span>
                             <input id="password_confirmation" type="password" name="password_confirmation" required
                                 class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition"
-                                placeholder="Ulangi password">
+                                placeholder="Repeat password">
                         </div>
                     </div>
                 </div>
@@ -321,7 +321,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                     </div>
-                    <h3 class="font-semibold text-gray-800">Dokumen</h3>
+                    <h3 class="font-semibold text-gray-800">Documents</h3>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -330,7 +330,7 @@
                     {{-- Payment Amount --}}
                     <div>
                         <label for="payment_amount" class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Nominal Pembayaran (Rp) <span class="text-red-500">*</span>
+                            Payment Amount (Rp) <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -343,7 +343,7 @@
                         </div>
                         <p class="text-xs text-teal-600 mt-1 flex items-center gap-1">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            Nominal otomatis dari paket yang dipilih
+                            Amount set automatically from selected package
                         </p>
                         @error('payment_amount')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
@@ -351,12 +351,12 @@
                     {{-- Proof of Payment --}}
                     <div>
                         <label for="proof_of_payment" class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Bukti Pembayaran <span class="text-red-500">*</span>
+                            Payment Proof <span class="text-red-500">*</span>
                         </label>
                         <input id="proof_of_payment" type="file" name="proof_of_payment" accept=".jpg,.jpeg,.png,.pdf"
                             @change="previewPayment($event)"
                             class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition file:mr-3 file:py-1.5 file:px-3 file:border-0 file:rounded-md file:bg-orange-100 file:text-orange-700 file:text-xs file:font-medium file:cursor-pointer hover:file:bg-orange-200 @error('proof_of_payment') border-red-400 bg-red-50 @enderror">
-                        <p class="text-xs text-gray-400 mt-1">JPG, PNG, atau PDF &bull; Maks 5MB</p>
+                        <p class="text-xs text-gray-400 mt-1">JPG, PNG, or PDF &bull; Max 5MB</p>
                         <template x-if="paymentPreview">
                             <img :src="paymentPreview" class="mt-2 max-h-28 rounded-lg border border-gray-200 shadow-sm">
                         </template>
@@ -369,8 +369,8 @@
                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <div>
-                            <p class="font-semibold text-amber-800 text-sm">Bukti Pembayaran Diunggah via Dashboard</p>
-                            <p class="text-xs text-amber-700 mt-0.5">Setelah mendaftar, login ke dashboard dan unggah bukti pembayaran di menu <strong>Pembayaran</strong>.</p>
+                            <p class="font-semibold text-amber-800 text-sm">Payment Proof Uploaded via Dashboard</p>
+                            <p class="text-xs text-amber-700 mt-0.5">After registering, log in to the dashboard and upload your payment proof in the <strong>Payment</strong> menu.</p>
                         </div>
                     </div>
 @endif
@@ -378,12 +378,12 @@
                     {{-- Signature --}}
                     <div @if(!($preselectedPackage && !$preselectedPackage->is_free)) class="md:col-span-2" @endif>
                         <label for="signature" class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Tanda Tangan <span class="text-gray-400 font-normal">(opsional)</span>
+                            Signature <span class="text-gray-400 font-normal">(optional)</span>
                         </label>
                         <input id="signature" type="file" name="signature" accept=".jpg,.jpeg,.png"
                             @change="previewSignature($event)"
                             class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition file:mr-3 file:py-1.5 file:px-3 file:border-0 file:rounded-md file:bg-gray-100 file:text-gray-600 file:text-xs file:font-medium file:cursor-pointer hover:file:bg-gray-200 @error('signature') border-red-400 bg-red-50 @enderror">
-                        <p class="text-xs text-gray-400 mt-1">JPG atau PNG &bull; Maks 2MB</p>
+                        <p class="text-xs text-gray-400 mt-1">JPG or PNG &bull; Max 2MB</p>
                         <template x-if="signaturePreview">
                             <img :src="signaturePreview" class="mt-2 max-h-28 rounded-lg border border-gray-200 shadow-sm">
                         </template>
@@ -399,8 +399,8 @@
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 </div>
                 <div>
-                    <p class="font-semibold text-emerald-800 text-sm">Pendaftaran Gratis — Akun Langsung Aktif</p>
-                    <p class="text-xs text-emerald-600 mt-0.5">Tidak diperlukan bukti pembayaran. Klik tombol di bawah untuk melanjutkan.</p>
+                    <p class="font-semibold text-emerald-800 text-sm">Free Registration — Account Immediately Active</p>
+                    <p class="text-xs text-emerald-600 mt-0.5">No payment proof required. Click the button below to proceed.</p>
                 </div>
             </div>
 
@@ -408,12 +408,12 @@
             <div class="px-8 pb-8">
                 <button type="submit"
                     class="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3.5 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-4 focus:ring-orange-300 transition-all shadow-md text-base flex items-center justify-center gap-2"
-                    x-text="(role === 'participant' && isFree) ? '✓  Daftar Gratis' : 'Buat Akun'">
-                    Buat Akun
+                    x-text="(role === 'participant' && isFree) ? '✓  Register Free' : 'Create Account'">
+                    Create Account
                 </button>
                 <p class="text-center text-sm text-gray-500 mt-4">
-                    Sudah punya akun?
-                    <a href="{{ route('login') }}" class="font-semibold text-orange-600 hover:text-orange-700 transition">Login di sini</a>
+                    Already have an account?
+                    <a href="{{ route('login') }}" class="font-semibold text-orange-600 hover:text-orange-700 transition">Sign in here</a>
                 </p>
             </div>
 

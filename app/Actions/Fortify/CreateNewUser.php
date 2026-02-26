@@ -145,10 +145,10 @@ class CreateNewUser implements CreatesNewUsers
         Notification::createForUser(
             userId: $user->id,
             type: 'success',
-            title: 'Selamat Datang! 🎉',
-            message: 'Akun Anda telah berhasil didaftarkan. ' . ($isFreePackage ? 'Paket gratis Anda sudah aktif, selamat bergabung!' : ($isParticipant && !empty($data['proof_of_payment']) ? 'Bukti pembayaran Anda sudah diterima dan akan segera diverifikasi.' : ($isParticipant ? 'Silakan login dan upload bukti pembayaran Anda di menu Pembayaran pada dashboard.' : 'Silakan login dan mulai submit paper Anda.'))),
+            title: 'Welcome! 🎉',
+            message: 'Your account has been successfully registered. ' . ($isFreePackage ? 'Your free package is now active, welcome aboard!' : ($isParticipant && !empty($data['proof_of_payment']) ? 'Your payment proof has been received and will be verified shortly.' : ($isParticipant ? 'Please log in and upload your payment proof in the Payment menu on the dashboard.' : 'Please log in and start submitting your paper.'))),
             actionUrl: url('/dashboard'),
-            actionText: 'Ke Dashboard'
+            actionText: 'Go to Dashboard'
         );
 
         // Send welcome email
