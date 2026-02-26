@@ -6,6 +6,7 @@ use App\Models\Conference;
 use App\Models\ConferenceMaterial;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 
 class MaterialList extends Component
@@ -14,28 +15,46 @@ class MaterialList extends Component
     {
         $user = Auth::user();
 
-        // Ambil semua conference_id yang sudah diverifikasi pembayarannya
-        $verifiedConferenceIds = Payment::where('user_id', $user->id)
-            ->where('type', Payment::TYPE_PARTICIPANT)
-            ->where('status', 'verified')
-            ->with('registrationPackage')
-            ->get()
-            ->map(function ($payment) {
-                // Ambil conference_id dari registration package
-                if ($payment->registrationPackage) {
-                    return $payment->registrationPackage->conference_id;
-                }
-                // Fallback: cari konferensi aktif jika tidak ada package
-                return Conference::active()->value('id');
-            })
-            ->filter()
-            ->unique()
-            ->values();
+        $verifiedConferenceIds = collect();
 
-        // Ambil data konferensi beserta materinya, dikelompokkan per konferensi
+        // Guard: only query type/registration_package_id if columns exist (migrations may not be run on production)
+        $hasTypeColumn    = Schema::hasColumn('payments', 'type');
+        $hasPackageColumn = Schema::hasColumn('payments', 'registration_package_id');
+
+        if ($hasTypeColumn) {
+            $query = Payment::where('user_id', $user->id)
+                ->where('type', Payment::TYPE_PARTICIPANT)
+                ->where('status', 'verified');
+
+            if ($hasPackageColumn) {
+                $query->with('registrationPackage');
+            }
+
+            $verifiedConferenceIds = $query->get()
+                ->map(function ($payment) use ($hasPackageColumn) {
+                    if ($hasPackageColumn && $payment->registrationPackage) {
+                        return $payment->registrationPackage->conference_id;
+                    }
+                    return Conference::active()->value('id');
+                })
+                ->filter()
+                ->unique()
+                ->values();
+        } else {
+            // Fallback: no type column yet — check any verified participant payment
+            $verifiedConferenceIds = Payment::where('user_id', $user->id)
+                ->where('status', 'verified')
+                ->get()
+                ->map(fn() => Conference::active()->value('id'))
+                ->filter()
+                ->unique()
+                ->values();
+        }
+
+        // Guard: conference_materials table may not exist yet
         $conferenceGroups = collect();
 
-        if ($verifiedConferenceIds->isNotEmpty()) {
+        if ($verifiedConferenceIds->isNotEmpty() && Schema::hasTable('conference_materials')) {
             $conferences = Conference::whereIn('id', $verifiedConferenceIds)
                 ->orderByDesc('start_date')
                 ->get();
