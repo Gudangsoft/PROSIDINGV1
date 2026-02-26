@@ -98,6 +98,7 @@
                     @if($__dmv['arsip'] ?? true)
                     <a href="{{ route('archive') }}" class="text-sm text-gray-500 hover:text-teal-700 px-3 py-2 rounded-lg hover:bg-teal-50/60 transition font-medium">{{ __('welcome.nav.arsip') }}</a>
                     @endif
+                    <a href="{{ route('tutorial') }}" class="text-sm text-gray-500 hover:text-teal-700 px-3 py-2 rounded-lg hover:bg-teal-50/60 transition font-medium {{ request()->routeIs('tutorial') ? 'bg-teal-50 text-teal-700 font-semibold' : '' }}">Tutorial</a>
 
                     @if($headerMenus->count())
                     @include(\App\Helpers\Template::view('partials.menu-dropdown'), ['items' => $headerMenus, 'depth' => 0])
@@ -146,6 +147,7 @@
                 @if($__dmv['arsip'] ?? true)
                 <a href="{{ route('archive') }}" class="block px-3 py-2 text-sm text-gray-600 hover:bg-teal-50 rounded-lg">{{ __('welcome.nav.arsip') }}</a>
                 @endif
+                <a href="{{ route('tutorial') }}" class="block px-3 py-2 text-sm text-gray-600 hover:bg-teal-50 rounded-lg">Tutorial</a>
                 @if($headerMenus->count())
                 <div class="border-t border-gray-100 pt-1 mt-1">
                     @include(\App\Helpers\Template::view('partials.menu-mobile'), ['items' => $headerMenus, 'depth' => 0])

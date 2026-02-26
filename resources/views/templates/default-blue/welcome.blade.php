@@ -98,6 +98,7 @@
                     @if($__dmv['arsip'] ?? true)
                     <a href="{{ route('archive') }}" class="text-sm text-gray-600 hover:text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-50 transition font-medium">{{ __('welcome.nav.arsip') }}</a>
                     @endif
+                    <a href="{{ route('tutorial') }}" class="text-sm text-gray-600 hover:text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-50 transition font-medium {{ request()->routeIs('tutorial') ? 'bg-blue-50 text-blue-700 font-semibold' : '' }}">Tutorial</a>
 
                     {{-- Dynamic header menus --}}
                     @if($headerMenus->count())
@@ -150,6 +151,7 @@
                 @if($__dmv['arsip'] ?? true)
                 <a href="{{ route('archive') }}" onclick="closeMobileMenu()" class="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 rounded-lg">{{ __('welcome.nav.arsip') }}</a>
                 @endif
+                <a href="{{ route('tutorial') }}" onclick="closeMobileMenu()" class="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 rounded-lg">Tutorial</a>
 
                 {{-- Dynamic mobile menus --}}
                 @if($headerMenus->count())

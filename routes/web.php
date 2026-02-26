@@ -30,6 +30,7 @@ use App\Livewire\Admin\UsersRoles;
 use App\Livewire\Admin\PageList;
 use App\Livewire\Admin\PageForm;
 use App\Livewire\Admin\EmailTemplateManager;
+use App\Livewire\Admin\TutorialManager;
 use App\Http\Controllers\Admin\PaymentExportController;
 use App\Http\Controllers\Admin\DatabaseExportController;
 use App\Livewire\Admin\DatabaseManager;
@@ -243,6 +244,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/pages/create', PageForm::class)->name('admin.pages.create');
         Route::get('/pages/{page}/edit', PageForm::class)->name('admin.pages.edit');
 
+        // Tutorial
+        Route::get('/tutorials', TutorialManager::class)->name('admin.tutorials');
+
         // Supporter
         Route::get('/supporters', SupporterManager::class)->name('admin.supporters');
 
@@ -380,6 +384,17 @@ Route::get('/publikasi/{conference}', function (\App\Models\Conference $conferen
         'siteName', 'siteTagline', 'siteLogo', 'footerText', 'poweredBy', 'headerMenus'
     ));
 })->name('proceedings.show');
+
+// ─── Public Tutorial ───
+Route::get('/tutorial', function () {
+    $tutorials = collect();
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('tutorials')) {
+            $tutorials = \App\Models\Tutorial::active()->ordered()->get();
+        }
+    } catch (\Throwable $e) {}
+    return view(\App\Helpers\Template::view('tutorial'), compact('tutorials'));
+})->name('tutorial');
 
 // ─── Public Archive (Past Conferences) ───
 Route::get('/arsip', function () {
