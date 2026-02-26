@@ -85,10 +85,27 @@
                 </div>
             </div>
 
-            <label class="inline-flex items-center gap-2 text-sm">
-                <input wire:model="is_pinned" type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <span class="text-gray-700">Pinned (tampilkan di atas)</span>
-            </label>
+            <div class="flex flex-wrap gap-6">
+                <label class="inline-flex items-center gap-2 text-sm">
+                    <input wire:model="is_pinned" type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="text-gray-700">Pinned (tampilkan di atas)</span>
+                </label>
+                <label class="inline-flex items-center gap-2 text-sm">
+                    <input wire:model="show_popup" type="checkbox" class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                    <span class="text-gray-700 flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-purple-500"></span>
+                        Pop-up setelah login peserta
+                    </span>
+                </label>
+            </div>
+            @if($show_popup)
+            <div class="mt-2 p-3 bg-purple-50 border border-purple-200 rounded-lg text-xs text-purple-700 flex items-start gap-2">
+                <svg class="w-4 h-4 shrink-0 mt-0.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Pengumuman ini akan muncul sebagai <strong>pop-up modal</strong> ketika peserta membuka dashboard setelah login. Pop-up hanya muncul sekali per sesi (tidak berulang setiap halaman reload).</span>
+            </div>
+            @endif
         </div>
 
         <div class="flex justify-end gap-3">

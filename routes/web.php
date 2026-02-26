@@ -18,6 +18,7 @@ use App\Livewire\Admin\NewsList;
 use App\Livewire\Admin\NewsForm;
 use App\Livewire\Admin\AnnouncementList;
 use App\Livewire\Admin\AnnouncementForm;
+use App\Livewire\Admin\CertificateManager;
 use App\Livewire\Admin\GeneralSettings;
 use App\Livewire\Admin\EmailSettings;
 use App\Livewire\Admin\SliderList;
@@ -75,6 +76,53 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    // ─── Dismiss Popup Announcement ───
+    Route::post('/dismiss-popup/{id}', function ($id) {
+        $dismissed = session('dismissed_popups', []);
+        if (!in_array((int)$id, $dismissed)) {
+            $dismissed[] = (int)$id;
+        }
+        session(['dismissed_popups' => $dismissed]);
+        return response()->json(['ok' => true]);
+    })->name('dismiss-popup');
+
+    // ─── Certificate Preview (admin) ───
+    Route::get('/admin/certificates/preview', function (\Illuminate\Http\Request $request) {
+        if (!auth()->user()->isAdmin()) abort(403);
+        $conf = \App\Models\Conference::find($request->input('conference'));
+        $type = $request->input('type', 'author');
+        $dummyUser = new \App\Models\User([
+            'name' => 'Dr. Sample User, M.Sc.',
+            'institution' => $conf ? ($conf->organizer ?? config('app.name')) : config('app.name'),
+        ]);
+        $dummyPaper = null;
+        if ($type === 'author') {
+            $dummyPaper = new \App\Models\Paper([
+                'title' => 'Enhancing Digital Innovation in Academic Publishing: A Systematic Review',
+            ]);
+        }
+        $certNumber = 'CERT/' . strtoupper(substr($type, 0, 3)) . '/001/' . now()->year;
+        $qrUrl = route('verify-certificate', ['code' => $certNumber]);
+        $builder = new \Endroid\QrCode\Builder\Builder(
+            writer: new \Endroid\QrCode\Writer\PngWriter(),
+            data: $qrUrl,
+            encoding: new \Endroid\QrCode\Encoding\Encoding('UTF-8'),
+            size: 120,
+            margin: 5,
+        );
+        $qrCode = $builder->build()->getDataUri();
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.certificate-template', [
+            'user'          => $dummyUser,
+            'paper'         => $dummyPaper,
+            'conference'    => $conf,
+            'certNumber'    => $certNumber,
+            'qrCode'        => $qrCode,
+            'type'          => $type,
+            'generatedDate' => now(),
+        ])->setPaper('a4', 'landscape');
+        return $pdf->stream('certificate-preview.pdf');
+    })->name('admin.certificate.preview');
 
     // ─── Helpdesk Routes (all authenticated users) ───
     Route::get('/helpdesk', Helpdesk::class)->name('helpdesk');
@@ -139,6 +187,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/news', NewsList::class)->name('admin.news');
         Route::get('/news/create', NewsForm::class)->name('admin.news.create');
         Route::get('/news/{news}/edit', NewsForm::class)->name('admin.news.edit');
+
+        // Sertifikat
+        Route::get('/certificates', CertificateManager::class)->name('admin.certificates');
 
         // Pengumuman
         Route::get('/announcements', AnnouncementList::class)->name('admin.announcements');

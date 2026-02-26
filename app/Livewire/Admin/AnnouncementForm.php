@@ -25,6 +25,7 @@ class AnnouncementForm extends Component
     public string $conference_id = '';
     public string $expires_at = '';
     public $attachment;
+    public bool $show_popup = false;
 
     public function mount(?Announcement $announcement = null)
     {
@@ -39,6 +40,7 @@ class AnnouncementForm extends Component
                 'audience' => $announcement->audience ?? ['all'],
                 'status' => $announcement->status,
                 'is_pinned' => $announcement->is_pinned,
+                'show_popup' => $announcement->show_popup,
                 'conference_id' => (string) ($announcement->conference_id ?? ''),
                 'expires_at' => $announcement->expires_at?->format('Y-m-d') ?? '',
             ]);
@@ -66,6 +68,7 @@ class AnnouncementForm extends Component
             'audience' => $this->audience,
             'status' => $this->status,
             'is_pinned' => $this->is_pinned,
+            'show_popup' => $this->show_popup,
             'conference_id' => $this->conference_id ?: null,
             'expires_at' => $this->expires_at ?: null,
         ];

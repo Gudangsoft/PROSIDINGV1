@@ -21,6 +21,8 @@ class Conference extends Model
         'visible_sections', 'hidden_speaker_types',
         'wa_group_pemakalah', 'wa_group_non_pemakalah', 'wa_group_reviewer', 'wa_group_editor',
         'read_more_url',
+        'chairman_name', 'chairman_title', 'secretary_name', 'secretary_title',
+        'chairman_signature', 'secretary_signature',
     ];
 
     protected $casts = [

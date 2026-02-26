@@ -9,13 +9,14 @@ class Announcement extends Model
 {
     protected $fillable = [
         'conference_id', 'title', 'content', 'type', 'priority',
-        'audience', 'status', 'is_pinned', 'attachment',
+        'audience', 'status', 'is_pinned', 'show_popup', 'attachment',
         'published_at', 'expires_at', 'created_by', 'views_count',
     ];
 
     protected $casts = [
         'audience' => 'array',
         'is_pinned' => 'boolean',
+        'show_popup' => 'boolean',
         'published_at' => 'datetime',
         'expires_at' => 'datetime',
     ];

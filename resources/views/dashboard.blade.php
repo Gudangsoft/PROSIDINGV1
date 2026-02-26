@@ -3,6 +3,121 @@
 @section('title', 'Dashboard - Prosiding LPKD-APJI')
 
 @section('content')
+
+{{-- ════════════════════════════════════════════════════════════
+     POPUP ANNOUNCEMENT (shown once per session per popup)
+════════════════════════════════════════════════════════════ --}}
+@php
+    $popupUser = Auth::user();
+    $popupAnn = \App\Models\Announcement::published()
+        ->where('show_popup', true)
+        ->where(function($q) use ($popupUser) {
+            $q->whereJsonContains('audience', $popupUser->role ?? 'participant')
+              ->orWhereJsonContains('audience', 'all');
+        })
+        ->whereNotIn('id', session('dismissed_popups', []))
+        ->orderByDesc('priority')
+        ->first();
+@endphp
+
+@if($popupAnn)
+@php
+    $popupColors = ['info'=>'blue','warning'=>'yellow','success'=>'green','danger'=>'red','deadline'=>'orange','result'=>'purple'];
+    $pc = $popupColors[$popupAnn->type] ?? 'blue';
+@endphp
+<div
+    x-data="{ open: true }"
+    x-show="open"
+    x-cloak
+    style="display:none"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4"
+    role="dialog" aria-modal="true">
+
+    {{-- Backdrop --}}
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="open=false; dismissPopup({{ $popupAnn->id }})"></div>
+
+    {{-- Modal card --}}
+    <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden z-10"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+
+        {{-- Colored header --}}
+        <div class="bg-{{ $pc }}-600 px-6 py-4 flex items-start justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    @if($popupAnn->type === 'info')
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    @elseif($popupAnn->type === 'warning' || $popupAnn->type === 'deadline')
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    @elseif($popupAnn->type === 'success')
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    @else
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+                    @endif
+                </div>
+                <h2 class="text-white font-bold text-lg leading-tight">{{ $popupAnn->title }}</h2>
+            </div>
+            <button @click="open=false; dismissPopup({{ $popupAnn->id }})"
+                    class="text-white/70 hover:text-white transition ml-3 mt-0.5 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Body --}}
+        <div class="px-6 py-5">
+            @if($popupAnn->attachment)
+            <div class="mb-4">
+                <img src="{{ Storage::url($popupAnn->attachment) }}" alt="Attachment"
+                     class="w-full rounded-lg object-cover max-h-48" onerror="this.style.display='none'">
+            </div>
+            @endif
+            <div class="text-gray-700 text-sm leading-relaxed prose prose-sm max-w-none">
+                {!! nl2br(e($popupAnn->content)) !!}
+            </div>
+            @if($popupAnn->expires_at)
+            <p class="mt-3 text-xs text-gray-400">
+                Berlaku s.d. {{ $popupAnn->expires_at->format('d F Y') }}
+            </p>
+            @endif
+        </div>
+
+        {{-- Footer --}}
+        <div class="px-6 pb-5 flex items-center justify-between">
+            <label class="flex items-center gap-2 text-xs text-gray-500 cursor-pointer"
+                   x-data="{ checked: false }" @click="checked=!checked; if(checked) dismissPopupPermanent({{ $popupAnn->id }})">
+                <input type="checkbox" :checked="checked" class="rounded border-gray-300 text-{{ $pc }}-600 focus:ring-{{ $pc }}-500">
+                Jangan tampilkan lagi hari ini
+            </label>
+            <button @click="open=false; dismissPopup({{ $popupAnn->id }})"
+                    class="px-5 py-2 bg-{{ $pc }}-600 text-white text-sm font-medium rounded-lg hover:bg-{{ $pc }}-700 transition">
+                Mengerti
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function dismissPopup(id) {
+    fetch('/dismiss-popup/' + id, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json' }
+    });
+}
+function dismissPopupPermanent(id) {
+    fetch('/dismiss-popup/' + id + '?permanent=1', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json' }
+    });
+}
+</script>
+@endif
+{{-- ═══════════════ END POPUP ═══════════════ --}}
 <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
     <!-- Header -->
     <div class="mb-8">

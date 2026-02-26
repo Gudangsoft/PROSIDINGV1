@@ -1,36 +1,105 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Sertifikat - {{ $code }}</title>
+    <title>Certificate Verification – {{ $code }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-8">
-        <div class="text-center mb-6">
-            <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden">
+
+        {{-- Header band --}}
+        <div class="bg-gradient-to-r from-blue-800 to-indigo-700 px-8 py-6 text-center">
+            <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-3">
+                <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0
+                             3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946
+                             3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138
+                             3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806
+                             3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438
+                             3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
                 </svg>
             </div>
-            <h1 class="text-2xl font-bold text-blue-700">Verifikasi Sertifikat</h1>
-            <p class="text-gray-500 text-sm mt-1">Nomor: <code class="font-mono bg-gray-100 px-2 py-0.5 rounded">{{ $code }}</code></p>
+            <h1 class="text-2xl font-bold text-white tracking-wide">Certificate Verification</h1>
+            <p class="text-blue-200 text-sm mt-1">Official Authenticity Check</p>
         </div>
 
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-            <p class="text-sm text-yellow-800">
-                Dokumen sertifikat dengan kode <strong>{{ $code }}</strong> 
-                terdaftar dalam sistem.
-            </p>
-            <p class="text-xs text-yellow-700 mt-2">
-                Untuk konfirmasi lebih lanjut, hubungi panitia penyelenggara.
-            </p>
-        </div>
-        
-        <div class="mt-6 pt-4 border-t border-gray-100 text-center">
-            <p class="text-xs text-gray-400">Verifikasi pada {{ now()->format('d F Y, H:i') }} WIB</p>
-            <a href="{{ url('/') }}" class="text-xs text-blue-600 hover:underline mt-1 block">Kembali ke Beranda</a>
+        {{-- Body --}}
+        <div class="px-8 py-6">
+
+            {{-- Certificate number --}}
+            <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-5">
+                <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75
+                             A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5
+                             A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0
+                             1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789
+                             6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"/>
+                </svg>
+                <span class="text-xs text-gray-500 font-medium">Certificate No.</span>
+                <code class="ml-auto font-mono text-sm bg-white border border-gray-200 px-2 py-0.5 rounded text-blue-800 font-bold">{{ $code }}</code>
+            </div>
+
+            {{-- Valid badge --}}
+            <div class="flex items-start gap-3 bg-green-50 border border-green-200 rounded-xl p-4 mb-5">
+                <div class="mt-0.5 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-semibold text-green-800 text-sm">Valid Certificate</p>
+                    <p class="text-green-700 text-xs mt-0.5">
+                        This certificate is registered and verified in our system.
+                    </p>
+                </div>
+            </div>
+
+            {{-- Details (if passed from controller) --}}
+            @isset($certificate)
+            <div class="border border-gray-100 rounded-xl divide-y divide-gray-100 mb-5 text-sm">
+                @isset($certificate['holder'])
+                <div class="flex items-center px-4 py-3">
+                    <span class="text-gray-500 w-32 shrink-0">Issued to</span>
+                    <span class="font-semibold text-gray-800">{{ $certificate['holder'] }}</span>
+                </div>
+                @endisset
+                @isset($certificate['type'])
+                <div class="flex items-center px-4 py-3">
+                    <span class="text-gray-500 w-32 shrink-0">Type</span>
+                    <span class="text-gray-700">{{ ucfirst($certificate['type']) }}</span>
+                </div>
+                @endisset
+                @isset($certificate['event'])
+                <div class="flex items-center px-4 py-3">
+                    <span class="text-gray-500 w-32 shrink-0">Event</span>
+                    <span class="text-gray-700">{{ $certificate['event'] }}</span>
+                </div>
+                @endisset
+                @isset($certificate['issued_at'])
+                <div class="flex items-center px-4 py-3">
+                    <span class="text-gray-500 w-32 shrink-0">Issued on</span>
+                    <span class="text-gray-700">{{ $certificate['issued_at'] }}</span>
+                </div>
+                @endisset
+            </div>
+            @endisset
+
+            {{-- Note --}}
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 mb-5">
+                For further confirmation, please contact the organizing committee directly.
+            </div>
+
+            {{-- Footer --}}
+            <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+                <p class="text-xs text-gray-400">Verified at {{ now()->format('d F Y, H:i') }} UTC</p>
+                <a href="{{ url('/') }}" class="text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline">
+                    ← Back to Home
+                </a>
+            </div>
         </div>
     </div>
 </body>
