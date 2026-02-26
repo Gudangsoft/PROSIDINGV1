@@ -9,15 +9,22 @@
 ════════════════════════════════════════════════════════════ --}}
 @php
     $popupUser = Auth::user();
-    $popupAnn = \App\Models\Announcement::published()
-        ->where('show_popup', true)
-        ->where(function($q) use ($popupUser) {
-            $q->whereJsonContains('audience', $popupUser->role ?? 'participant')
-              ->orWhereJsonContains('audience', 'all');
-        })
-        ->whereNotIn('id', session('dismissed_popups', []))
-        ->orderByDesc('priority')
-        ->first();
+    $popupAnn = null;
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasColumn('announcements', 'show_popup')) {
+            $popupAnn = \App\Models\Announcement::published()
+                ->where('show_popup', true)
+                ->where(function($q) use ($popupUser) {
+                    $q->whereJsonContains('audience', $popupUser->role ?? 'participant')
+                      ->orWhereJsonContains('audience', 'all');
+                })
+                ->whereNotIn('id', session('dismissed_popups', []))
+                ->orderByDesc('priority')
+                ->first();
+        }
+    } catch (\Throwable $e) {
+        $popupAnn = null;
+    }
 @endphp
 
 @if($popupAnn)
