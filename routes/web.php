@@ -170,7 +170,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ─── Reviewer Routes ───
-    Route::middleware(['role:reviewer'])->prefix('reviewer')->group(function () {
+    Route::middleware(['role:reviewer,editor'])->prefix('reviewer')->group(function () {
         Route::get('/reviews', ReviewList::class)->name('reviewer.reviews');
         Route::get('/reviews/{review}', ReviewForm::class)->name('reviewer.review.form');
     });

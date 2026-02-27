@@ -10,7 +10,18 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (!$request->user() || !in_array($request->user()->role, $roles)) {
+        $user = $request->user();
+
+        if (!$user) {
+            abort(403, 'Unauthorized.');
+        }
+
+        // Admin bypasses all role restrictions
+        if ($user->role === 'admin') {
+            return $next($request);
+        }
+
+        if (!in_array($user->role, $roles)) {
             abort(403, 'Unauthorized.');
         }
 
