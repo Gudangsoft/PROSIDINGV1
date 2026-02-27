@@ -135,6 +135,9 @@ class DocumentGenerator
             ->count() + 1;
         
         $acronym = $conference->acronym ?: 'CONF';
+        // Sanitize: collapse spaces, remove characters that break URLs/filenames
+        $acronym = preg_replace('/\s+/', '-', trim($acronym));
+        $acronym = preg_replace('/[^A-Za-z0-9\-]/', '', $acronym);
         
         return sprintf("LOA/%03d/%s/%d", $count, strtoupper($acronym), $year);
     }

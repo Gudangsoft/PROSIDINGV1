@@ -459,6 +459,25 @@ class PaperDetail extends Component
         }
     }
 
+    public function regenerateLoa()
+    {
+        try {
+            $generator = new \App\Services\DocumentGenerator();
+            $loaPath = $generator->generateLOA($this->paper);
+
+            $this->paper->update([
+                'loa_link' => $loaPath,
+            ]);
+            $this->paper->refresh();
+
+            session()->flash('success', 'LOA berhasil di-generate ulang. Nomor LOA: ' . $this->paper->loa_number);
+            $this->dispatch('paperStatusUpdated');
+        } catch (\Exception $e) {
+            \Log::error('Error regenerating LOA for paper ' . $this->paper->id . ': ' . $e->getMessage());
+            session()->flash('error', 'Gagal generate LOA: ' . $e->getMessage());
+        }
+    }
+
     public function requestRevision()
     {
         try {

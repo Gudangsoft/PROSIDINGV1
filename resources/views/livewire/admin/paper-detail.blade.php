@@ -463,6 +463,42 @@
 
                 {{-- ──── PRODUCTION TAB ──── --}}
                 @elseif($workflowTab === 'production')
+                    {{-- LOA Info Section --}}
+                    <div class="border border-gray-200 rounded mb-5">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
+                            <h3 class="text-sm font-bold text-gray-800">Letter of Acceptance (LOA)</h3>
+                        </div>
+                        <div class="p-4">
+                            @if($paper->loa_url)
+                                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                                    <div>
+                                        <span class="text-gray-500 text-xs">Nomor LOA:</span>
+                                        <p class="font-mono font-medium text-xs break-all">{{ $paper->loa_number ?? '-' }}</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500 text-xs">File LOA:</span>
+                                        <p><a href="{{ $paper->loa_url }}" target="_blank" class="text-blue-600 text-sm hover:underline font-medium">Buka LOA ↗</a></p>
+                                    </div>
+                                </div>
+                                <button wire:click="regenerateLoa"
+                                    wire:confirm="Generate ulang LOA? Nomor LOA lama akan digantikan dengan yang baru."
+                                    type="button"
+                                    class="w-full py-2 border border-orange-400 text-orange-600 rounded text-xs font-medium hover:bg-orange-50 cursor-pointer">
+                                    <span wire:loading.remove wire:target="regenerateLoa">↺ Regenerate LOA</span>
+                                    <span wire:loading wire:target="regenerateLoa">Generating...</span>
+                                </button>
+                            @else
+                                <p class="text-sm text-gray-400 italic mb-3">LOA belum di-generate untuk paper ini.</p>
+                                <button wire:click="regenerateLoa"
+                                    type="button"
+                                    class="w-full py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 cursor-pointer">
+                                    <span wire:loading.remove wire:target="regenerateLoa">Generate LOA Sekarang</span>
+                                    <span wire:loading wire:target="regenerateLoa">Generating...</span>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+
                     {{-- Payment Section --}}
                     <div class="border border-gray-200 rounded mb-5">
                         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
