@@ -536,7 +536,110 @@ class DeliverableUpload extends Component
 ';
 
 // === PATCH ACTIONS ===
-$patchMsg = $routePatchMsg = $reviewerPatchMsg = $authorPatchMsg = '';
+$patchMsg = $routePatchMsg = $reviewerPatchMsg = $authorPatchMsg = $forceMsg = '';
+
+// Handle FORCE RE-PATCH ALL action (always overwrite)
+if (($_POST['action'] ?? '') === 'force_patch_all') {
+    $msgs = [];
+    
+    // Clear OPcache first
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+        $msgs[] = 'OPcache cleared';
+    }
+    
+    // 1. Patch Middleware - FORCE WRITE
+    $path = $root . '/app/Http/Middleware/RoleMiddleware.php';
+    @chmod($path, 0666);
+    if (file_put_contents($path, $MIDDLEWARE_CONTENT) !== false) {
+        $msgs[] = 'OK: RoleMiddleware.php';
+        @touch($path); // Force file time update
+    } else {
+        $msgs[] = 'ERR: RoleMiddleware.php';
+    }
+    
+    // 2. Patch Routes - FORCE WRITE entire file
+    $routesPath = $root . '/routes/web.php';
+    @chmod($routesPath, 0666);
+    $content = file_get_contents($routesPath);
+    // Replace any reviewer route pattern
+    $content = preg_replace(
+        "/Route::middleware\(\['role:reviewer'\]\)->prefix\('reviewer'\)/",
+        "Route::middleware(['role:reviewer,editor'])->prefix('reviewer')",
+        $content
+    );
+    file_put_contents($routesPath, $content);
+    $msgs[] = 'OK: routes/web.php';
+    @touch($routesPath);
+    
+    // 3. Patch Reviewer Components - FORCE WRITE
+    @chmod($root . '/app/Livewire/Reviewer/ReviewForm.php', 0666);
+    @chmod($root . '/app/Livewire/Reviewer/ReviewList.php', 0666);
+    file_put_contents($root . '/app/Livewire/Reviewer/ReviewForm.php', $REVIEW_FORM_CONTENT);
+    file_put_contents($root . '/app/Livewire/Reviewer/ReviewList.php', $REVIEW_LIST_CONTENT);
+    @touch($root . '/app/Livewire/Reviewer/ReviewForm.php');
+    @touch($root . '/app/Livewire/Reviewer/ReviewList.php');
+    $msgs[] = 'OK: ReviewForm.php, ReviewList.php';
+    
+    // 4. Patch Author Components - FORCE WRITE
+    @chmod($root . '/app/Livewire/Author/PaperDetail.php', 0666);
+    @chmod($root . '/app/Livewire/Author/PaymentUpload.php', 0666);
+    @chmod($root . '/app/Livewire/Author/HelpdeskDetail.php', 0666);
+    @chmod($root . '/app/Livewire/Author/DeliverableUpload.php', 0666);
+    file_put_contents($root . '/app/Livewire/Author/PaperDetail.php', $PAPER_DETAIL_CONTENT);
+    file_put_contents($root . '/app/Livewire/Author/PaymentUpload.php', $PAYMENT_UPLOAD_CONTENT);
+    file_put_contents($root . '/app/Livewire/Author/HelpdeskDetail.php', $HELPDESK_DETAIL_CONTENT);
+    file_put_contents($root . '/app/Livewire/Author/DeliverableUpload.php', $DELIVERABLE_UPLOAD_CONTENT);
+    $msgs[] = 'OK: Author components';
+    
+    // 5. Patch Layout (sidebar)
+    $layoutPath = $root . '/resources/views/layouts/app.blade.php';
+    @chmod($layoutPath, 0666);
+    $content = file_get_contents($layoutPath);
+    $content = str_replace('@if(Auth::user()->isReviewer())', '@if(Auth::user()->isReviewer() || Auth::user()->isEditor() || Auth::user()->isAdmin())', $content);
+    file_put_contents($layoutPath, $content);
+    $msgs[] = 'OK: layouts/app.blade.php';
+    
+    // 6. Clear ALL caches aggressively
+    $vs = glob($root . '/storage/framework/views/*.php') ?: [];
+    foreach ($vs as $f) @unlink($f);
+    $vs = glob($root . '/storage/framework/views/*/*.php') ?: [];
+    foreach ($vs as $f) @unlink($f);
+    
+    foreach (['routes-v7.php','routes.php','config.php','events.php','services.php','packages.php'] as $cf) {
+        $p = $root . '/bootstrap/cache/' . $cf;
+        if (file_exists($p)) @unlink($p);
+    }
+    
+    // Clear data cache
+    $cacheDir = $root . '/storage/framework/cache/data';
+    if (is_dir($cacheDir)) {
+        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($cacheDir, RecursiveDirectoryIterator::SKIP_DOTS)) as $f) {
+            if ($f->isFile()) @unlink($f->getPathname());
+        }
+    }
+    
+    // Clear sessions (optional but helps)
+    $sessDir = $root . '/storage/framework/sessions';
+    if (is_dir($sessDir)) {
+        foreach (glob($sessDir . '/*') as $f) {
+            if (is_file($f)) @unlink($f);
+        }
+    }
+    
+    // OPcache again
+    if (function_exists('opcache_reset')) opcache_reset();
+    if (function_exists('opcache_invalidate')) {
+        opcache_invalidate($root . '/app/Http/Middleware/RoleMiddleware.php', true);
+        opcache_invalidate($root . '/routes/web.php', true);
+        opcache_invalidate($root . '/app/Livewire/Reviewer/ReviewForm.php', true);
+        opcache_invalidate($root . '/app/Livewire/Reviewer/ReviewList.php', true);
+    }
+    
+    $msgs[] = 'ALL CACHES CLEARED';
+    
+    $forceMsg = 'FORCE PATCH COMPLETE: ' . implode(' | ', $msgs);
+}
 
 // Handle PATCH ALL action
 if (($_POST['action'] ?? '') === 'patch_all') {
@@ -680,10 +783,20 @@ if ($laravelReady && !empty($_POST['fix_role_email']) && !empty($_POST['fix_role
         $roleMsg = 'ERR: Role tidak valid';
     } else {
         try {
-            $updated = DB::table('users')->where('email', $email)->update(['role' => $newRole]);
-            $roleMsg = $updated ? "OK: [{$email}] -> role=[{$newRole}]" : "WARN: User [{$email}] tidak ditemukan";
+            $updated = \Illuminate\Support\Facades\DB::table('users')->where('email', $email)->update(['role' => $newRole]);
+            if ($updated) {
+                $roleMsg = "OK: [{$email}] -> role=[{$newRole}] - SILAKAN LOGOUT & LOGIN ULANG!";
+            } else {
+                // Check if user exists
+                $user = \Illuminate\Support\Facades\DB::table('users')->where('email', $email)->first();
+                if ($user) {
+                    $roleMsg = "INFO: User ditemukan tapi role sudah [{$user->role}]";
+                } else {
+                    $roleMsg = "WARN: User [{$email}] tidak ditemukan di database";
+                }
+            }
         } catch (Throwable $e) {
-            $roleMsg = 'ERR: ' . $e->getMessage();
+            $roleMsg = 'ERR DB: ' . $e->getMessage();
         }
     }
 }
@@ -706,8 +819,8 @@ $allPatched = $middlewarePatched && $routesPatched && $reviewerPatched && $autho
 $userList = [];
 if ($laravelReady) {
     try {
-        $userList = DB::table('users')->select('id','name','email','role')->orderBy('id')->limit(100)->get()->toArray();
-    } catch (Throwable $e) { }
+        $userList = \Illuminate\Support\Facades\DB::table('users')->select('id','name','email','role')->orderBy('id')->limit(100)->get()->toArray();
+    } catch (Throwable $e) { $results[] = 'DB Error: ' . $e->getMessage(); }
 }
 ?><!DOCTYPE html>
 <html lang="id">
@@ -747,10 +860,61 @@ td{padding:5px 10px;border-bottom:1px solid #1e293b}
 <?php if($patchMsg): $mc=str_contains($patchMsg,'OK')?'ok':(str_contains($patchMsg,'WARN')?'warn':'err'); ?>
 <div class="line <?=$mc?>" style="font-size:14px;font-weight:bold;margin-bottom:12px"><?=htmlspecialchars($patchMsg)?></div>
 <?php endif; ?>
+<?php if($forceMsg): $mc=str_contains($forceMsg,'COMPLETE')?'ok':'err'; ?>
+<div class="line <?=$mc?>" style="font-size:14px;font-weight:bold;margin-bottom:12px"><?=htmlspecialchars($forceMsg)?></div>
+<?php endif; ?>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
 <form method="POST" action="?token=<?=urlencode($_GET['token']??'')?>">
   <input type="hidden" name="action" value="patch_all">
   <button type="submit" class="btn-green" style="font-size:16px;padding:12px 30px">PATCH ALL - Fix Semua Sekarang!</button>
 </form>
+<form method="POST" action="?token=<?=urlencode($_GET['token']??'')?>">
+  <input type="hidden" name="action" value="force_patch_all">
+  <button type="submit" class="btn-orange" style="font-size:16px;padding:12px 30px">FORCE RE-PATCH (Jika masih error)</button>
+</form>
+</div>
+</div>
+
+<!-- CURRENT USER DEBUG -->
+<?php
+$currentUser = null;
+$currentUserRole = 'Unknown';
+if ($laravelReady) {
+    try {
+        // Get session data
+        $sessionId = $_COOKIE['laravel_session'] ?? $_COOKIE[config('session.cookie')] ?? null;
+        if ($sessionId) {
+            $sessionFile = $root . '/storage/framework/sessions/' . $sessionId;
+            if (file_exists($sessionFile)) {
+                $sessionData = @unserialize(@file_get_contents($sessionFile));
+                if ($sessionData && isset($sessionData['login_web_' . sha1('Illuminate\Auth\SessionGuard')])) {
+                    $userId = $sessionData['login_web_' . sha1('Illuminate\Auth\SessionGuard')];
+                    $currentUser = \Illuminate\Support\Facades\DB::table('users')->where('id', $userId)->first();
+                    if ($currentUser) {
+                        $currentUserRole = $currentUser->role ?? 'no role';
+                    }
+                }
+            }
+        }
+    } catch (Throwable $e) {
+        $currentUserRole = 'Error: ' . $e->getMessage();
+    }
+}
+?>
+<div class="box" style="border-color:#818cf8">
+<h3 style="color:#818cf8">DEBUG: User Session & Test</h3>
+<?php if($currentUser): ?>
+<p class="line">Logged in as: <strong style="color:#4ade80"><?=htmlspecialchars($currentUser->name)?></strong> (<?=htmlspecialchars($currentUser->email)?>)</p>
+<p class="line">Role: <strong style="color:#fbbf24"><?=htmlspecialchars($currentUserRole)?></strong></p>
+<?php else: ?>
+<p class="line warn">Tidak bisa detect user session dari cookie. Login via browser normal.</p>
+<?php endif; ?>
+<p class="line" style="margin-top:10px">Test links (buka di tab baru setelah patch):</p>
+<ul style="margin:5px 0 0 20px;font-size:13px">
+<li><a href="/reviewer/reviews" target="_blank" style="color:#60a5fa">/reviewer/reviews</a> - List semua review</li>
+<li><a href="/reviewer/reviews/10" target="_blank" style="color:#60a5fa">/reviewer/reviews/10</a> - Review detail #10</li>
+<li><a href="/admin/papers" target="_blank" style="color:#60a5fa">/admin/papers</a> - Admin papers</li>
+</ul>
 </div>
 
 <!-- Status Overview -->
