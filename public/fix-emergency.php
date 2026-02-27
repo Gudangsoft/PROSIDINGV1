@@ -11,6 +11,14 @@ if (($_GET['token'] ?? '') !== 'stifar-fix-2026') {
 $root = dirname(__DIR__);
 $results = [];
 
+// 0. Clear OPcache (IMPORTANT for production)
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+    $results[] = "CLEARED OPcache";
+} else {
+    $results[] = "OPcache not available";
+}
+
 // 1. Clear all caches
 foreach (['routes-v7.php','routes.php','config.php','events.php','services.php','packages.php'] as $cf) {
     $p = $root . '/bootstrap/cache/' . $cf;
@@ -587,9 +595,14 @@ if (($_POST['action'] ?? '') === 'patch_all') {
     // Clear all caches after patching
     $vs = glob($root . '/storage/framework/views/*.php') ?: [];
     foreach ($vs as $f) @unlink($f);
-    foreach (['routes-v7.php','routes.php','config.php'] as $cf) {
+    foreach (['routes-v7.php','routes.php','config.php','events.php','services.php','packages.php'] as $cf) {
         $p = $root . '/bootstrap/cache/' . $cf;
         if (file_exists($p)) @unlink($p);
+    }
+    // Clear opcache
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+        $msgs[] = 'OK: OPcache cleared';
     }
     $msgs[] = 'OK: Caches cleared';
     
@@ -844,4 +857,43 @@ Patch Individual (Klik untuk expand)
   <p style="color:#fca5a5;margin:0"><strong>HAPUS FILE INI</strong> setelah selesai! Path: <code>public/fix-emergency.php</code></p>
   <p style="color:#475569;font-size:12px;margin:8px 0 0">PHP <?=PHP_VERSION?> | <?=date('Y-m-d H:i:s')?></p>
 </div>
+
+<!-- DEBUG: Show actual file contents -->
+<details style="margin-bottom:20px">
+<summary style="cursor:pointer;color:#94a3b8;font-size:14px;padding:10px;background:#1e293b;border-radius:8px">
+DEBUG: Lihat isi file (klik untuk expand)
+</summary>
+<div class="box" style="margin-top:10px">
+<h3 style="color:#f87171">RoleMiddleware.php (line 20-25)</h3>
+<pre style="background:#0f172a;padding:10px;border-radius:6px;overflow-x:auto;font-size:12px"><?php
+$mwContent = @file_get_contents($root . '/app/Http/Middleware/RoleMiddleware.php');
+$mwLines = $mwContent ? explode("\n", $mwContent) : [];
+echo htmlspecialchars(implode("\n", array_slice($mwLines, 17, 12)));
+?></pre>
+
+<h3 style="color:#f87171;margin-top:20px">ReviewForm.php (mount method)</h3>
+<pre style="background:#0f172a;padding:10px;border-radius:6px;overflow-x:auto;font-size:12px"><?php
+$rfContent = @file_get_contents($root . '/app/Livewire/Reviewer/ReviewForm.php');
+$rfLines = $rfContent ? explode("\n", $rfContent) : [];
+echo htmlspecialchars(implode("\n", array_slice($rfLines, 18, 15)));
+?></pre>
+
+<h3 style="color:#f87171;margin-top:20px">routes/web.php (reviewer route)</h3>
+<pre style="background:#0f172a;padding:10px;border-radius:6px;overflow-x:auto;font-size:12px"><?php
+$routesContent = @file_get_contents($root . '/routes/web.php');
+if ($routesContent && preg_match('/Route::middleware.*reviewer.*\{[^}]*\}/s', $routesContent, $m)) {
+    echo htmlspecialchars($m[0]);
+} else {
+    // Try to find the line
+    $lines = explode("\n", $routesContent);
+    foreach ($lines as $i => $line) {
+        if (str_contains($line, 'reviewer')) {
+            echo htmlspecialchars(implode("\n", array_slice($lines, max(0,$i-1), 5)));
+            break;
+        }
+    }
+}
+?></pre>
+</div>
+</details>
 </body></html>
