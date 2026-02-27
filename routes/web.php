@@ -67,7 +67,7 @@ Route::get('/verify-loa/{code}', function ($code) {
         ->first();
     
     return view('verify.loa', compact('paper', 'code'));
-})->name('verify-loa');
+})->where('code', '.+')->name('verify-loa');
 
 Route::get('/verify-certificate/{code}', function ($code) {
     $certificate = null;
@@ -81,7 +81,7 @@ Route::get('/verify-certificate/{code}', function ($code) {
         // table not yet migrated — just pass null
     }
     return view('verify.certificate', compact('code', 'certificate'));
-})->name('verify-certificate');
+})->where('code', '.+')->name('verify-certificate');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
