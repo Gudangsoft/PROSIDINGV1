@@ -151,10 +151,23 @@ class CreateNewUser implements CreatesNewUsers
             actionText: 'Go to Dashboard'
         );
 
+        // Determine registration status label for the welcome email
+        if ($role === 'participant') {
+            if ($isFreePackage) {
+                $registrationStatus = 'Terdaftar (Gratis)';
+            } elseif (!empty($data['proof_of_payment'])) {
+                $registrationStatus = 'Bukti Pembayaran Diterima — Menunggu Verifikasi';
+            } else {
+                $registrationStatus = 'Menunggu Upload Bukti Pembayaran';
+            }
+        } else {
+            $registrationStatus = 'Terdaftar sebagai Penulis';
+        }
+
         // Send welcome email
         try {
             Mail::to($user->email)->send(
-                new WelcomeMail($user->name, $role, url('/dashboard'), $packageObj?->conference_id)
+                new WelcomeMail($user->name, $role, url('/dashboard'), $packageObj?->conference_id, $registrationStatus)
             );
         } catch (\Exception $e) {
             \Log::error('Failed to send welcome email: ' . $e->getMessage());

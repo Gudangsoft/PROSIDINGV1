@@ -30,6 +30,7 @@ class SecurityHeaders
                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " .
                "font-src 'self' https://fonts.gstatic.com; " .
                "img-src 'self' data: https: blob:; " .
+               "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://drive.google.com https://docs.google.com; " .
                "connect-src 'self';";
         
         $response->headers->set('Content-Security-Policy', $csp);

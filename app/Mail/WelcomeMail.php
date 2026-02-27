@@ -15,16 +15,18 @@ class WelcomeMail extends Mailable
     public $userRole;
     public $dashboardUrl;
     public ?int $conferenceId;
+    public string $registrationStatus;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($userName, $userRole, $dashboardUrl, ?int $conferenceId = null)
+    public function __construct($userName, $userRole, $dashboardUrl, ?int $conferenceId = null, string $registrationStatus = 'Terdaftar')
     {
         $this->userName = $userName;
         $this->userRole = $userRole;
         $this->dashboardUrl = $dashboardUrl;
         $this->conferenceId = $conferenceId;
+        $this->registrationStatus = $registrationStatus;
     }
 
     /**
@@ -38,11 +40,12 @@ class WelcomeMail extends Mailable
                 ? \App\Models\Conference::find($this->conferenceId)
                 : \App\Models\Conference::where('is_active', true)->first();
             $vars = [
-                'name'            => $this->userName,
-                'email'           => '',
-                'conference_name' => $conference?->name ?? config('app.name'),
-                'login_url'       => $this->dashboardUrl,
-                'dashboard_url'   => $this->dashboardUrl,
+                'name'                => $this->userName,
+                'email'               => '',
+                'conference_name'     => $conference?->name ?? config('app.name'),
+                'login_url'           => $this->dashboardUrl,
+                'dashboard_url'       => $this->dashboardUrl,
+                'registration_status' => $this->registrationStatus,
             ];
             $subject = $tpl->renderSubject($vars);
             return $this

@@ -32,9 +32,11 @@
           <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
             <tr>
               <td style="background:#f5f3ff;border-left:4px solid #7c3aed;border-radius:0 8px 8px 0;padding:14px 18px;">
+                <p style="margin:0 0 4px;font-size:14px;color:#5b21b6;">
+                  <strong>Role:</strong>&nbsp;{{ $userRole === 'author' ? 'Author / Penulis' : 'Partisipan' }}
+                </p>
                 <p style="margin:0;font-size:14px;color:#5b21b6;">
-                  <strong>Status Pendaftaran:</strong>&nbsp;
-                  {{ $userRole === 'author' ? 'Author / Penulis' : 'Partisipan' }}
+                  <strong>Status Pendaftaran:</strong>&nbsp;{{ $registrationStatus ?? ($userRole === 'author' ? 'Terdaftar sebagai Penulis' : 'Terdaftar') }}
                 </p>
               </td>
             </tr>
