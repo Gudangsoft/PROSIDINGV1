@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Prosiding LPKD-APJI')</title>
+    @php
+        $__siteName = \App\Models\Setting::getValue('site_name', 'Prosiding');
+        $__siteTagline = \App\Models\Setting::getValue('site_tagline');
+        $__siteTitle = $__siteName . ($__siteTagline ? ' | ' . $__siteTagline : '');
+    @endphp
+    <title>@yield('title', $__siteTitle)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         [x-cloak] { display: none !important; }
