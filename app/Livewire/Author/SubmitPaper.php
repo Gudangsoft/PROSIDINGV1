@@ -5,9 +5,11 @@ namespace App\Livewire\Author;
 use App\Models\Paper;
 use App\Models\PaperFile;
 use App\Models\Topic;
+use App\Models\EmailTemplate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class SubmitPaper extends Component
 {
@@ -146,6 +148,26 @@ class SubmitPaper extends Component
                 'mime_type' => $this->turnitinFile->getMimeType(),
                 'file_size' => $this->turnitinFile->getSize(),
             ]);
+        }
+
+        // Send paper_submitted email using custom template if available
+        try {
+            $user = Auth::user();
+            $tpl = EmailTemplate::forConference($activeConference?->id, 'paper_submitted');
+            if ($tpl) {
+                $vars = [
+                    'name'            => $user->name,
+                    'conference_name' => $activeConference?->name ?? config('app.name'),
+                    'paper_title'     => $paper->title,
+                    'submission_id'   => '#' . $paper->id,
+                    'dashboard_url'   => route('author.papers'),
+                ];
+                Mail::html($tpl->render($vars), function ($m) use ($tpl, $vars, $user) {
+                    $m->to($user->email)->subject($tpl->renderSubject($vars));
+                });
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to send paper_submitted email: ' . $e->getMessage());
         }
 
         session()->flash('success', 'Paper berhasil disubmit!');

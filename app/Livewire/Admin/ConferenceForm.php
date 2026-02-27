@@ -662,7 +662,9 @@ class ConferenceForm extends Component
                                 $user->name,
                                 $conference->name,
                                 $conference->start_date ? \Carbon\Carbon::parse($conference->start_date)->format('d M Y') : null,
-                                url('/')
+                                url('/'),
+                                $conference->id,
+                                $conference->venue_display
                             )
                         );
                     }
@@ -696,7 +698,9 @@ class ConferenceForm extends Component
                                 $user->name,
                                 $conference->name,
                                 $conference->start_date ? \Carbon\Carbon::parse($conference->start_date)->format('d M Y') : null,
-                                url('/')
+                                url('/'),
+                                $conference->id,
+                                $conference->venue_display
                             )
                         );
                     }

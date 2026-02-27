@@ -13,6 +13,8 @@ use App\Models\PaperFile;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Mail\PaymentVerifiedMail;
+use App\Models\EmailTemplate;
+use App\Models\Conference;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
@@ -424,6 +426,27 @@ class PaperDetail extends Component
             $this->newStatus = $this->paper->status;
             $this->workflowTab = 'production';
 
+            // Send paper_accepted email using custom template if available
+            try {
+                $conference = $this->paper->conference_id ? Conference::find($this->paper->conference_id) : null;
+                $tpl = EmailTemplate::forConference($this->paper->conference_id, 'paper_accepted');
+                if ($tpl) {
+                    $vars = [
+                        'name'            => $this->paper->user->name,
+                        'conference_name' => $conference?->name ?? config('app.name'),
+                        'paper_title'     => $this->paper->title,
+                        'loa_url'         => $this->paper->loa_link ?? route('author.paper.detail', $this->paper),
+                        'dashboard_url'   => route('author.paper.detail', $this->paper),
+                    ];
+                    Mail::html($tpl->render($vars), function ($m) use ($tpl, $vars) {
+                        $m->to($this->paper->user->email)
+                          ->subject($tpl->renderSubject($vars));
+                    });
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send paper_accepted email: ' . $e->getMessage());
+            }
+
             $message = $this->autoGenerateLoa 
                 ? 'Paper diterima! LOA auto-generated dan tagihan berhasil dikirim ke author.'
                 : 'Paper diterima! LOA dan tagihan berhasil dikirim ke author.';
@@ -482,6 +505,27 @@ class PaperDetail extends Component
                 route('author.paper.detail', $this->paper),
                 'Lihat Detail'
             );
+
+            // Send paper_rejected email using custom template if available
+            try {
+                $conference = $this->paper->conference_id ? Conference::find($this->paper->conference_id) : null;
+                $tpl = EmailTemplate::forConference($this->paper->conference_id, 'paper_rejected');
+                if ($tpl) {
+                    $vars = [
+                        'name'            => $this->paper->user->name,
+                        'conference_name' => $conference?->name ?? config('app.name'),
+                        'paper_title'     => $this->paper->title,
+                        'review_notes'    => $this->editorNotes,
+                        'dashboard_url'   => route('author.paper.detail', $this->paper),
+                    ];
+                    Mail::html($tpl->render($vars), function ($m) use ($tpl, $vars) {
+                        $m->to($this->paper->user->email)
+                          ->subject($tpl->renderSubject($vars));
+                    });
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send paper_rejected email: ' . $e->getMessage());
+            }
             
             $this->paper->refresh();
             
