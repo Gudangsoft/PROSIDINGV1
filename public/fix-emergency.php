@@ -1,5 +1,5 @@
 <?php
-// EMERGENCY FIX — conference.stifar.ac.id
+// EMERGENCY FIX ï¿½ conference.stifar.ac.id
 // Akses: /fix-emergency.php?token=stifar-fix-2026
 // HAPUS FILE INI SETELAH SELESAI!
 
@@ -82,7 +82,7 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px}
 th{text-align:left;padding:5px 10px;color:#94a3b8;border-bottom:1px solid #334155}
 td{padding:5px 10px;border-bottom:1px solid #1e293b}
 </style></head><body>
-<h2>??? Emergency Fix — conference.stifar.ac.id</h2>
+<h2>??? Emergency Fix ï¿½ conference.stifar.ac.id</h2>
 
 <div class="box">
 <h3 style="color:#38bdf8">?? Cache & Bootstrap</h3>
