@@ -14,9 +14,10 @@ class HelpdeskDetail extends Component
 
     public function mount(HelpdeskTicket $ticket)
     {
-        $isAdmin = Auth::user()?->role === 'admin';
+        $user = Auth::user();
+        $isAdminOrEditor = in_array($user?->role, ['admin', 'editor']);
         $isImpersonating = session()->has('impersonating_from');
-        if (! $isAdmin && ! $isImpersonating && (int) $ticket->user_id !== (int) Auth::id()) {
+        if (! $isAdminOrEditor && ! $isImpersonating && (int) $ticket->user_id !== (int) Auth::id()) {
             abort(403);
         }
         $this->ticket = $ticket;

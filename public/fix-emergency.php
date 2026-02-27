@@ -268,6 +268,72 @@ class ReviewList extends Component
     $reviewerPatchMsg = $success ? 'OK: Livewire components berhasil di-patch! ' . implode(', ', $msgs) : 'ERR: ' . implode(', ', $msgs);
 }
 
+// 5b. Patch Author components (action=patch_author)
+$authorPatchMsg = '';
+if (($_POST['action'] ?? '') === 'patch_author') {
+    $success = true;
+    $msgs = [];
+    
+    // Common pattern for isAdminOrEditor check
+    $authorFiles = [
+        'PaperDetail.php' => [
+            'old' => '$isAdmin      = Auth::user()?->role === \'admin\';',
+            'new' => '$user = Auth::user();
+        $isAdminOrEditor = in_array($user?->role, [\'admin\', \'editor\']);',
+            'old2' => 'if (! $isAdmin && ! $isImpersonating',
+            'new2' => 'if (! $isAdminOrEditor && ! $isImpersonating',
+        ],
+        'PaymentUpload.php' => [
+            'old' => '$isAdmin = Auth::user()?->role === \'admin\';',
+            'new' => '$user = Auth::user();
+        $isAdminOrEditor = in_array($user?->role, [\'admin\', \'editor\']);',
+            'old2' => 'if (! $isAdmin && ! $isImpersonating',
+            'new2' => 'if (! $isAdminOrEditor && ! $isImpersonating',
+        ],
+        'HelpdeskDetail.php' => [
+            'old' => '$isAdmin = Auth::user()?->role === \'admin\';',
+            'new' => '$user = Auth::user();
+        $isAdminOrEditor = in_array($user?->role, [\'admin\', \'editor\']);',
+            'old2' => 'if (! $isAdmin && ! $isImpersonating',
+            'new2' => 'if (! $isAdminOrEditor && ! $isImpersonating',
+        ],
+        'DeliverableUpload.php' => [
+            'old' => '$isAdmin = Auth::user()?->role === \'admin\';',
+            'new' => '$user = Auth::user();
+        $isAdminOrEditor = in_array($user?->role, [\'admin\', \'editor\']);',
+            'old2' => 'if (! $isAdmin && ! $isImpersonating',
+            'new2' => 'if (! $isAdminOrEditor && ! $isImpersonating',
+        ],
+    ];
+    
+    foreach ($authorFiles as $filename => $patches) {
+        $filepath = $root . '/app/Livewire/Author/' . $filename;
+        if (file_exists($filepath)) {
+            $content = file_get_contents($filepath);
+            if (str_contains($content, 'isAdminOrEditor')) {
+                $msgs[] = "SKIP: {$filename} (already patched)";
+                continue;
+            }
+            $content = str_replace($patches['old'], $patches['new'], $content);
+            $content = str_replace($patches['old2'], $patches['new2'], $content);
+            if (file_put_contents($filepath, $content) !== false) {
+                $msgs[] = "OK: {$filename}";
+            } else {
+                $success = false;
+                $msgs[] = "ERR: {$filename}";
+            }
+        } else {
+            $msgs[] = "SKIP: {$filename} not found";
+        }
+    }
+    
+    // Clear caches
+    $vs = glob($root . '/storage/framework/views/*.php') ?: [];
+    foreach ($vs as $f) unlink($f);
+    
+    $authorPatchMsg = $success ? 'OK: Author components patched! ' . implode(', ', $msgs) : 'ERR: ' . implode(', ', $msgs);
+}
+
 // 6. Handle role update POST
 $roleMsg = '';
 if ($laravelReady && !empty($_POST['fix_role_email']) && !empty($_POST['fix_role_value'])) {
@@ -298,6 +364,8 @@ $routesCurrent     = @file_get_contents($root . '/routes/web.php');
 $routesPatched     = $routesCurrent && str_contains($routesCurrent, "role:reviewer,editor");
 $reviewFormCurrent = @file_get_contents($root . '/app/Livewire/Reviewer/ReviewForm.php');
 $reviewerPatched   = $reviewFormCurrent && str_contains($reviewFormCurrent, 'isAdminOrEditor');
+$authorDetailCurrent = @file_get_contents($root . '/app/Livewire/Author/PaperDetail.php');
+$authorPatched     = $authorDetailCurrent && str_contains($authorDetailCurrent, 'isAdminOrEditor');
 ?><!DOCTYPE html>
 <html lang="id">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -387,8 +455,28 @@ td{padding:5px 10px;border-bottom:1px solid #1e293b}
 <?php endif; ?>
 </div>
 
+<div class="box" style="border-color:<?=$authorPatched?'#16a34a':'#ea580c'?>">
+<h3 style="color:#fb923c">[4] Patch Author Components -- Editor bisa akses halaman paper author</h3>
+<p class="line" style="margin-bottom:12px">Status:
+  <?php if($authorPatched): ?>
+    <span class="badge" style="background:#16a34a;color:#fff">SUDAH DI-PATCH</span>
+  <?php else: ?>
+    <span class="badge" style="background:#dc2626;color:#fff">BELUM DI-PATCH -- editor kena 403 di detail paper author</span>
+  <?php endif; ?>
+</p>
+<?php if($authorPatchMsg): $mc=str_starts_with($authorPatchMsg,'OK')?'ok':(str_starts_with($authorPatchMsg,'INFO')?'info':(str_starts_with($authorPatchMsg,'WARN')?'warn':'err')); ?>
+<div class="line <?=$mc?>" style="font-size:14px;font-weight:bold;margin-bottom:12px"><?=htmlspecialchars($authorPatchMsg)?></div>
+<?php endif; ?>
+<?php if(!$authorPatched): ?>
+<form method="POST" action="?token=<?=urlencode($_GET['token']??'')?>">
+  <input type="hidden" name="action" value="patch_author">
+  <button type="submit" class="btn-blue">Patch Author Components Sekarang</button>
+</form>
+<?php endif; ?>
+</div>
+
 <div class="box">
-<h3 style="color:#f472b6">[4] Fix User Role</h3>
+<h3 style="color:#f472b6">[5] Fix User Role</h3>
 <?php if($roleMsg): $mc=str_starts_with($roleMsg,'OK')?'ok':(str_starts_with($roleMsg,'WARN')?'warn':'err'); ?>
 <div class="line <?=$mc?>" style="font-size:15px;font-weight:bold;margin-bottom:14px"><?=htmlspecialchars($roleMsg)?></div>
 <?php endif; ?>

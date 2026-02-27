@@ -123,7 +123,7 @@
                 @endif
 
                 {{-- Reviewer Menu --}}
-                @if(Auth::user()->isReviewer())
+                @if(Auth::user()->isReviewer() || Auth::user()->isEditor() || Auth::user()->isAdmin())
                 <div class="pt-4">
                     <p class="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Reviewer</p>
                     <a href="{{ route('reviewer.reviews') }}"
