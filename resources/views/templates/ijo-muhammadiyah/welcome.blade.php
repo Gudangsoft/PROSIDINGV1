@@ -29,7 +29,7 @@
         $_dmvRaw = \App\Models\Setting::getValue('default_menu_visibility', '{}');
         $__dmv = is_array($_dmvRaw) ? $_dmvRaw : (json_decode($_dmvRaw, true) ?: []);
     @endphp
-    <title>{{ $siteName }}</title>
+    <title>{{ $siteName }}{{ $siteTagline ? ' | ' . $siteTagline : '' }}</title>
     @if($siteDescription)<meta name="description" content="{{ $siteDescription }}">@endif
     @if($siteKeywords)<meta name="keywords" content="{{ $siteKeywords }}">@endif
     @if($googleAnalytics)
