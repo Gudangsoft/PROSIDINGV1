@@ -78,12 +78,34 @@ class GeneralSettings extends Component
         }
 
         if ($this->siteLogo) {
-            // Delete old
+            // Delete old - check both locations
             $old = Setting::getValue('site_logo');
-            if ($old && \Storage::disk('public')->exists($old)) {
-                \Storage::disk('public')->delete($old);
+            if ($old) {
+                $oldPath = public_path($old);
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                }
             }
-            $path = $this->siteLogo->store('settings', 'public');
+            
+            // Save directly to public/uploads/settings/
+            $uploadDir = public_path('uploads/settings');
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            $filename = 'logo_' . time() . '.' . $this->siteLogo->getClientOriginalExtension();
+            $destPath = $uploadDir . '/' . $filename;
+            
+            // Use native PHP - more reliable on shared hosting
+            $tempPath = $this->siteLogo->getRealPath();
+            if ($tempPath && file_exists($tempPath)) {
+                copy($tempPath, $destPath);
+            } else {
+                // Alternative: use Livewire's stored temporary file
+                file_put_contents($destPath, $this->siteLogo->get());
+            }
+            
+            $path = 'uploads/settings/' . $filename;
             Setting::setValue('site_logo', $path);
             $this->settings['site_logo'] = $path;
             $this->siteLogo = null;
@@ -91,10 +113,32 @@ class GeneralSettings extends Component
 
         if ($this->siteFavicon) {
             $old = Setting::getValue('site_favicon');
-            if ($old && \Storage::disk('public')->exists($old)) {
-                \Storage::disk('public')->delete($old);
+            if ($old) {
+                $oldPath = public_path($old);
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                }
             }
-            $path = $this->siteFavicon->store('settings', 'public');
+            
+            // Save directly to public/uploads/settings/
+            $uploadDir = public_path('uploads/settings');
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            $filename = 'favicon_' . time() . '.' . $this->siteFavicon->getClientOriginalExtension();
+            $destPath = $uploadDir . '/' . $filename;
+            
+            // Use native PHP - more reliable on shared hosting
+            $tempPath = $this->siteFavicon->getRealPath();
+            if ($tempPath && file_exists($tempPath)) {
+                copy($tempPath, $destPath);
+            } else {
+                // Alternative: use Livewire's stored temporary file
+                file_put_contents($destPath, $this->siteFavicon->get());
+            }
+            
+            $path = 'uploads/settings/' . $filename;
             Setting::setValue('site_favicon', $path);
             $this->settings['site_favicon'] = $path;
             $this->siteFavicon = null;
@@ -106,8 +150,16 @@ class GeneralSettings extends Component
     public function removeLogo()
     {
         $old = Setting::getValue('site_logo');
-        if ($old && \Storage::disk('public')->exists($old)) {
-            \Storage::disk('public')->delete($old);
+        if ($old) {
+            // Try new location first
+            $oldPath = public_path($old);
+            if (file_exists($oldPath)) {
+                @unlink($oldPath);
+            }
+            // Also try old storage location
+            if (\Storage::disk('public')->exists($old)) {
+                \Storage::disk('public')->delete($old);
+            }
         }
         Setting::setValue('site_logo', null);
         $this->settings['site_logo'] = '';
@@ -117,8 +169,16 @@ class GeneralSettings extends Component
     public function removeFavicon()
     {
         $old = Setting::getValue('site_favicon');
-        if ($old && \Storage::disk('public')->exists($old)) {
-            \Storage::disk('public')->delete($old);
+        if ($old) {
+            // Try new location first
+            $oldPath = public_path($old);
+            if (file_exists($oldPath)) {
+                @unlink($oldPath);
+            }
+            // Also try old storage location
+            if (\Storage::disk('public')->exists($old)) {
+                \Storage::disk('public')->delete($old);
+            }
         }
         Setting::setValue('site_favicon', null);
         $this->settings['site_favicon'] = '';
