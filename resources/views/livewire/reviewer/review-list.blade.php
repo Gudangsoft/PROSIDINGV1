@@ -1,7 +1,13 @@
 <div class="max-w-7xl mx-auto py-8 px-4">
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-800">Paper untuk Review</h1>
-        <p class="text-gray-500 text-sm mt-1">Daftar paper yang ditugaskan kepada Anda</p>
+        <p class="text-gray-500 text-sm mt-1">
+            @if($isAdminOrEditor ?? false)
+                Daftar semua review (Admin/Editor View)
+            @else
+                Daftar paper yang ditugaskan kepada Anda
+            @endif
+        </p>
     </div>
 
     @if(session('success'))
@@ -24,6 +30,9 @@
                 <div class="flex-1">
                     <h3 class="font-semibold text-gray-800 mb-1">{{ $review->paper->title }}</h3>
                     <p class="text-sm text-gray-500">Penulis: {{ $review->paper->user->name }}</p>
+                    @if($isAdminOrEditor ?? false)
+                    <p class="text-sm text-indigo-600 font-medium">Reviewer: {{ $review->reviewer->name ?? '-' }}</p>
+                    @endif
                     <p class="text-xs text-gray-400 mt-1">Topik: {{ $review->paper->topic }} &bull; Ditugaskan: {{ $review->created_at->format('d M Y') }}</p>
                 </div>
                 <div class="text-right">

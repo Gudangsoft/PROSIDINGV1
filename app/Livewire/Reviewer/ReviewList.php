@@ -12,12 +12,15 @@ class ReviewList extends Component
 
     public function render()
     {
-        $reviews = Review::with(['paper.user', 'paper.files'])
-            ->where('reviewer_id', Auth::id())
+        $user = Auth::user();
+        $isAdminOrEditor = in_array($user->role, ['admin', 'editor']);
+        
+        $reviews = Review::with(['paper.user', 'paper.files', 'reviewer'])
+            ->when(!$isAdminOrEditor, fn($q) => $q->where('reviewer_id', $user->id))
             ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
             ->latest()
             ->paginate(10);
 
-        return view('livewire.reviewer.review-list', compact('reviews'))->layout('layouts.app');
+        return view('livewire.reviewer.review-list', compact('reviews', 'isAdminOrEditor'))->layout('layouts.app');
     }
 }

@@ -112,7 +112,163 @@ if (($_POST['action'] ?? '') === 'patch_routes') {
     }
 }
 
-// 5. Handle role update POST
+// 5. Patch Livewire Reviewer components (action=patch_reviewer)
+$reviewerPatchMsg = '';
+if (($_POST['action'] ?? '') === 'patch_reviewer') {
+    $success = true;
+    $msgs = [];
+    
+    // Patch ReviewForm.php
+    $reviewFormPath = $root . '/app/Livewire/Reviewer/ReviewForm.php';
+    $reviewFormNew = '<?php
+
+namespace App\Livewire\Reviewer;
+
+use App\Models\Review;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Auth;
+
+class ReviewForm extends Component
+{
+    use WithFileUploads;
+
+    public Review $review;
+    public string $comments = \'\';
+    public string $commentsForEditor = \'\';
+    public string $recommendation = \'\';
+    public $reviewFile;
+
+    public function mount(Review $review)
+    {
+        $user = Auth::user();
+        // Allow: assigned reviewer, admin, or editor
+        $isAssignedReviewer = $review->reviewer_id === $user->id;
+        $isAdminOrEditor = in_array($user->role, [\'admin\', \'editor\']);
+        
+        if (!$isAssignedReviewer && !$isAdminOrEditor) {
+            abort(403);
+        }
+
+        $this->review = $review;
+        $this->comments = $review->comments ?? \'\';
+        $this->commentsForEditor = $review->comments_for_editor ?? \'\';
+        $this->recommendation = $review->recommendation ?? \'\';
+    }
+
+    public function saveReview()
+    {
+        $this->validate([
+            \'comments\' => \'required|min:20\',
+            \'recommendation\' => \'required|in:accept,minor_revision,major_revision,reject\',
+            \'reviewFile\' => \'nullable|file|mimes:doc,docx|max:20480\',
+        ], [
+            \'comments.required\' => \'Komentar review wajib diisi.\',
+            \'comments.min\' => \'Komentar minimal 20 karakter.\',
+            \'recommendation.required\' => \'Rekomendasi wajib dipilih.\',
+            \'reviewFile.mimes\' => \'File harus berformat Word (.doc, .docx).\',
+            \'reviewFile.max\' => \'Ukuran file maksimal 20MB.\',
+        ]);
+
+        $data = [
+            \'comments\' => $this->comments,
+            \'comments_for_editor\' => $this->commentsForEditor,
+            \'recommendation\' => $this->recommendation,
+            \'status\' => \'completed\',
+            \'reviewed_at\' => now(),
+        ];
+
+        if ($this->reviewFile) {
+            $path = $this->reviewFile->store(\'reviews/\' . $this->review->paper_id, \'public\');
+            $data[\'review_file_path\'] = $path;
+            $data[\'review_file_name\'] = $this->reviewFile->getClientOriginalName();
+        }
+
+        $this->review->update($data);
+
+        $adminIds = \\App\\Models\\User::whereIn(\'role\', [\'admin\', \'editor\'])->pluck(\'id\');
+        \\App\\Models\\Notification::createForUsers(
+            $adminIds,
+            \'info\',
+            \'Review Selesai\',
+            \'Review untuk paper "\' . \\Illuminate\\Support\\Str::limit($this->review->paper->title, 50) . \'" telah selesai.\',
+            route(\'admin.paper.detail\', $this->review->paper),
+            \'Lihat Paper\'
+        );
+
+        session()->flash(\'success\', \'Review berhasil disimpan!\');
+        return redirect()->route(\'reviewer.reviews\');
+    }
+
+    public function saveDraft()
+    {
+        $data = [
+            \'comments\' => $this->comments,
+            \'comments_for_editor\' => $this->commentsForEditor,
+            \'recommendation\' => $this->recommendation ?: null,
+            \'status\' => \'in_progress\',
+        ];
+        $this->review->update($data);
+        session()->flash(\'success\', \'Draft berhasil disimpan.\');
+    }
+
+    public function render()
+    {
+        return view(\'livewire.reviewer.review-form\')->layout(\'layouts.app\');
+    }
+}
+';
+    if (file_put_contents($reviewFormPath, $reviewFormNew) === false) {
+        $success = false;
+        $msgs[] = 'ERR: Gagal menulis ReviewForm.php';
+    } else {
+        $msgs[] = 'OK: ReviewForm.php';
+    }
+    
+    // Patch ReviewList.php
+    $reviewListPath = $root . '/app/Livewire/Reviewer/ReviewList.php';
+    $reviewListNew = '<?php
+
+namespace App\Livewire\Reviewer;
+
+use App\Models\Review;
+use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
+
+class ReviewList extends Component
+{
+    public string $statusFilter = \'\';
+
+    public function render()
+    {
+        $user = Auth::user();
+        $isAdminOrEditor = in_array($user->role, [\'admin\', \'editor\']);
+        
+        $reviews = Review::with([\'paper.user\', \'paper.files\', \'reviewer\'])
+            ->when(!$isAdminOrEditor, fn($q) => $q->where(\'reviewer_id\', $user->id))
+            ->when($this->statusFilter, fn($q) => $q->where(\'status\', $this->statusFilter))
+            ->latest()
+            ->paginate(10);
+
+        return view(\'livewire.reviewer.review-list\', compact(\'reviews\', \'isAdminOrEditor\'))->layout(\'layouts.app\');
+    }
+}
+';
+    if (file_put_contents($reviewListPath, $reviewListNew) === false) {
+        $success = false;
+        $msgs[] = 'ERR: Gagal menulis ReviewList.php';
+    } else {
+        $msgs[] = 'OK: ReviewList.php';
+    }
+    
+    // Clear caches
+    $vs = glob($root . '/storage/framework/views/*.php') ?: [];
+    foreach ($vs as $f) unlink($f);
+    
+    $reviewerPatchMsg = $success ? 'OK: Livewire components berhasil di-patch! ' . implode(', ', $msgs) : 'ERR: ' . implode(', ', $msgs);
+}
+
+// 6. Handle role update POST
 $roleMsg = '';
 if ($laravelReady && !empty($_POST['fix_role_email']) && !empty($_POST['fix_role_value'])) {
     $email   = trim($_POST['fix_role_email']);
@@ -140,6 +296,8 @@ $middlewareCurrent = @file_get_contents($root . '/app/Http/Middleware/RoleMiddle
 $middlewarePatched  = $middlewareCurrent && str_contains($middlewareCurrent, 'Admin bypasses');
 $routesCurrent     = @file_get_contents($root . '/routes/web.php');
 $routesPatched     = $routesCurrent && str_contains($routesCurrent, "role:reviewer,editor");
+$reviewFormCurrent = @file_get_contents($root . '/app/Livewire/Reviewer/ReviewForm.php');
+$reviewerPatched   = $reviewFormCurrent && str_contains($reviewFormCurrent, 'isAdminOrEditor');
 ?><!DOCTYPE html>
 <html lang="id">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -209,8 +367,28 @@ td{padding:5px 10px;border-bottom:1px solid #1e293b}
 <?php endif; ?>
 </div>
 
+<div class="box" style="border-color:<?=$reviewerPatched?'#16a34a':'#ea580c'?>">
+<h3 style="color:#fb923c">[3] Patch Reviewer Components -- Fix 403 di halaman review detail</h3>
+<p class="line" style="margin-bottom:12px">Status:
+  <?php if($reviewerPatched): ?>
+    <span class="badge" style="background:#16a34a;color:#fff">SUDAH DI-PATCH</span>
+  <?php else: ?>
+    <span class="badge" style="background:#dc2626;color:#fff">BELUM DI-PATCH -- admin/editor masih kena 403 di form review</span>
+  <?php endif; ?>
+</p>
+<?php if($reviewerPatchMsg): $mc=str_starts_with($reviewerPatchMsg,'OK')?'ok':(str_starts_with($reviewerPatchMsg,'INFO')?'info':(str_starts_with($reviewerPatchMsg,'WARN')?'warn':'err')); ?>
+<div class="line <?=$mc?>" style="font-size:14px;font-weight:bold;margin-bottom:12px"><?=htmlspecialchars($reviewerPatchMsg)?></div>
+<?php endif; ?>
+<?php if(!$reviewerPatched): ?>
+<form method="POST" action="?token=<?=urlencode($_GET['token']??'')?>">
+  <input type="hidden" name="action" value="patch_reviewer">
+  <button type="submit" class="btn-orange">Patch Reviewer Components Sekarang</button>
+</form>
+<?php endif; ?>
+</div>
+
 <div class="box">
-<h3 style="color:#f472b6">[3] Fix User Role</h3>
+<h3 style="color:#f472b6">[4] Fix User Role</h3>
 <?php if($roleMsg): $mc=str_starts_with($roleMsg,'OK')?'ok':(str_starts_with($roleMsg,'WARN')?'warn':'err'); ?>
 <div class="line <?=$mc?>" style="font-size:15px;font-weight:bold;margin-bottom:14px"><?=htmlspecialchars($roleMsg)?></div>
 <?php endif; ?>

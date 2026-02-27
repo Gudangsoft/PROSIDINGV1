@@ -19,7 +19,14 @@ class ReviewForm extends Component
 
     public function mount(Review $review)
     {
-        if ($review->reviewer_id !== Auth::id()) abort(403);
+        $user = Auth::user();
+        // Allow: assigned reviewer, admin, or editor
+        $isAssignedReviewer = $review->reviewer_id === $user->id;
+        $isAdminOrEditor = in_array($user->role, ['admin', 'editor']);
+        
+        if (!$isAssignedReviewer && !$isAdminOrEditor) {
+            abort(403);
+        }
 
         $this->review = $review;
         $this->comments = $review->comments ?? '';
