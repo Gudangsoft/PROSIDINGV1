@@ -83,6 +83,9 @@ Route::get('/verify-certificate/{code}', function ($code) {
     return view('verify.certificate', compact('code', 'certificate'));
 })->where('code', '.+')->name('verify-certificate');
 
+// ─── Reviewer Registration Route ───
+Route::get('/register/reviewer', \App\Livewire\Auth\ReviewerRegister::class)->name('register.reviewer');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
