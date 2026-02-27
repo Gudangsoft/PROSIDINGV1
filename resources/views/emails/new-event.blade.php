@@ -1,56 +1,94 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kegiatan Baru</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; padding: 40px 20px; text-align: center; }
-        .header h1 { margin: 0; font-size: 28px; }
-        .content { padding: 40px 30px; }
-        .button { display: inline-block; background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; text-decoration: none; padding: 14px 35px; border-radius: 25px; margin: 20px 0; font-weight: 600; }
-        .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }
-        .event-box { background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%); padding: 25px; margin: 20px 0; border-radius: 8px; border-left: 5px solid #4299e1; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kegiatan Baru</title>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📢 Kegiatan Baru Dipublikasikan!</h1>
-        </div>
-        <div class="content">
-            <h2>Halo {{ $userName }}!</h2>
-            <p>Kami dengan senang hati mengumumkan kegiatan baru yang telah dipublikasikan!</p>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;color:#1e293b;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 16px;">
+  <tr><td align="center">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
 
-            <div class="event-box">
-                <h3 style="margin-top: 0; color: #2c5282;">{{ $eventName }}</h3>
+      {{-- Header --}}
+      <tr>
+        <td style="background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);padding:40px 32px;text-align:center;">
+          <div style="font-size:44px;margin-bottom:12px;">📢</div>
+          <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;">Kegiatan Baru!</h1>
+          <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">{{ config('app.name') }}</p>
+        </td>
+      </tr>
+
+      {{-- Body --}}
+      <tr>
+        <td style="padding:36px 32px;">
+
+          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! 👋</p>
+          <p style="margin:0 0 24px;color:#475569;font-size:15px;">
+            Kami dengan senang hati mengumumkan kegiatan baru yang telah dipublikasikan!
+          </p>
+
+          {{-- Event Info Box --}}
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#e0f2fe 0%,#bae6fd 100%);border-radius:10px;border:1px solid #7dd3fc;margin-bottom:24px;">
+            <tr>
+              <td style="padding:20px 22px;">
+                <p style="margin:0 0 10px;font-size:17px;font-weight:800;color:#0c4a6e;">{{ $eventName }}</p>
                 @if($eventDate)
-                <p style="margin: 10px 0;"><strong>📅 Tanggal:</strong> {{ $eventDate }}</p>
+                <p style="margin:0 0 6px;font-size:14px;color:#075985;">📅 <strong>Tanggal:</strong> {{ $eventDate }}</p>
                 @endif
-                <p style="margin: 10px 0; font-size: 14px; color: #4a5568;">Jangan lewatkan kesempatan untuk berpartisipasi dalam kegiatan ini!</p>
-            </div>
+                @if(!empty($conferenceVenue))
+                <p style="margin:0;font-size:14px;color:#075985;">📍 <strong>Lokasi:</strong> {{ $conferenceVenue }}</p>
+                @endif
+              </td>
+            </tr>
+          </table>
 
-            <p>Segera daftarkan diri Anda dan submit paper untuk kesempatan publikasi ilmiah.</p>
+          {{-- Benefits --}}
+          <p style="margin:0 0 10px;font-size:15px;font-weight:600;color:#1e293b;">Manfaat mengikuti kegiatan:</p>
+          <table width="100%" cellpadding="4" cellspacing="0" style="margin-bottom:28px;">
+            @foreach([
+              'Publikasi paper di prosiding berindeks',
+              'Networking dengan para akademisi & praktisi',
+              'Sertifikat keikutsertaan resmi',
+              'Akses materi dan rekaman kegiatan',
+              'Pengembangan profesional & karir akademik'
+            ] as $item)
+            <tr>
+              <td width="28" style="font-size:16px;color:#0284c7;vertical-align:top;padding-top:2px;">✓</td>
+              <td style="font-size:14px;color:#334155;padding-bottom:4px;">{{ $item }}</td>
+            </tr>
+            @endforeach
+          </table>
 
-            <div style="text-align: center;">
-                <a href="{{ $eventUrl }}" class="button">Lihat Detail Kegiatan</a>
-            </div>
+          {{-- CTA Button --}}
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+            <tr>
+              <td align="center">
+                <a href="{{ $eventUrl }}"
+                   style="display:inline-block;background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);color:#ffffff;text-decoration:none;padding:14px 40px;border-radius:30px;font-size:15px;font-weight:700;">
+                  🔗 Lihat Detail &amp; Daftar
+                </a>
+              </td>
+            </tr>
+          </table>
 
-            <p style="margin-top: 30px;"><strong>Manfaat mengikuti kegiatan:</strong></p>
-            <ul>
-                <li>Publikasi paper di prosiding</li>
-                <li>Networking dengan para ahli</li>
-                <li>Sertifikat resmi</li>
-                <li>Pengembangan profesional</li>
-            </ul>
+          <hr style="border:none;border-top:1px solid #e2e8f0;margin:0 0 20px;">
+          <p style="margin:0;font-size:13px;color:#94a3b8;">Segera daftarkan diri sebelum kuota penuh.</p>
+          <p style="margin:16px 0 0;font-size:14px;color:#334155;">Salam,<br><strong>Tim {{ config('app.name') }}</strong></p>
 
-            <p>Salam,<br><strong>Tim {{ config('app.name') }}</strong></p>
-        </div>
-        <div class="footer">
-            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
-        </div>
-    </div>
+        </td>
+      </tr>
+
+      {{-- Footer --}}
+      <tr>
+        <td style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0;">
+          <p style="margin:0;font-size:12px;color:#94a3b8;">&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
+          <p style="margin:4px 0 0;font-size:11px;color:#cbd5e1;">Email ini dikirim otomatis, mohon tidak dibalas.</p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
 </body>
 </html>

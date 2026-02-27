@@ -50,9 +50,14 @@ class PaymentReminderMail extends Mailable
                 'payment_url'     => $this->paymentUrl,
                 'dashboard_url'   => $this->paymentUrl,
             ];
+            $subject = $tpl->renderSubject($vars);
             return $this
-                ->subject($tpl->renderSubject($vars))
-                ->html($tpl->render($vars));
+                ->subject($subject)
+                ->view('emails.custom-template', [
+                    'subject' => $subject,
+                    'body'    => $tpl->render($vars),
+                    'icon'    => $tpl->icon(),
+                ]);
         }
 
         return $this->subject('⏰ Pengingat: Segera Upload Bukti Pembayaran — ' . config('app.name'))

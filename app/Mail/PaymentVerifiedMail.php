@@ -59,9 +59,14 @@ class PaymentVerifiedMail extends Mailable
                 'dashboard_url'   => $this->dashboardUrl,
                 'wa_group_link'   => $this->waGroupLink ?? '',
             ];
+            $subject = $tpl->renderSubject($vars);
             return $this
-                ->subject($tpl->renderSubject($vars))
-                ->html($tpl->render($vars));
+                ->subject($subject)
+                ->view('emails.custom-template', [
+                    'subject' => $subject,
+                    'body'    => $tpl->render($vars),
+                    'icon'    => $tpl->icon(),
+                ]);
         }
 
         return $this->subject('✅ Pembayaran Terverifikasi — ' . config('app.name'))

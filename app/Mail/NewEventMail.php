@@ -44,9 +44,14 @@ class NewEventMail extends Mailable
                 'conference_venue' => $this->conferenceVenue ?? '',
                 'register_url'     => $this->eventUrl,
             ];
+            $subject = $tpl->renderSubject($vars);
             return $this
-                ->subject($tpl->renderSubject($vars))
-                ->html($tpl->render($vars));
+                ->subject($subject)
+                ->view('emails.custom-template', [
+                    'subject' => $subject,
+                    'body'    => $tpl->render($vars),
+                    'icon'    => $tpl->icon(),
+                ]);
         }
 
         return $this->subject('Kegiatan Baru: ' . $this->eventName)

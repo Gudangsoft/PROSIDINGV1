@@ -44,9 +44,14 @@ class WelcomeMail extends Mailable
                 'login_url'       => $this->dashboardUrl,
                 'dashboard_url'   => $this->dashboardUrl,
             ];
+            $subject = $tpl->renderSubject($vars);
             return $this
-                ->subject($tpl->renderSubject($vars))
-                ->html($tpl->render($vars));
+                ->subject($subject)
+                ->view('emails.custom-template', [
+                    'subject' => $subject,
+                    'body'    => $tpl->render($vars),
+                    'icon'    => $tpl->icon(),
+                ]);
         }
 
         return $this->subject('Selamat Datang di ' . config('app.name'))

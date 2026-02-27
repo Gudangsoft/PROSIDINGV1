@@ -1,65 +1,120 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tagihan Pembayaran</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); color: white; padding: 40px 20px; text-align: center; }
-        .header h1 { margin: 0; font-size: 28px; }
-        .content { padding: 40px 30px; }
-        .button { display: inline-block; background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); color: white; text-decoration: none; padding: 14px 35px; border-radius: 25px; margin: 20px 0; font-weight: 600; }
-        .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }
-        .invoice-box { background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 8px; border: 2px solid #e2e8f0; }
-        .invoice-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
-        .invoice-row:last-child { border-bottom: none; }
-        .amount { font-size: 24px; color: #ed8936; font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tagihan Pembayaran</title>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>💳 Tagihan Pembayaran</h1>
-        </div>
-        <div class="content">
-            <h2>Halo {{ $userName }}!</h2>
-            <p>Tagihan pembayaran untuk paper Anda telah dibuat.</p>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;color:#1e293b;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 16px;">
+  <tr><td align="center">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
 
-            <div class="invoice-box">
-                <h3 style="margin-top: 0;">Detail Invoice</h3>
-                <div class="invoice-row">
-                    <span>Paper:</span>
-                    <strong>{{ $paperTitle }}</strong>
-                </div>
-                <div class="invoice-row">
-                    <span>No. Invoice:</span>
-                    <strong style="font-family: monospace;">{{ $invoiceNumber }}</strong>
-                </div>
-                <div class="invoice-row">
-                    <span>Jumlah Tagihan:</span>
-                    <span class="amount">Rp {{ number_format($amount, 0, ',', '.') }}</span>
-                </div>
-            </div>
+      {{-- Header --}}
+      <tr>
+        <td style="background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);padding:40px 32px;text-align:center;">
+          <div style="font-size:44px;margin-bottom:12px;">💳</div>
+          <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;">Tagihan Pembayaran</h1>
+          <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">Invoice baru telah dibuat untuk Anda</p>
+        </td>
+      </tr>
 
-            <p><strong>Silakan lakukan pembayaran sesuai nominal di atas.</strong></p>
-            
-            <p>Setelah melakukan pembayaran, upload bukti pembayaran melalui dashboard Anda untuk verifikasi.</p>
+      {{-- Body --}}
+      <tr>
+        <td style="padding:36px 32px;">
 
-            <div style="text-align: center;">
-                <a href="{{ $paymentUrl }}" class="button">Lihat & Bayar Invoice</a>
-            </div>
+          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! 👋</p>
+          <p style="margin:0 0 24px;color:#475569;font-size:15px;">
+            Tagihan pembayaran telah dibuat. Silakan selesaikan pembayaran sesuai nominal di bawah ini.
+          </p>
 
-            <p style="margin-top: 30px; font-size: 13px; color: #6c757d;">
-                <em>Invoice ini dibuat secara otomatis. Pastikan Anda melakukan pembayaran sebelum batas waktu yang ditentukan.</em>
-            </p>
+          {{-- Status Box --}}
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+            <tr>
+              <td style="background:#eef2ff;border-left:4px solid #6366f1;border-radius:0 8px 8px 0;padding:14px 18px;">
+                <p style="margin:0;font-size:14px;color:#3730a3;">
+                  <strong>Status Invoice:</strong>&nbsp;📄 Menunggu Pembayaran
+                </p>
+              </td>
+            </tr>
+          </table>
 
-            <p>Terima kasih,<br><strong>Tim {{ config('app.name') }}</strong></p>
-        </div>
-        <div class="footer">
-            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
-        </div>
-    </div>
+          {{-- Invoice Detail --}}
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:10px;border:1px solid #c7d2fe;margin-bottom:24px;">
+            <tr>
+              <td style="padding:18px 20px;">
+                <p style="margin:0 0 14px;font-size:15px;font-weight:700;color:#3730a3;">Detail Invoice</p>
+                <table width="100%" cellpadding="6" cellspacing="0">
+                  @if($paperTitle)
+                  <tr>
+                    <td style="font-size:14px;color:#64748b;width:45%;">Paper</td>
+                    <td style="font-size:14px;font-weight:600;color:#1e293b;">{{ $paperTitle }}</td>
+                  </tr>
+                  @endif
+                  <tr>
+                    <td style="font-size:14px;color:#64748b;">No. Invoice</td>
+                    <td style="font-size:14px;font-weight:700;font-family:monospace;color:#1e293b;">{{ $invoiceNumber }}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size:14px;color:#64748b;padding-top:10px;">Jumlah Tagihan</td>
+                    <td style="font-size:20px;font-weight:800;color:#4f46e5;padding-top:10px;">Rp {{ number_format($amount, 0, ',', '.') }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          {{-- Steps --}}
+          <p style="margin:0 0 10px;font-size:15px;font-weight:600;color:#1e293b;">Cara melakukan pembayaran:</p>
+          <table width="100%" cellpadding="4" cellspacing="0" style="margin-bottom:28px;">
+            @php $steps = [
+              ['num'=>'1','title'=>'Transfer Sesuai Nominal','desc'=>'Lihat rekening tujuan di halaman pembayaran.'],
+              ['num'=>'2','title'=>'Simpan Bukti Transfer','desc'=>'Ambil foto atau screenshot bukti transfer Anda.'],
+              ['num'=>'3','title'=>'Upload Bukti di Dashboard','desc'=>'Login dan upload bukti pembayaran melalui tombol di bawah.'],
+              ['num'=>'4','title'=>'Tunggu Konfirmasi','desc'=>'Admin akan memverifikasi dan Anda mendapat email konfirmasi.'],
+            ] @endphp
+            @foreach($steps as $s)
+            <tr>
+              <td width="36" style="vertical-align:top;padding-top:4px;">
+                <span style="display:inline-block;background:#4f46e5;color:#fff;border-radius:50%;width:22px;height:22px;text-align:center;font-size:12px;font-weight:700;line-height:22px;">{{ $s['num'] }}</span>
+              </td>
+              <td style="padding-bottom:10px;">
+                <p style="margin:0;font-size:14px;font-weight:700;color:#1e293b;">{{ $s['title'] }}</p>
+                <p style="margin:2px 0 0;font-size:13px;color:#64748b;">{{ $s['desc'] }}</p>
+              </td>
+            </tr>
+            @endforeach
+          </table>
+
+          {{-- CTA Button --}}
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+            <tr>
+              <td align="center">
+                <a href="{{ $paymentUrl }}"
+                   style="display:inline-block;background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);color:#ffffff;text-decoration:none;padding:14px 40px;border-radius:30px;font-size:15px;font-weight:700;">
+                  💳 Lihat &amp; Bayar Invoice
+                </a>
+              </td>
+            </tr>
+          </table>
+
+          <hr style="border:none;border-top:1px solid #e2e8f0;margin:0 0 20px;">
+          <p style="margin:0;font-size:13px;color:#94a3b8;">Pastikan melakukan pembayaran sebelum batas waktu yang ditentukan.</p>
+          <p style="margin:16px 0 0;font-size:14px;color:#334155;">Terima kasih,<br><strong>Tim {{ config('app.name') }}</strong></p>
+
+        </td>
+      </tr>
+
+      {{-- Footer --}}
+      <tr>
+        <td style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0;">
+          <p style="margin:0;font-size:12px;color:#94a3b8;">&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
+          <p style="margin:4px 0 0;font-size:11px;color:#cbd5e1;">Email ini dikirim otomatis, mohon tidak dibalas.</p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
 </body>
 </html>

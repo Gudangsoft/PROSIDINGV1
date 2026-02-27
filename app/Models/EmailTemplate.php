@@ -93,6 +93,24 @@ class EmailTemplate extends Model
     }
 
     /**
+     * Return an emoji icon for this template type, used in the email header.
+     */
+    public function icon(): string
+    {
+        return match ($this->key) {
+            'welcome'           => '🎉',
+            'payment_verified'  => '✅',
+            'payment_reminder'  => '⏰',
+            'invoice_created'   => '💳',
+            'paper_submitted'   => '📄',
+            'paper_accepted'    => '🏆',
+            'paper_rejected'    => '📋',
+            'new_event'         => '📢',
+            default             => '✉️',
+        };
+    }
+
+    /**
      * Get template for a given conference and key, or return null if not customized.
      * Falls back to the active conference when conferenceId is null.
      */

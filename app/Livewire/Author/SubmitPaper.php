@@ -6,6 +6,7 @@ use App\Models\Paper;
 use App\Models\PaperFile;
 use App\Models\Topic;
 use App\Models\EmailTemplate;
+use App\Mail\CustomTemplateMail;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
@@ -162,9 +163,7 @@ class SubmitPaper extends Component
                     'submission_id'   => '#' . $paper->id,
                     'dashboard_url'   => route('author.papers'),
                 ];
-                Mail::html($tpl->render($vars), function ($m) use ($tpl, $vars, $user) {
-                    $m->to($user->email)->subject($tpl->renderSubject($vars));
-                });
+                Mail::to($user->email)->send(new CustomTemplateMail($tpl, $vars));
             }
         } catch (\Exception $e) {
             \Log::error('Failed to send paper_submitted email: ' . $e->getMessage());
