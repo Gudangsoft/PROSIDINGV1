@@ -53,6 +53,31 @@ class Setting extends Model
         return $query->where('group', $group)->orderBy('sort_order');
     }
 
+    // ── Helper for logo/favicon URLs ──
+    public static function getLogoUrl(): ?string
+    {
+        $logo = static::getValue('site_logo');
+        if (!$logo) return null;
+        
+        // New format: uploads/settings/...
+        if (str_starts_with($logo, 'uploads/')) {
+            return asset($logo);
+        }
+        // Old format: settings/... (needs storage/)
+        return asset('storage/' . $logo);
+    }
+
+    public static function getFaviconUrl(): ?string
+    {
+        $favicon = static::getValue('site_favicon');
+        if (!$favicon) return null;
+        
+        if (str_starts_with($favicon, 'uploads/')) {
+            return asset($favicon);
+        }
+        return asset('storage/' . $favicon);
+    }
+
     // ── GROUP CONSTANTS ──
     const GROUP_GENERAL = 'general';
     const GROUP_EMAIL = 'email';
