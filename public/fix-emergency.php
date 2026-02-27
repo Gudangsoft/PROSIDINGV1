@@ -72,7 +72,15 @@ class RoleMiddleware
             return $next($request);
         }
 
-        if (!in_array($user->role, $roles)) {
+        // Parse comma-separated roles (e.g., \'reviewer,editor\' -> [\'reviewer\', \'editor\'])
+        $allowedRoles = [];
+        foreach ($roles as $role) {
+            foreach (explode(\',\', $role) as $r) {
+                $allowedRoles[] = trim($r);
+            }
+        }
+
+        if (!in_array($user->role, $allowedRoles)) {
             abort(403, \'Unauthorized.\');
         }
 
@@ -803,7 +811,7 @@ if ($laravelReady && !empty($_POST['fix_role_email']) && !empty($_POST['fix_role
 
 // Check current patch status
 $middlewareCurrent = @file_get_contents($root . '/app/Http/Middleware/RoleMiddleware.php');
-$middlewarePatched = $middlewareCurrent && str_contains($middlewareCurrent, 'Admin bypasses');
+$middlewarePatched = $middlewareCurrent && str_contains($middlewareCurrent, 'comma-separated');
 $routesCurrent = @file_get_contents($root . '/routes/web.php');
 $routesPatched = $routesCurrent && str_contains($routesCurrent, "role:reviewer,editor");
 $reviewFormCurrent = @file_get_contents($root . '/app/Livewire/Reviewer/ReviewForm.php');
@@ -1058,6 +1066,40 @@ if ($routesContent && preg_match('/Route::middleware.*reviewer.*\{[^}]*\}/s', $r
     }
 }
 ?></pre>
+
+<h3 style="color:#f87171;margin-top:20px">TEST: Simulate Middleware Check</h3>
+<?php
+if ($laravelReady) {
+    try {
+        // Get authenticated user
+        $authUser = \Illuminate\Support\Facades\Auth::user();
+        if ($authUser) {
+            echo '<p class="ok">User terautentikasi: <strong>' . htmlspecialchars($authUser->name) . '</strong> (' . htmlspecialchars($authUser->email) . ')</p>';
+            echo '<p>Role di database: <strong style="color:#fbbf24">' . htmlspecialchars($authUser->role ?? 'NULL') . '</strong></p>';
+            
+            // Simulate middleware check
+            $allowedRoles = ['reviewer', 'editor'];
+            $userRole = $authUser->role;
+            
+            echo '<p>Cek middleware role:reviewer,editor:</p>';
+            echo '<ul style="margin-left:20px">';
+            echo '<li>User role === "admin"? ' . ($userRole === 'admin' ? '<span class="ok">YA → BYPASS!</span>' : '<span class="warn">TIDAK</span>') . '</li>';
+            echo '<li>in_array(role, [reviewer,editor])? ' . (in_array($userRole, $allowedRoles) ? '<span class="ok">YA</span>' : '<span class="err">TIDAK</span>') . '</li>';
+            echo '</ul>';
+            
+            $shouldPass = ($userRole === 'admin') || in_array($userRole, $allowedRoles);
+            echo '<p style="font-size:16px;margin-top:10px">Hasil: ' . ($shouldPass ? '<span class="ok">SEHARUSNYA BISA AKSES</span>' : '<span class="err">AKAN KENA 403</span>') . '</p>';
+        } else {
+            echo '<p class="err">Tidak ada user yang login di session ini.</p>';
+            echo '<p class="warn">SOLUSI: Login ke aplikasi dulu, baru akses /reviewer/reviews</p>';
+        }
+    } catch (Throwable $e) {
+        echo '<p class="err">Error: ' . htmlspecialchars($e->getMessage()) . '</p>';
+    }
+} else {
+    echo '<p class="warn">Laravel tidak bisa di-bootstrap</p>';
+}
+?>
 </div>
 </details>
 </body></html>

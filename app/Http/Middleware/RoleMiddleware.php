@@ -21,7 +21,15 @@ class RoleMiddleware
             return $next($request);
         }
 
-        if (!in_array($user->role, $roles)) {
+        // Parse comma-separated roles (e.g., 'reviewer,editor' -> ['reviewer', 'editor'])
+        $allowedRoles = [];
+        foreach ($roles as $role) {
+            foreach (explode(',', $role) as $r) {
+                $allowedRoles[] = trim($r);
+            }
+        }
+
+        if (!in_array($user->role, $allowedRoles)) {
             abort(403, 'Unauthorized.');
         }
 
