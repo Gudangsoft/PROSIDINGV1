@@ -176,8 +176,25 @@ class UsersRoles extends Component
     public function saveAssignedRoles()
     {
         $user = User::findOrFail($this->assignUserId);
-        $user->roles()->sync(array_map('intval', $this->assignRoles));
-        session()->flash('success', "Role untuk {$user->name} berhasil diperbarui.");
+        $roleIds = array_map('intval', $this->assignRoles);
+        $user->roles()->sync($roleIds);
+
+        // Sync users.role column from the highest-priority custom role's permission_level
+        // so route middleware (role:admin,editor etc.) works correctly.
+        $priorityMap = ['admin' => 6, 'manager' => 5, 'editor' => 4, 'assistant' => 3, 'reviewer' => 2, 'author' => 1];
+        $usersRoleMap = ['admin' => 'admin', 'manager' => 'editor', 'editor' => 'editor', 'assistant' => 'editor', 'reviewer' => 'reviewer', 'author' => 'author'];
+
+        if (!empty($roleIds)) {
+            $topLevel = Role::whereIn('id', $roleIds)->get()
+                ->sortByDesc(fn($r) => $priorityMap[$r->permission_level] ?? 0)
+                ->first()?->permission_level;
+
+            if ($topLevel && isset($usersRoleMap[$topLevel])) {
+                $user->update(['role' => $usersRoleMap[$topLevel]]);
+            }
+        }
+
+        session()->flash('success', "Role untuk {$user->name} berhasil diperbarui (users.role: {$user->role}).");
         $this->showAssignRoleModal = false;
     }
 

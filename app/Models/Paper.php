@@ -58,6 +58,30 @@ class Paper extends Model
         return self::STATUS_LABELS[$this->status] ?? $this->status;
     }
 
+    /**
+     * Generate correct LOA URL regardless of how/when it was stored.
+     * - Relative paths  → asset('storage/<path>')
+     * - Legacy full URLs pointing to /storage/loa/ → re-generate from current APP_URL
+     * - Manual (Google Drive, etc.) full URLs → return as-is
+     */
+    public function getLoaUrlAttribute(): ?string
+    {
+        if (!$this->loa_link) return null;
+
+        // Already a full URL
+        if (str_starts_with($this->loa_link, 'http://') || str_starts_with($this->loa_link, 'https://')) {
+            // If it's an auto-generated storage file, extract relative path and rebuild URL
+            if (preg_match('#/storage/(loa/.+\.pdf)$#', $this->loa_link, $m)) {
+                return asset('storage/' . $m[1]);
+            }
+            // Manual link (Google Drive, Dropbox, etc.) – return as-is
+            return $this->loa_link;
+        }
+
+        // Relative path (new format)
+        return asset('storage/' . $this->loa_link);
+    }
+
     public function getStatusColorAttribute(): string
     {
         return self::STATUS_COLORS[$this->status] ?? 'gray';

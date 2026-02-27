@@ -803,7 +803,7 @@
                         @if($paper->abstract)
                         <div class="mt-2">
                             <span class="text-gray-500">Abstract:</span>
-                            <p class="mt-1 text-gray-700 line-clamp-4">{{ $paper->abstract }}</p>
+                            <p class="mt-1 text-gray-700 line-clamp-4 break-words">{{ $paper->abstract }}</p>
                         </div>
                         @endif
                     </div>
@@ -829,7 +829,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1">Abstract</label>
-                            <p class="text-gray-700 whitespace-pre-line text-sm">{{ $paper->abstract }}</p>
+                            <p class="text-gray-700 whitespace-pre-line text-sm break-words">{{ $paper->abstract }}</p>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1">Keywords</label>

@@ -388,7 +388,8 @@ class PaperDetail extends Component
             if ($this->autoGenerateLoa) {
                 $generator = new \App\Services\DocumentGenerator();
                 $loaPath = $generator->generateLOA($this->paper);
-                $loaLink = asset('storage/' . $loaPath);
+                // Store relative path only so the URL stays correct across domain changes
+                $loaLink = $loaPath;
             } else {
                 $loaLink = $this->acceptLoaLink;
             }
@@ -436,7 +437,7 @@ class PaperDetail extends Component
                         'name'            => $this->paper->user->name,
                         'conference_name' => $conference?->name ?? config('app.name'),
                         'paper_title'     => $this->paper->title,
-                        'loa_url'         => $this->paper->loa_link ?? route('author.paper.detail', $this->paper),
+                        'loa_url'         => $this->paper->loa_url ?? route('author.paper.detail', $this->paper),
                         'dashboard_url'   => route('author.paper.detail', $this->paper),
                     ];
                     Mail::to($this->paper->user->email)->send(new CustomTemplateMail($tpl, $vars));
