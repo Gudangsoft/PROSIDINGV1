@@ -17,15 +17,27 @@ class ReviewForm extends Component
     public string $recommendation = '';
     public $reviewFile;
 
+    public bool $isAdminOrEditor = false;
+
     public function mount(Review $review)
     {
         $user = Auth::user();
-        // Allow: assigned reviewer, admin, or editor
-        $isAssignedReviewer = $review->reviewer_id === $user->id;
-        $isAdminOrEditor = in_array($user->role, ['admin', 'editor']);
         
-        if (!$isAssignedReviewer && !$isAdminOrEditor) {
-            abort(403);
+        // Check user role - ensure proper comparison with lowercase
+        $userRole = strtolower(trim($user->role ?? ''));
+        
+        $this->isAdminOrEditor = in_array($userRole, ['admin', 'editor']);
+        $isAssignedReviewer = ($review->reviewer_id == $user->id); // Use == for loose comparison
+        
+        // Allow access if: admin, editor, or assigned reviewer
+        if (!$this->isAdminOrEditor && !$isAssignedReviewer) {
+            \Log::warning("Review access denied", [
+                'user_id' => $user->id,
+                'user_role' => $userRole,
+                'review_id' => $review->id,
+                'reviewer_id' => $review->reviewer_id,
+            ]);
+            abort(403, 'Access denied. Role: ' . $userRole);
         }
 
         $this->review = $review;
