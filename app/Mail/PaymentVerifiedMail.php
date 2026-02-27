@@ -46,12 +46,18 @@ class PaymentVerifiedMail extends Mailable
     {
         $tpl = EmailTemplate::forConference($this->conferenceId, 'payment_verified');
         if ($tpl) {
+            $conference = $this->conferenceId
+                ? \App\Models\Conference::find($this->conferenceId)
+                : \App\Models\Conference::where('is_active', true)->first();
             $vars = [
-                'name'          => $this->userName,
-                'invoice'       => $this->invoiceNumber,
-                'amount'        => number_format($this->amount, 0, ',', '.'),
-                'dashboard_url' => $this->dashboardUrl,
-                'wa_group_link' => $this->waGroupLink ?? '',
+                'name'            => $this->userName,
+                'conference_name' => $conference?->name ?? config('app.name'),
+                'package_name'    => $this->paymentType === 'paper' ? ($this->paperTitle ?? 'Paper') : 'Registrasi Peserta',
+                'invoice'         => $this->invoiceNumber,
+                'invoice_number'  => $this->invoiceNumber,
+                'amount'          => number_format($this->amount, 0, ',', '.'),
+                'dashboard_url'   => $this->dashboardUrl,
+                'wa_group_link'   => $this->waGroupLink ?? '',
             ];
             return $this
                 ->subject($tpl->renderSubject($vars))

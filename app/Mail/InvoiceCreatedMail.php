@@ -38,12 +38,17 @@ class InvoiceCreatedMail extends Mailable
     {
         $tpl = EmailTemplate::forConference($this->conferenceId, 'invoice_created');
         if ($tpl) {
+            $conference = $this->conferenceId
+                ? \App\Models\Conference::find($this->conferenceId)
+                : \App\Models\Conference::where('is_active', true)->first();
             $vars = [
                 'name'             => $this->userName,
+                'conference_name'  => $conference?->name ?? config('app.name'),
                 'paper_title'      => $this->paperTitle ?? '',
                 'invoice'          => $this->invoiceNumber,
                 'invoice_number'   => $this->invoiceNumber,
                 'amount'           => number_format($this->amount, 0, ',', '.'),
+                'due_date'         => '',
                 'payment_url'      => $this->paymentUrl,
                 'dashboard_url'    => $this->paymentUrl,
             ];

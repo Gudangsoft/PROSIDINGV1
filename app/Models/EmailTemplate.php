@@ -94,10 +94,15 @@ class EmailTemplate extends Model
 
     /**
      * Get template for a given conference and key, or return null if not customized.
+     * Falls back to the active conference when conferenceId is null.
      */
     public static function forConference(?int $conferenceId, string $key): ?self
     {
-        if (!$conferenceId) return null;
+        if (!$conferenceId) {
+            $active = \App\Models\Conference::where('is_active', true)->first();
+            if (!$active) return null;
+            $conferenceId = $active->id;
+        }
         return static::where('conference_id', $conferenceId)
             ->where('key', $key)
             ->where('is_active', true)

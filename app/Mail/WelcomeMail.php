@@ -34,9 +34,13 @@ class WelcomeMail extends Mailable
     {
         $tpl = EmailTemplate::forConference($this->conferenceId, 'welcome');
         if ($tpl) {
+            $conference = $this->conferenceId
+                ? \App\Models\Conference::find($this->conferenceId)
+                : \App\Models\Conference::where('is_active', true)->first();
             $vars = [
                 'name'            => $this->userName,
                 'email'           => '',
+                'conference_name' => $conference?->name ?? config('app.name'),
                 'login_url'       => $this->dashboardUrl,
                 'dashboard_url'   => $this->dashboardUrl,
             ];

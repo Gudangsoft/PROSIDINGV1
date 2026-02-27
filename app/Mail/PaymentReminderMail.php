@@ -37,11 +37,18 @@ class PaymentReminderMail extends Mailable
     {
         $tpl = EmailTemplate::forConference($this->conferenceId, 'payment_reminder');
         if ($tpl) {
+            $conference = $this->conferenceId
+                ? \App\Models\Conference::find($this->conferenceId)
+                : \App\Models\Conference::where('is_active', true)->first();
             $vars = [
-                'name'        => $this->userName,
-                'invoice'     => $this->invoiceNumber,
-                'amount'      => number_format($this->amount, 0, ',', '.'),
-                'payment_url' => $this->paymentUrl,
+                'name'            => $this->userName,
+                'conference_name' => $conference?->name ?? config('app.name'),
+                'package_name'    => 'Pembayaran Prosiding',
+                'invoice'         => $this->invoiceNumber,
+                'invoice_number'  => $this->invoiceNumber,
+                'amount'          => number_format($this->amount, 0, ',', '.'),
+                'payment_url'     => $this->paymentUrl,
+                'dashboard_url'   => $this->paymentUrl,
             ];
             return $this
                 ->subject($tpl->renderSubject($vars))
