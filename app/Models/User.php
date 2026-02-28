@@ -38,7 +38,9 @@ class User extends Authenticatable
     public function isReviewer(): bool { return $this->role === 'reviewer'; }
     public function isAuthor(): bool { return $this->role === 'author'; }
     public function isParticipant(): bool { return $this->role === 'participant'; }
+    public function isKeuangan(): bool { return $this->role === 'keuangan'; }
     public function isAdminOrEditor(): bool { return in_array($this->role, ['admin', 'editor']); }
+    public function canManagePayments(): bool { return in_array($this->role, ['admin', 'editor', 'keuangan']); }
 
     // Relationships
     public function roles()

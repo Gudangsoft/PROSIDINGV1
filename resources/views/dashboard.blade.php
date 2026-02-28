@@ -425,6 +425,88 @@ function dismissPopupPermanent(id) {
     </div>
     @endif
 
+    {{-- ============ KEUANGAN DASHBOARD ============ --}}
+    @if($user->isKeuangan())
+    @php
+        $pendingPayments = \App\Models\Payment::where('status', 'uploaded')->count();
+        $verifiedPayments = \App\Models\Payment::where('status', 'verified')->count();
+        $rejectedPayments = \App\Models\Payment::where('status', 'rejected')->count();
+        $totalPayments = \App\Models\Payment::count();
+        $todayPayments = \App\Models\Payment::whereDate('created_at', today())->count();
+        $totalRevenue = \App\Models\Payment::where('status', 'verified')->sum('amount');
+    @endphp
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div class="bg-white rounded-xl shadow-sm p-5 border text-center">
+            <p class="text-3xl font-bold text-orange-600">{{ $pendingPayments }}</p>
+            <p class="text-sm text-gray-500">Menunggu Verifikasi</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-5 border text-center">
+            <p class="text-3xl font-bold text-green-600">{{ $verifiedPayments }}</p>
+            <p class="text-sm text-gray-500">Terverifikasi</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-5 border text-center">
+            <p class="text-3xl font-bold text-red-600">{{ $rejectedPayments }}</p>
+            <p class="text-sm text-gray-500">Ditolak</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-5 border text-center">
+            <p class="text-3xl font-bold text-blue-600">{{ $totalPayments }}</p>
+            <p class="text-sm text-gray-500">Total Pembayaran</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-5 border text-center">
+            <p class="text-3xl font-bold text-purple-600">{{ $todayPayments }}</p>
+            <p class="text-sm text-gray-500">Hari Ini</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-5 border text-center">
+            <p class="text-3xl font-bold text-emerald-600">Rp {{ number_format($totalRevenue / 1000000, 1) }}jt</p>
+            <p class="text-sm text-gray-500">Total Pendapatan</p>
+        </div>
+    </div>
+
+    {{-- Pending Payments List --}}
+    <div class="bg-white rounded-xl shadow-sm border mb-8">
+        <div class="p-4 border-b flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-800">Pembayaran Menunggu Verifikasi</h2>
+            <a href="{{ route('keuangan.payments') }}" class="text-sm text-blue-600 hover:underline">Lihat Semua</a>
+        </div>
+        @php
+            $recentPending = \App\Models\Payment::with(['user', 'paper'])
+                ->where('status', 'uploaded')
+                ->latest()
+                ->take(5)
+                ->get();
+        @endphp
+        @if($recentPending->count())
+        <div class="divide-y">
+            @foreach($recentPending as $payment)
+            <div class="p-4 flex items-center justify-between hover:bg-gray-50">
+                <div>
+                    <p class="font-medium text-gray-800">{{ $payment->user->name ?? 'Unknown' }}</p>
+                    <p class="text-sm text-gray-500">{{ $payment->paper->title ?? 'Participant Payment' }}</p>
+                    <p class="text-xs text-gray-400">{{ $payment->created_at->diffForHumans() }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-gray-800">Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</p>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                        Menunggu
+                    </span>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @else
+        <p class="px-6 py-8 text-center text-gray-400 text-sm">Tidak ada pembayaran yang menunggu verifikasi.</p>
+        @endif
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm p-6 border">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Aksi Cepat</h2>
+        <a href="{{ route('keuangan.payments') }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Verifikasi Pembayaran
+        </a>
+    </div>
+    @endif
+
     {{-- ============ ADMIN DASHBOARD ============ --}}
     @if($user->isAdmin())
     @php

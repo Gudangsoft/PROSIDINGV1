@@ -47,6 +47,7 @@
                     <option value="">Semua Role</option>
                     <option value="admin">Admin</option>
                     <option value="editor">Editor</option>
+                    <option value="keuangan">Keuangan</option>
                     <option value="reviewer">Reviewer</option>
                     <option value="author">Author</option>
                     <option value="participant">Partisipan</option>
@@ -98,11 +99,12 @@
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold
                                     @if($user->role === 'admin') bg-red-100 text-red-700
                                     @elseif($user->role === 'editor') bg-purple-100 text-purple-700
+                                    @elseif($user->role === 'keuangan') bg-emerald-100 text-emerald-700
                                     @elseif($user->role === 'reviewer') bg-indigo-100 text-indigo-700
                                     @elseif($user->role === 'participant') bg-teal-100 text-teal-700
                                     @else bg-blue-100 text-blue-700
                                     @endif">
-                                    {{ $user->role === 'participant' ? 'Partisipan' : ucfirst($user->role) }}
+                                    @if($user->role === 'participant') Partisipan @elseif($user->role === 'keuangan') Keuangan @else {{ ucfirst($user->role) }} @endif
                                 </span>
                             </td>
                             <td class="px-4 py-3">
@@ -347,6 +349,7 @@
                     <select wire:model="userRole" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                         <option value="admin">Admin</option>
                         <option value="editor">Editor</option>
+                        <option value="keuangan">Keuangan</option>
                         <option value="reviewer">Reviewer</option>
                         <option value="author">Author</option>
                         <option value="participant">Partisipan</option>

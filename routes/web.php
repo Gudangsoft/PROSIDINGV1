@@ -45,6 +45,7 @@ use App\Livewire\Participant\PaymentProof;
 use App\Livewire\Participant\ParticipantInfo;
 use App\Livewire\Participant\MaterialList as ParticipantMaterialList;
 use App\Http\Controllers\NotificationController;
+use App\Livewire\NotificationList;
 use App\Helpers\Template;
 
 Route::get('/', function () {
@@ -145,6 +146,9 @@ Route::middleware(['auth'])->group(function () {
     // ─── Profile Route ───
     Route::get('/profile', Profile::class)->name('profile');
 
+    // ─── Notifications Page ───
+    Route::get('/notifications', NotificationList::class)->name('notifications');
+
     // ─── Notifications API Routes ───
     Route::prefix('api/notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
@@ -176,6 +180,12 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:reviewer,editor'])->prefix('reviewer')->group(function () {
         Route::get('/reviews', ReviewList::class)->name('reviewer.reviews');
         Route::get('/reviews/{review}', ReviewForm::class)->name('reviewer.review.form');
+    });
+
+    // ─── Keuangan Routes (Payment Management) ───
+    Route::middleware(['role:keuangan'])->prefix('keuangan')->group(function () {
+        Route::get('/payments', PaymentList::class)->name('keuangan.payments');
+        Route::get('/payments/export', [PaymentExportController::class, 'export'])->name('keuangan.payments.export');
     });
 
     // ─── Admin/Editor Shared Routes (Papers, Payments, Conferences) ───
