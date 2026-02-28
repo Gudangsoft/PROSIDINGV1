@@ -124,7 +124,7 @@ class UsersRoles extends Component
         $rules = [
             'userName'  => 'required|string|max:255',
             'userEmail' => 'required|email|max:255|unique:users,email,' . ($this->editUserId ?? 'NULL'),
-            'userRole'  => 'required|in:admin,editor,reviewer,author,participant',
+            'userRole'  => 'required|in:admin,editor,keuangan,reviewer,author,participant',
         ];
 
         if (!$this->editingUser) {
@@ -152,14 +152,47 @@ class UsersRoles extends Component
         if ($this->editingUser && $this->editUserId) {
             $user = User::findOrFail($this->editUserId);
             $user->update($data);
+            
+            // Auto-assign role based on base role if user has no roles
+            $this->autoAssignRoleIfNeeded($user);
+            
             session()->flash('success', 'User berhasil diperbarui.');
         } else {
-            User::create($data);
+            $user = User::create($data);
+            
+            // Auto-assign role based on base role
+            $this->autoAssignRoleIfNeeded($user);
+            
             session()->flash('success', 'User berhasil dibuat.');
         }
 
         $this->showUserModal = false;
         $this->resetUserForm();
+    }
+
+    /**
+     * Auto-assign a role from roles table based on user's base role
+     */
+    protected function autoAssignRoleIfNeeded(User $user): void
+    {
+        // Skip if user already has roles assigned
+        if ($user->roles()->count() > 0) {
+            return;
+        }
+
+        // Map base role to role slug
+        $roleMap = [
+            'reviewer' => 'reviewer',
+            'author'   => 'author',
+            'editor'   => 'section-editor',
+        ];
+
+        if (isset($roleMap[$user->role])) {
+            $role = Role::where('slug', $roleMap[$user->role])->first();
+            if ($role) {
+                $user->roles()->attach($role->id);
+            }
+        }
     }
 
     // ─── Assign Roles to User ───
@@ -333,6 +366,35 @@ class UsersRoles extends Component
             session()->flash('success', 'Role berhasil dihapus.');
         }
         $this->showDeleteModal = false;
+    }
+
+    /**
+     * Auto-assign roles to all users without roles
+     */
+    public function autoAssignAllRoles(): void
+    {
+        $roleMap = [
+            'reviewer' => 'reviewer',
+            'author'   => 'author',
+            'editor'   => 'section-editor',
+        ];
+
+        $usersWithoutRoles = User::doesntHave('roles')
+            ->whereIn('role', array_keys($roleMap))
+            ->get();
+
+        $count = 0;
+        foreach ($usersWithoutRoles as $user) {
+            if (isset($roleMap[$user->role])) {
+                $role = Role::where('slug', $roleMap[$user->role])->first();
+                if ($role) {
+                    $user->roles()->attach($role->id);
+                    $count++;
+                }
+            }
+        }
+
+        session()->flash('success', "Berhasil meng-assign role ke {$count} user.");
     }
 
     public function closeModal()
