@@ -4,6 +4,73 @@
         <p class="text-gray-500 text-sm mt-1">Kelola pembayaran penulis — cek bukti bayar, lalu ubah status: Lunas, Pending, atau Ditolak</p>
     </div>
 
+    {{-- Income Statistics Cards --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {{-- Total Pemasukan --}}
+        <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-4 text-white shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-emerald-100 text-sm font-medium">Total Pemasukan</p>
+                    <p class="text-2xl font-bold mt-1">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</p>
+                </div>
+                <div class="bg-white/20 rounded-lg p-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-emerald-100 text-xs mt-2">Pembayaran terverifikasi</p>
+        </div>
+
+        {{-- Pending Revenue --}}
+        <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-4 text-white shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-amber-100 text-sm font-medium">Menunggu Verifikasi</p>
+                    <p class="text-2xl font-bold mt-1">Rp {{ number_format($pendingRevenue, 0, ',', '.') }}</p>
+                </div>
+                <div class="bg-white/20 rounded-lg p-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-amber-100 text-xs mt-2">Pending & sudah upload</p>
+        </div>
+
+        {{-- Today Revenue --}}
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm font-medium">Pemasukan Hari Ini</p>
+                    <p class="text-2xl font-bold mt-1">Rp {{ number_format($todayRevenue, 0, ',', '.') }}</p>
+                </div>
+                <div class="bg-white/20 rounded-lg p-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-blue-100 text-xs mt-2">{{ now()->format('d M Y') }}</p>
+        </div>
+
+        {{-- Month Revenue --}}
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-purple-100 text-sm font-medium">Pemasukan Bulan Ini</p>
+                    <p class="text-2xl font-bold mt-1">Rp {{ number_format($monthRevenue, 0, ',', '.') }}</p>
+                </div>
+                <div class="bg-white/20 rounded-lg p-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-purple-100 text-xs mt-2">{{ now()->format('F Y') }}</p>
+        </div>
+    </div>
+
     @if(session('success'))
         <div class="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 mb-4 text-sm">{{ session('success') }}</div>
     @endif

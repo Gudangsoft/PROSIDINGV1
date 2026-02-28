@@ -224,6 +224,15 @@ class PaymentList extends Component
         $paperCount = Payment::where('type', 'paper')->count();
         $participantCount = Payment::where('type', 'participant')->count();
 
-        return view('livewire.admin.payment-list', compact('payments', 'allCount', 'paperCount', 'participantCount'))->layout('layouts.app');
+        // Income Statistics
+        $totalRevenue = Payment::where('status', 'verified')->sum('amount');
+        $pendingRevenue = Payment::whereIn('status', ['pending', 'uploaded'])->sum('amount');
+        $todayRevenue = Payment::where('status', 'verified')->whereDate('updated_at', today())->sum('amount');
+        $monthRevenue = Payment::where('status', 'verified')->whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->sum('amount');
+
+        return view('livewire.admin.payment-list', compact(
+            'payments', 'allCount', 'paperCount', 'participantCount',
+            'totalRevenue', 'pendingRevenue', 'todayRevenue', 'monthRevenue'
+        ))->layout('layouts.app');
     }
 }
