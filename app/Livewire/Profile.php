@@ -25,6 +25,7 @@ class Profile extends Component
     // File uploads
     public $photo;
     public $signatureFile;
+    public string $signatureData = ''; // For canvas signature
 
     // Password change
     public string $current_password = '';
@@ -67,6 +68,7 @@ class Profile extends Component
             'other_info' => 'nullable|string|max:1000',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'signatureFile' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'signatureData' => 'nullable|string',
         ]);
 
         $data = [
@@ -91,7 +93,7 @@ class Profile extends Component
             $this->photo = null;
         }
 
-        // Handle signature upload
+        // Handle signature upload (file or canvas)
         if ($this->signatureFile) {
             if ($user->signature) {
                 Storage::disk('public')->delete($user->signature);
@@ -99,6 +101,18 @@ class Profile extends Component
             $data['signature'] = $this->signatureFile->store('signatures', 'public');
             $this->existingSignature = $data['signature'];
             $this->signatureFile = null;
+        } elseif ($this->signatureData) {
+            // Handle canvas signature (base64)
+            if ($user->signature) {
+                Storage::disk('public')->delete($user->signature);
+            }
+            $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $this->signatureData);
+            $imageData = base64_decode($imageData);
+            $filename = 'signatures/' . uniqid('sig_') . '.png';
+            Storage::disk('public')->put($filename, $imageData);
+            $data['signature'] = $filename;
+            $this->existingSignature = $filename;
+            $this->signatureData = '';
         }
 
         $user->update($data);

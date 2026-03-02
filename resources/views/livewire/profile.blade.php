@@ -151,28 +151,132 @@
                 </div>
 
                 {{-- Signature --}}
-                <div class="mt-4 pt-4 border-t border-gray-100">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanda Tangan</label>
-                    <div class="flex items-start gap-4">
-                        @if($signatureFile)
-                            <img src="{{ $signatureFile->temporaryUrl() }}" class="h-16 rounded border">
-                        @elseif($existingSignature)
-                            <img src="{{ asset('storage/' . $existingSignature) }}" class="h-16 rounded border">
-                        @endif
-                        <div class="space-y-1">
-                            <label for="signatureFile" class="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                                Upload Tanda Tangan
-                            </label>
-                            <input id="signatureFile" type="file" wire:model="signatureFile" accept=".jpg,.jpeg,.png" class="hidden">
-                            @if($existingSignature)
-                            <button wire:click="removeSignature" wire:confirm="Hapus tanda tangan?" class="block text-xs text-red-600 hover:text-red-800 font-medium cursor-pointer">Hapus</button>
-                            @endif
-                            <p class="text-xs text-gray-500">JPG, PNG. Maks 2MB.</p>
-                            @error('signatureFile') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
+                <div class="mt-4 pt-4 border-t border-gray-100" x-data="signaturePad()">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanda Tangan <span class="text-gray-400 text-xs font-normal">(optional)</span></label>
+                    
+                    {{-- Existing Signature Preview --}}
+                    @if($existingSignature)
+                    <div class="mb-3">
+                        <p class="text-xs text-gray-500 mb-1">Tanda tangan saat ini:</p>
+                        <div class="flex items-center gap-3">
+                            <img src="{{ asset('storage/' . $existingSignature) }}" class="h-16 rounded border bg-white">
+                            <button type="button" wire:click="removeSignature" wire:confirm="Hapus tanda tangan?" class="text-xs text-red-600 hover:text-red-800 font-medium cursor-pointer">Hapus</button>
                         </div>
                     </div>
+                    @endif
+
+                    {{-- Signature Canvas --}}
+                    <div class="space-y-2">
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-1 bg-gray-50 inline-block" :class="{ 'border-blue-400 bg-blue-50': isDrawing }">
+                            <canvas 
+                                x-ref="signatureCanvas"
+                                width="400" 
+                                height="150"
+                                class="bg-white rounded cursor-crosshair touch-none"
+                                @mousedown="startDrawing($event)"
+                                @mousemove="draw($event)"
+                                @mouseup="stopDrawing()"
+                                @mouseleave="stopDrawing()"
+                                @touchstart.prevent="startDrawing($event)"
+                                @touchmove.prevent="draw($event)"
+                                @touchend="stopDrawing()"
+                            ></canvas>
+                        </div>
+                        <input type="hidden" wire:model="signatureData" x-ref="signatureInput">
+                        
+                        <div class="flex items-center gap-3">
+                            <button type="button" @click="clearCanvas()" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                Hapus
+                            </button>
+                            <span class="text-xs text-gray-400">Gambar tanda tangan Anda di area di atas</span>
+                        </div>
+                        @error('signatureData') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
+                    </div>
                 </div>
+
+                <script>
+                    function signaturePad() {
+                        return {
+                            isDrawing: false,
+                            ctx: null,
+                            lastX: 0,
+                            lastY: 0,
+                            isEmpty: true,
+
+                            init() {
+                                const canvas = this.$refs.signatureCanvas;
+                                this.ctx = canvas.getContext('2d');
+                                this.ctx.strokeStyle = '#000';
+                                this.ctx.lineWidth = 2;
+                                this.ctx.lineCap = 'round';
+                                this.ctx.lineJoin = 'round';
+                            },
+
+                            getCoordinates(event) {
+                                const canvas = this.$refs.signatureCanvas;
+                                const rect = canvas.getBoundingClientRect();
+                                const scaleX = canvas.width / rect.width;
+                                const scaleY = canvas.height / rect.height;
+                                
+                                if (event.touches && event.touches[0]) {
+                                    return {
+                                        x: (event.touches[0].clientX - rect.left) * scaleX,
+                                        y: (event.touches[0].clientY - rect.top) * scaleY
+                                    };
+                                }
+                                return {
+                                    x: (event.clientX - rect.left) * scaleX,
+                                    y: (event.clientY - rect.top) * scaleY
+                                };
+                            },
+
+                            startDrawing(event) {
+                                this.isDrawing = true;
+                                const coords = this.getCoordinates(event);
+                                this.lastX = coords.x;
+                                this.lastY = coords.y;
+                            },
+
+                            draw(event) {
+                                if (!this.isDrawing) return;
+                                
+                                const coords = this.getCoordinates(event);
+                                
+                                this.ctx.beginPath();
+                                this.ctx.moveTo(this.lastX, this.lastY);
+                                this.ctx.lineTo(coords.x, coords.y);
+                                this.ctx.stroke();
+                                
+                                this.lastX = coords.x;
+                                this.lastY = coords.y;
+                                this.isEmpty = false;
+                            },
+
+                            stopDrawing() {
+                                if (this.isDrawing && !this.isEmpty) {
+                                    this.saveSignature();
+                                }
+                                this.isDrawing = false;
+                            },
+
+                            clearCanvas() {
+                                const canvas = this.$refs.signatureCanvas;
+                                this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                this.$refs.signatureInput.value = '';
+                                this.$wire.set('signatureData', '');
+                                this.isEmpty = true;
+                            },
+
+                            saveSignature() {
+                                const canvas = this.$refs.signatureCanvas;
+                                const dataUrl = canvas.toDataURL('image/png');
+                                this.$refs.signatureInput.value = dataUrl;
+                                this.$wire.set('signatureData', dataUrl);
+                            }
+                        }
+                    }
+                </script>
 
                 {{-- Proof of Payment (read-only for participant) --}}
                 @if(Auth::user()->isParticipant() && $existingProofOfPayment)
