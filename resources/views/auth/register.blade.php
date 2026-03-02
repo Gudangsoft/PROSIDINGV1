@@ -377,17 +377,35 @@
 
                     {{-- Signature --}}
                     <div @if(!($preselectedPackage && !$preselectedPackage->is_free)) class="md:col-span-2" @endif>
-                        <label for="signature" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
                             Signature <span class="text-gray-400 font-normal">(optional)</span>
                         </label>
-                        <input id="signature" type="file" name="signature" accept=".jpg,.jpeg,.png"
-                            @change="previewSignature($event)"
-                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition file:mr-3 file:py-1.5 file:px-3 file:border-0 file:rounded-md file:bg-gray-100 file:text-gray-600 file:text-xs file:font-medium file:cursor-pointer hover:file:bg-gray-200 @error('signature') border-red-400 bg-red-50 @enderror">
-                        <p class="text-xs text-gray-400 mt-1">JPG or PNG &bull; Max 2MB</p>
-                        <template x-if="signaturePreview">
-                            <img :src="signaturePreview" class="mt-2 max-h-28 rounded-lg border border-gray-200 shadow-sm">
-                        </template>
-                        @error('signature')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-2 bg-gray-50 inline-block transition-colors"
+                            :class="{ 'border-orange-400 bg-orange-50': isDrawingSignature }">
+                            <canvas 
+                                x-ref="signatureCanvas"
+                                width="360" 
+                                height="120"
+                                class="bg-white rounded cursor-crosshair touch-none"
+                                @mousedown="startDrawingSignature($event)"
+                                @mousemove="drawSignature($event)"
+                                @mouseup="stopDrawingSignature()"
+                                @mouseleave="stopDrawingSignature()"
+                                @touchstart.prevent="startDrawingSignature($event)"
+                                @touchmove.prevent="drawSignature($event)"
+                                @touchend="stopDrawingSignature()"
+                            ></canvas>
+                        </div>
+                        <input type="hidden" name="signature_data" x-ref="signatureInput" :value="signatureData">
+                        
+                        <div class="flex items-center gap-3 mt-2">
+                            <button type="button" @click="clearSignatureCanvas()" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                Clear
+                            </button>
+                            <span class="text-xs text-gray-400">Draw your signature above</span>
+                        </div>
+                        @error('signature_data')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                 </div>
             </div>
@@ -428,21 +446,92 @@ function registerForm(defaultRole, packageAmount, isFree) {
         packageAmount: packageAmount || null,
         isFree: isFree || false,
         paymentPreview: null,
-        signaturePreview: null,
+        
+        // Signature canvas properties
+        signatureData: '',
+        isDrawingSignature: false,
+        signatureCtx: null,
+        lastX: 0,
+        lastY: 0,
+        signatureEmpty: true,
+
+        init() {
+            this.$nextTick(() => {
+                if (this.$refs.signatureCanvas) {
+                    this.signatureCtx = this.$refs.signatureCanvas.getContext('2d');
+                    this.signatureCtx.strokeStyle = '#000';
+                    this.signatureCtx.lineWidth = 2;
+                    this.signatureCtx.lineCap = 'round';
+                    this.signatureCtx.lineJoin = 'round';
+                }
+            });
+        },
+
+        getSignatureCoordinates(event) {
+            const canvas = this.$refs.signatureCanvas;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            if (event.touches && event.touches[0]) {
+                return {
+                    x: (event.touches[0].clientX - rect.left) * scaleX,
+                    y: (event.touches[0].clientY - rect.top) * scaleY
+                };
+            }
+            return {
+                x: (event.clientX - rect.left) * scaleX,
+                y: (event.clientY - rect.top) * scaleY
+            };
+        },
+
+        startDrawingSignature(event) {
+            this.isDrawingSignature = true;
+            const coords = this.getSignatureCoordinates(event);
+            this.lastX = coords.x;
+            this.lastY = coords.y;
+        },
+
+        drawSignature(event) {
+            if (!this.isDrawingSignature) return;
+            
+            const coords = this.getSignatureCoordinates(event);
+            
+            this.signatureCtx.beginPath();
+            this.signatureCtx.moveTo(this.lastX, this.lastY);
+            this.signatureCtx.lineTo(coords.x, coords.y);
+            this.signatureCtx.stroke();
+            
+            this.lastX = coords.x;
+            this.lastY = coords.y;
+            this.signatureEmpty = false;
+        },
+
+        stopDrawingSignature() {
+            if (this.isDrawingSignature && !this.signatureEmpty) {
+                this.saveSignature();
+            }
+            this.isDrawingSignature = false;
+        },
+
+        clearSignatureCanvas() {
+            const canvas = this.$refs.signatureCanvas;
+            this.signatureCtx.clearRect(0, 0, canvas.width, canvas.height);
+            this.signatureData = '';
+            this.signatureEmpty = true;
+        },
+
+        saveSignature() {
+            const canvas = this.$refs.signatureCanvas;
+            this.signatureData = canvas.toDataURL('image/png');
+        },
+
         previewPayment(e) {
             const file = e.target.files[0];
             if (file && file.type.startsWith('image/')) {
                 this.paymentPreview = URL.createObjectURL(file);
             } else {
                 this.paymentPreview = null;
-            }
-        },
-        previewSignature(e) {
-            const file = e.target.files[0];
-            if (file && file.type.startsWith('image/')) {
-                this.signaturePreview = URL.createObjectURL(file);
-            } else {
-                this.signaturePreview = null;
             }
         }
     }

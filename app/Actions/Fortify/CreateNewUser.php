@@ -43,7 +43,7 @@ class CreateNewUser implements CreatesNewUsers
         // Common optional fields for all roles
         $rules['research_interest'] = ['required', 'string', 'max:255'];
         $rules['other_info'] = ['nullable', 'string', 'max:1000'];
-        $rules['signature'] = ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:2048'];
+        $rules['signature_data'] = ['nullable', 'string']; // Base64 signature from canvas
 
         // Check if selected package is free (before validation)
         $isFreePackage = false;
@@ -75,8 +75,13 @@ class CreateNewUser implements CreatesNewUsers
             'other_info' => $input['other_info'] ?? null,
         ];
 
-        if (isset($input['signature']) && $input['signature'] instanceof \Illuminate\Http\UploadedFile) {
-            $data['signature'] = $input['signature']->store('signatures', 'public');
+        // Handle canvas signature (base64)
+        if (!empty($input['signature_data']) && str_starts_with($input['signature_data'], 'data:image/')) {
+            $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $input['signature_data']);
+            $imageData = base64_decode($imageData);
+            $filename = 'signatures/' . uniqid('sig_') . '.png';
+            \Illuminate\Support\Facades\Storage::disk('public')->put($filename, $imageData);
+            $data['signature'] = $filename;
         }
 
         // Save proof of payment file if provided (package with require_payment_proof flag)
