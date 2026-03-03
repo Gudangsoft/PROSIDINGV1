@@ -691,6 +691,14 @@
         <p class="brand-subtitle">Setup Wizard - Instalasi Mudah Tanpa Terminal</p>
     </div>
     
+    {{-- Error Display --}}
+    @if(!empty($error))
+    <div class="alert alert-danger d-flex align-items-center mb-3" role="alert" style="border-radius: 12px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #dc2626;">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <div>{{ $error }}</div>
+    </div>
+    @endif
+    
     {{-- Step Progress --}}
     @if(!$completed)
     <div class="step-progress" id="stepProgress">

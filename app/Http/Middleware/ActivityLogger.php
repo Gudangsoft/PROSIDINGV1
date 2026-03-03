@@ -31,6 +31,11 @@ class ActivityLogger
      */
     private function shouldLog(Request $request): bool
     {
+        // Skip setup routes
+        if (str_starts_with($request->path(), 'setup')) {
+            return false;
+        }
+        
         // Log POST, PUT, PATCH, DELETE requests
         if (in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
             return true;

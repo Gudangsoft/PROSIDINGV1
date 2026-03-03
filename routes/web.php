@@ -480,7 +480,11 @@ Route::get('/page/{page:slug}', function (\App\Models\Page $page) {
 })->name('page.show');
 
 // ─── Setup Installer (cPanel deployment, tanpa terminal) ───────────────────
-Route::prefix('setup')->name('setup.')->group(function () {
+// Setup routes menggunakan minimal middleware untuk menghindari error saat .env belum dikonfigurasi
+Route::prefix('setup')->name('setup.')->withoutMiddleware([
+    \App\Http\Middleware\ActivityLogger::class,
+    \Illuminate\Session\Middleware\AuthenticateSession::class,
+])->group(function () {
     Route::get  ('/',            [SetupController::class, 'index'])       ->name('index');
     Route::post ('/auth',        [SetupController::class, 'auth'])        ->name('auth');
     Route::post ('/requirements',[SetupController::class, 'requirements'])->name('requirements');

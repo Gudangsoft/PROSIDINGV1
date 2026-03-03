@@ -12,32 +12,113 @@ class SetupController extends Controller
     // Token keamanan - baca dari file .setup-token atau gunakan default
     private function getSetupToken(): string
     {
-        $tokenFile = base_path('.setup-token');
-        if (file_exists($tokenFile)) {
-            return trim(file_get_contents($tokenFile));
+        try {
+            $tokenFile = base_path('.setup-token');
+            if (file_exists($tokenFile) && is_readable($tokenFile)) {
+                $token = trim(file_get_contents($tokenFile));
+                if (!empty($token)) {
+                    return $token;
+                }
+            }
+        } catch (\Exception $e) {
+            // Ignore errors, use default
         }
         return 'setup-prosiding'; // Default token
     }
 
     // Rate limiting - max 5 attempts per 15 minutes
+    // Menggunakan file-based jika cache tidak tersedia
     private function isRateLimited(Request $request): bool
     {
-        $key = 'setup_attempts_' . $request->ip();
-        $attempts = cache()->get($key, 0);
-        return $attempts >= 5;
+        try {
+            $key = 'setup_attempts_' . md5($request->ip());
+            
+            // Coba gunakan cache terlebih dahulu
+            if ($this->isCacheAvailable()) {
+                $attempts = cache()->get($key, 0);
+                return $attempts >= 5;
+            }
+            
+            // Fallback ke file-based rate limiting
+            $filePath = $this->getRateLimitFilePath($request);
+            if (file_exists($filePath)) {
+                $data = json_decode(file_get_contents($filePath), true);
+                if ($data && isset($data['expires']) && $data['expires'] > time()) {
+                    return ($data['attempts'] ?? 0) >= 5;
+                }
+            }
+        } catch (\Exception $e) {
+            // Jika error, izinkan akses
+        }
+        return false;
     }
 
     private function incrementAttempts(Request $request): void
     {
-        $key = 'setup_attempts_' . $request->ip();
-        $attempts = cache()->get($key, 0);
-        cache()->put($key, $attempts + 1, now()->addMinutes(15));
+        try {
+            $key = 'setup_attempts_' . md5($request->ip());
+            
+            if ($this->isCacheAvailable()) {
+                $attempts = cache()->get($key, 0);
+                cache()->put($key, $attempts + 1, now()->addMinutes(15));
+                return;
+            }
+            
+            // Fallback ke file-based
+            $filePath = $this->getRateLimitFilePath($request);
+            $data = ['attempts' => 1, 'expires' => time() + 900]; // 15 minutes
+            
+            if (file_exists($filePath)) {
+                $existing = json_decode(file_get_contents($filePath), true);
+                if ($existing && isset($existing['expires']) && $existing['expires'] > time()) {
+                    $data['attempts'] = ($existing['attempts'] ?? 0) + 1;
+                    $data['expires'] = $existing['expires'];
+                }
+            }
+            
+            file_put_contents($filePath, json_encode($data));
+        } catch (\Exception $e) {
+            // Ignore errors
+        }
     }
 
     private function clearAttempts(Request $request): void
     {
-        $key = 'setup_attempts_' . $request->ip();
-        cache()->forget($key);
+        try {
+            $key = 'setup_attempts_' . md5($request->ip());
+            
+            if ($this->isCacheAvailable()) {
+                cache()->forget($key);
+            }
+            
+            // Hapus file juga jika ada
+            $filePath = $this->getRateLimitFilePath($request);
+            if (file_exists($filePath)) {
+                @unlink($filePath);
+            }
+        } catch (\Exception $e) {
+            // Ignore errors
+        }
+    }
+    
+    private function isCacheAvailable(): bool
+    {
+        try {
+            cache()->put('_test_cache_', 1, 1);
+            cache()->forget('_test_cache_');
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+    
+    private function getRateLimitFilePath(Request $request): string
+    {
+        $dir = storage_path('app/setup_ratelimit');
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0755, true);
+        }
+        return $dir . '/' . md5($request->ip()) . '.json';
     }
 
     // File penanda bahwa setup sudah selesai
@@ -48,12 +129,20 @@ class SetupController extends Controller
 
     private function isCompleted(): bool
     {
-        return file_exists($this->completedFlagPath());
+        try {
+            return file_exists($this->completedFlagPath());
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     private function checkToken(Request $request): bool
     {
-        return $request->session()->get('setup_authenticated') === true;
+        try {
+            return $request->session()->get('setup_authenticated') === true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -61,17 +150,27 @@ class SetupController extends Controller
     // -------------------------------------------------------------------------
     public function index(Request $request)
     {
-        if ($this->isCompleted()) {
-            return view('setup.index', ['completed' => true, 'envValues' => []]);
+        try {
+            if ($this->isCompleted()) {
+                return view('setup.index', ['completed' => true, 'envValues' => [], 'error' => null]);
+            }
+            
+            // Load existing .env values for pre-fill
+            $envValues = $this->getEnvValues();
+            
+            return view('setup.index', [
+                'completed' => false,
+                'envValues' => $envValues,
+                'error' => null,
+            ]);
+        } catch (\Exception $e) {
+            // Jika ada error, tampilkan halaman setup dengan pesan error
+            return view('setup.index', [
+                'completed' => false,
+                'envValues' => [],
+                'error' => 'Error: ' . $e->getMessage(),
+            ]);
         }
-        
-        // Load existing .env values for pre-fill
-        $envValues = $this->getEnvValues();
-        
-        return view('setup.index', [
-            'completed' => false,
-            'envValues' => $envValues,
-        ]);
     }
 
     // -------------------------------------------------------------------------
@@ -438,40 +537,71 @@ class SetupController extends Controller
     // -------------------------------------------------------------------------
     private function getEnvValues(): array
     {
-        $envPath = base_path('.env');
-        if (!file_exists($envPath)) {
-            return [];
-        }
-
-        $values = [];
-        $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        foreach ($lines as $line) {
-            if (str_starts_with(trim($line), '#')) {
-                continue;
+        try {
+            $envPath = base_path('.env');
+            if (!file_exists($envPath) || !is_readable($envPath)) {
+                return $this->getDefaultEnvValues();
             }
-            [$key, $value] = array_pad(explode('=', $line, 2), 2, '');
-            $key   = trim($key);
-            $value = trim($value, " \t\n\r\0\x0B\"'");
-            if (!empty($key)) {
-                $values[$key] = $value;
-            }
-        }
 
+            $values = [];
+            $lines = @file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            if ($lines === false) {
+                return $this->getDefaultEnvValues();
+            }
+            
+            foreach ($lines as $line) {
+                if (str_starts_with(trim($line), '#')) {
+                    continue;
+                }
+                $parts = explode('=', $line, 2);
+                if (count($parts) < 2) {
+                    continue;
+                }
+                $key   = trim($parts[0]);
+                $value = trim($parts[1], " \t\n\r\0\x0B\"'");
+                if (!empty($key)) {
+                    $values[$key] = $value;
+                }
+            }
+
+            return [
+                'app_name'     => $values['APP_NAME'] ?? 'Prosiding Conference',
+                'app_url'      => $values['APP_URL'] ?? '',
+                'app_env'      => $values['APP_ENV'] ?? 'production',
+                'app_debug'    => $values['APP_DEBUG'] ?? 'false',
+                'app_timezone' => $values['APP_TIMEZONE'] ?? 'Asia/Jakarta',
+                'db_host'      => $values['DB_HOST'] ?? 'localhost',
+                'db_port'      => $values['DB_PORT'] ?? '3306',
+                'db_database'  => $values['DB_DATABASE'] ?? '',
+                'db_username'  => $values['DB_USERNAME'] ?? '',
+                'mail_mailer'  => $values['MAIL_MAILER'] ?? 'log',
+                'mail_host'    => $values['MAIL_HOST'] ?? '',
+                'mail_port'    => $values['MAIL_PORT'] ?? '587',
+                'mail_username'=> $values['MAIL_USERNAME'] ?? '',
+                'mail_from_address' => $values['MAIL_FROM_ADDRESS'] ?? '',
+            ];
+        } catch (\Exception $e) {
+            return $this->getDefaultEnvValues();
+        }
+    }
+    
+    private function getDefaultEnvValues(): array
+    {
         return [
-            'app_name'     => $values['APP_NAME'] ?? 'Prosiding Conference',
-            'app_url'      => $values['APP_URL'] ?? '',
-            'app_env'      => $values['APP_ENV'] ?? 'production',
-            'app_debug'    => $values['APP_DEBUG'] ?? 'false',
-            'app_timezone' => $values['APP_TIMEZONE'] ?? 'Asia/Jakarta',
-            'db_host'      => $values['DB_HOST'] ?? 'localhost',
-            'db_port'      => $values['DB_PORT'] ?? '3306',
-            'db_database'  => $values['DB_DATABASE'] ?? '',
-            'db_username'  => $values['DB_USERNAME'] ?? '',
-            'mail_mailer'  => $values['MAIL_MAILER'] ?? 'log',
-            'mail_host'    => $values['MAIL_HOST'] ?? '',
-            'mail_port'    => $values['MAIL_PORT'] ?? '587',
-            'mail_username'=> $values['MAIL_USERNAME'] ?? '',
-            'mail_from_address' => $values['MAIL_FROM_ADDRESS'] ?? '',
+            'app_name'     => 'Prosiding Conference',
+            'app_url'      => '',
+            'app_env'      => 'production',
+            'app_debug'    => 'false',
+            'app_timezone' => 'Asia/Jakarta',
+            'db_host'      => 'localhost',
+            'db_port'      => '3306',
+            'db_database'  => '',
+            'db_username'  => '',
+            'mail_mailer'  => 'log',
+            'mail_host'    => '',
+            'mail_port'    => '587',
+            'mail_username'=> '',
+            'mail_from_address' => '',
         ];
     }
 

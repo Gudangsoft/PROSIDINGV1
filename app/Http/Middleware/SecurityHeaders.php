@@ -17,6 +17,11 @@ class SecurityHeaders
     {
         $response = $next($request);
 
+        // Skip security headers for setup routes
+        if (str_starts_with($request->path(), 'setup')) {
+            return $response;
+        }
+
         // Security Headers
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
@@ -26,9 +31,9 @@ class SecurityHeaders
         
         // Content Security Policy (adjust as needed)
         $csp = "default-src 'self'; " .
-               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com; " .
-               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " .
-               "font-src 'self' https://fonts.gstatic.com; " .
+               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net; " .
+               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; " .
+               "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; " .
                "img-src 'self' data: https: blob:; " .
                "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://drive.google.com https://docs.google.com; " .
                "connect-src 'self';";
