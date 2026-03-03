@@ -26,7 +26,7 @@
                 @if(isset($authorDeliverables[$type]))
                     <div class="bg-gray-50 rounded-lg p-3 mb-3 text-sm">
                         <p class="text-gray-700">{{ $authorDeliverables[$type]->original_name }}</p>
-                        <p class="text-xs text-gray-400">{{ $authorDeliverables[$type]->created_at->format('d M Y H:i') }}</p>
+                        <p class="text-xs text-gray-400">{{ $authorDeliverables[$type]->created_at->format('d M Y h:i A') }}</p>
                         <a href="{{ asset('storage/' . $authorDeliverables[$type]->file_path) }}" target="_blank" class="text-blue-600 text-xs">Download</a>
                     </div>
                 @endif

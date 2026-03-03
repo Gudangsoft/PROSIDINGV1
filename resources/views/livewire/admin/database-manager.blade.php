@@ -147,7 +147,7 @@
                             <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">{{ $table['engine'] }}</span>
                         </td>
                         <td class="px-4 py-2.5 text-center text-xs text-gray-400">
-                            {{ $table['updated'] ? \Carbon\Carbon::parse($table['updated'])->format('d/m/Y H:i') : '-' }}
+                            {{ $table['updated'] ? \Carbon\Carbon::parse($table['updated'])->format('d/m/Y h:i A') : '-' }}
                         </td>
                     </tr>
                     @endforeach

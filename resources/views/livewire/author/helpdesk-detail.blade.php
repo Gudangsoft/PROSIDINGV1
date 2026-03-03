@@ -26,7 +26,7 @@
                         {{ $ticket->priority_label }}
                     </span>
                     <span class="text-gray-400">{{ $ticket->category_label }}</span>
-                    <span class="text-gray-400">{{ $ticket->created_at->format('d M Y H:i') }}</span>
+                    <span class="text-gray-400">{{ $ticket->created_at->format('d M Y h:i A') }}</span>
                 </div>
             </div>
             @if($ticket->status !== 'closed')

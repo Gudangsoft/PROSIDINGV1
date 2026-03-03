@@ -52,7 +52,7 @@
             </div>
             <div>
                 <p class="text-gray-500 text-xs">Dibuat</p>
-                <p class="font-medium text-gray-800">{{ $ticket->created_at->format('d M Y H:i') }}</p>
+                <p class="font-medium text-gray-800">{{ $ticket->created_at->format('d M Y h:i A') }}</p>
             </div>
             <div>
                 <p class="text-gray-500 text-xs">Ditangani oleh</p>

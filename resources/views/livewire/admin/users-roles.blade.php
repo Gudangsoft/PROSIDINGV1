@@ -615,7 +615,7 @@
                     </div>
                     <div class="bg-gray-50 rounded-lg p-3">
                         <p class="text-xs font-medium text-gray-500 uppercase mb-1">Terdaftar</p>
-                        <p class="text-gray-800">{{ $detailUser->created_at->format('d M Y, H:i') }}</p>
+                        <p class="text-gray-800">{{ $detailUser->created_at->format('d M Y, h:i A') }}</p>
                     </div>
                 </div>
 

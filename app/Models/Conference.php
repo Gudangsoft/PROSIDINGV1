@@ -140,9 +140,9 @@ class Conference extends Model
     public function getFormattedTimeAttribute(): ?string
     {
         if (!$this->start_time) return null;
-        $start = \Carbon\Carbon::parse($this->start_time)->format('H:i');
+        $start = \Carbon\Carbon::parse($this->start_time)->format('h:i A');
         if ($this->end_time) {
-            $end = \Carbon\Carbon::parse($this->end_time)->format('H:i');
+            $end = \Carbon\Carbon::parse($this->end_time)->format('h:i A');
             return "{$start} - {$end} WIB";
         }
         return "{$start} WIB";

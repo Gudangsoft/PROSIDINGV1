@@ -934,16 +934,16 @@
                     <div class="p-3 text-xs space-y-2">
                         <div class="flex justify-between">
                             <span class="text-gray-500">Submitted:</span>
-                            <span>{{ $paper->submitted_at?->format('M d, Y H:i') ?? '-' }}</span>
+                            <span>{{ $paper->submitted_at?->format('M d, Y h:i A') ?? '-' }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-500">Accepted:</span>
-                            <span>{{ $paper->accepted_at?->format('M d, Y H:i') ?? '-' }}</span>
+                            <span>{{ $paper->accepted_at?->format('M d, Y h:i A') ?? '-' }}</span>
                         </div>
                         @if($paper->payment)
                         <div class="flex justify-between">
                             <span class="text-gray-500">Paid:</span>
-                            <span>{{ $paper->payment->paid_at?->format('M d, Y H:i') ?? '-' }}</span>
+                            <span>{{ $paper->payment->paid_at?->format('M d, Y h:i A') ?? '-' }}</span>
                         </div>
                         @endif
                     </div>
@@ -1370,30 +1370,30 @@
             <div class="space-y-3 text-xs">
                 <div class="border-l-2 border-blue-500 pl-3 py-1">
                     <p class="font-medium text-gray-800">Submission created</p>
-                    <p class="text-gray-500">{{ $paper->submitted_at?->format('M d, Y H:i') ?? $paper->created_at->format('M d, Y H:i') }}</p>
+                    <p class="text-gray-500">{{ $paper->submitted_at?->format('M d, Y h:i A') ?? $paper->created_at->format('M d, Y h:i A') }}</p>
                 </div>
                 @if($paper->status !== 'submitted')
                 <div class="border-l-2 border-indigo-500 pl-3 py-1">
                     <p class="font-medium text-gray-800">Status changed to {{ $paper->status_label }}</p>
-                    <p class="text-gray-500">{{ $paper->updated_at->format('M d, Y H:i') }}</p>
+                    <p class="text-gray-500">{{ $paper->updated_at->format('M d, Y h:i A') }}</p>
                 </div>
                 @endif
                 @foreach($paper->reviews as $review)
                 <div class="border-l-2 border-purple-500 pl-3 py-1">
                     <p class="font-medium text-gray-800">Reviewer assigned: {{ $review->reviewer->name }}</p>
-                    <p class="text-gray-500">{{ $review->created_at->format('M d, Y H:i') }}</p>
+                    <p class="text-gray-500">{{ $review->created_at->format('M d, Y h:i A') }}</p>
                 </div>
                 @if($review->status === 'completed')
                 <div class="border-l-2 border-green-500 pl-3 py-1">
                     <p class="font-medium text-gray-800">Review completed by {{ $review->reviewer->name }}</p>
-                    <p class="text-gray-500">{{ $review->reviewed_at?->format('M d, Y H:i') ?? '-' }}</p>
+                    <p class="text-gray-500">{{ $review->reviewed_at?->format('M d, Y h:i A') ?? '-' }}</p>
                 </div>
                 @endif
                 @endforeach
                 @if($paper->accepted_at)
                 <div class="border-l-2 border-green-500 pl-3 py-1">
                     <p class="font-medium text-gray-800">Paper accepted</p>
-                    <p class="text-gray-500">{{ $paper->accepted_at->format('M d, Y H:i') }}</p>
+                    <p class="text-gray-500">{{ $paper->accepted_at->format('M d, Y h:i A') }}</p>
                 </div>
                 @endif
             </div>

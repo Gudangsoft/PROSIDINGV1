@@ -38,7 +38,7 @@
 
                 @if($review->status === 'completed')
                     <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 text-sm text-green-700">
-                        Review telah selesai pada {{ $review->reviewed_at?->format('d M Y H:i') }}.
+                        Review telah selesai pada {{ $review->reviewed_at?->format('d M Y h:i A') }}.
                     </div>
                 @endif
 

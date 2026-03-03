@@ -99,13 +99,13 @@
                     @if($payment->paid_at)
                     <div>
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Upload Date</p>
-                        <p class="text-sm text-gray-700 mt-1">{{ $payment->paid_at->format('d M Y, H:i') }}</p>
+                        <p class="text-sm text-gray-700 mt-1">{{ $payment->paid_at->format('d M Y, h:i A') }}</p>
                     </div>
                     @endif
                     @if($payment->verified_at)
                     <div>
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Verification Date</p>
-                        <p class="text-sm text-gray-700 mt-1">{{ $payment->verified_at->format('d M Y, H:i') }}</p>
+                        <p class="text-sm text-gray-700 mt-1">{{ $payment->verified_at->format('d M Y, h:i A') }}</p>
                     </div>
                     @endif
                 </div>

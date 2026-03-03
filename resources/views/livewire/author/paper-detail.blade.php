@@ -14,7 +14,7 @@
                 @else bg-gray-100 text-gray-800 @endif">
                 {{ $paper->status_label }}
             </span>
-            <span class="text-sm text-gray-500">Disubmit: {{ $paper->submitted_at?->format('d M Y H:i') }}</span>
+            <span class="text-sm text-gray-500">Disubmit: {{ $paper->submitted_at?->format('d M Y h:i A') }}</span>
         </div>
     </div>
 
@@ -48,7 +48,7 @@
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                             <div>
                                 <p class="text-sm font-medium text-gray-800">{{ $file->original_name }}</p>
-                                <p class="text-xs text-gray-400">{{ ucfirst(str_replace('_', ' ', $file->type)) }} &bull; {{ $file->file_size_human }} &bull; {{ $file->created_at->format('d M Y H:i') }}</p>
+                                <p class="text-xs text-gray-400">{{ ucfirst(str_replace('_', ' ', $file->type)) }} &bull; {{ $file->file_size_human }} &bull; {{ $file->created_at->format('d M Y h:i A') }}</p>
                                 @if($file->notes) <p class="text-xs text-gray-500 mt-1">{{ $file->notes }}</p> @endif
                             </div>
                         </div>
@@ -68,7 +68,7 @@
                         <div class="flex justify-between items-start mb-3">
                             <div>
                                 <p class="font-medium text-gray-800">Reviewer</p>
-                                <p class="text-xs text-gray-400">{{ $review->reviewed_at?->format('d M Y H:i') }}</p>
+                                <p class="text-xs text-gray-400">{{ $review->reviewed_at?->format('d M Y h:i A') }}</p>
                             </div>
                             <div class="text-right">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
@@ -187,7 +187,7 @@
                                 <div>
                                     <p class="font-medium text-gray-800">{{ \App\Models\Deliverable::TYPE_LABELS[$deliverable->type] ?? $deliverable->type }}</p>
                                     <p class="text-xs text-gray-500">{{ $deliverable->original_name }}</p>
-                                    <p class="text-xs text-gray-400 mt-0.5">Dikirim: {{ $deliverable->sent_at?->format('d M Y H:i') }}</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Dikirim: {{ $deliverable->sent_at?->format('d M Y h:i A') }}</p>
                                 </div>
                             </div>
                             <a href="{{ asset('storage/' . $deliverable->file_path) }}" target="_blank"
@@ -331,7 +331,7 @@
                                 </svg>
                                 <div>
                                     <p class="text-sm font-medium text-gray-800">{{ $file->original_name }}</p>
-                                    <p class="text-xs text-gray-500">{{ $file->file_size_human }} &bull; {{ $file->created_at->format('d M Y H:i') }}</p>
+                                    <p class="text-xs text-gray-500">{{ $file->file_size_human }} &bull; {{ $file->created_at->format('d M Y h:i A') }}</p>
                                     @if($file->notes) <p class="text-xs text-gray-600 mt-1">Catatan: {{ $file->notes }}</p> @endif
                                 </div>
                             </div>

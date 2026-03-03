@@ -106,7 +106,7 @@
         {{-- Footer --}}
         <div class="mt-6 pt-4 border-t border-gray-100 text-center">
             <p class="text-xs text-gray-400">
-                Verifikasi dilakukan pada {{ now()->format('d F Y, H:i') }} WIB
+                Verifikasi dilakukan pada {{ now()->format('d F Y, h:i A') }} WIB
             </p>
             <a href="{{ url('/') }}" class="text-xs text-blue-600 hover:underline mt-1 block">
                 Kembali ke Beranda

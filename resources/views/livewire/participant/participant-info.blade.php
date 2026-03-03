@@ -200,7 +200,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div>
                     <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Registration Date</p>
-                    <p class="text-gray-800 mt-0.5">{{ $user->created_at->format('d M Y, H:i') }}</p>
+                    <p class="text-gray-800 mt-0.5">{{ $user->created_at->format('d M Y, h:i A') }}</p>
                 </div>
                 <div>
                     <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Role</p>

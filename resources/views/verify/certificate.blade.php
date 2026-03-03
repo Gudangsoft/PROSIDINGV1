@@ -120,7 +120,7 @@
 
             {{-- Footer --}}
             <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
-                <p class="text-xs text-gray-400">Verified at {{ now()->format('d F Y, H:i') }} UTC</p>
+                <p class="text-xs text-gray-400">Verified at {{ now()->format('d F Y, h:i A') }} UTC</p>
                 <a href="{{ url('/') }}" class="text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline">
                     ← Back to Home
                 </a>

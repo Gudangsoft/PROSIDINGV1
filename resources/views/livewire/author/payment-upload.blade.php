@@ -38,7 +38,7 @@
                 @if($payment->paid_at)
                 <div class="flex justify-between">
                     <span class="text-gray-500">Dibayar</span>
-                    <span>{{ $payment->paid_at->format('d M Y H:i') }}</span>
+                    <span>{{ $payment->paid_at->format('d M Y h:i A') }}</span>
                 </div>
                 @endif
                 @if($payment->admin_notes)
@@ -186,7 +186,7 @@
                 <div class="text-center py-6">
                     <div class="text-green-500 text-4xl mb-2">✅</div>
                     <p class="text-green-700 font-medium">Pembayaran Terverifikasi</p>
-                    <p class="text-gray-400 text-sm mt-1">{{ $payment->verified_at?->format('d M Y H:i') }}</p>
+                    <p class="text-gray-400 text-sm mt-1">{{ $payment->verified_at?->format('d M Y h:i A') }}</p>
                 </div>
             @else
                 <p class="text-gray-400 text-sm">Invoice belum tersedia.</p>
