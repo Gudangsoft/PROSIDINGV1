@@ -241,6 +241,7 @@ class ConferenceForm extends Component
                 'id' => $p->id,
                 'name' => $p->name,
                 'price' => $p->price,
+                'currency' => $p->currency ?? 'IDR',
                 'description' => $p->description ?? '',
                 'features' => implode("\n", $p->features ?? []),
                 'is_featured' => $p->is_featured,
@@ -407,7 +408,7 @@ class ConferenceForm extends Component
     // -- Registration Packages --
     public function addPackage()
     {
-        $this->packages[] = ['id' => null, 'name' => '', 'price' => 0, 'description' => '', 'features' => '', 'is_featured' => false, 'is_free' => false, 'require_payment_proof' => false, 'is_active' => true];
+        $this->packages[] = ['id' => null, 'name' => '', 'price' => 0, 'currency' => 'IDR', 'description' => '', 'features' => '', 'is_featured' => false, 'is_free' => false, 'require_payment_proof' => false, 'is_active' => true];
     }
 
     // -- Deliverable templates --
@@ -834,6 +835,7 @@ class ConferenceForm extends Component
                 'conference_id' => $conference->id,
                 'name' => $pkg['name'],
                 'price' => ($pkg['is_free'] ?? false) ? 0 : ($pkg['price'] ?? 0),
+                'currency' => $pkg['currency'] ?? 'IDR',
                 'description' => $pkg['description'] ?? null,
                 'features' => array_values($featuresArray),
                 'is_featured' => (bool) ($pkg['is_featured'] ?? false),

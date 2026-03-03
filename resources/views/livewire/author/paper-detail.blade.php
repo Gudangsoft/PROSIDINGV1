@@ -119,7 +119,7 @@
                         </div>
                         <div>
                             <span class="text-green-600 text-xs">Jumlah:</span>
-                            <p class="font-bold text-green-800 text-lg">Rp {{ number_format($paper->payment->amount, 0, ',', '.') }}</p>
+                            <p class="font-bold text-green-800 text-lg">{{ $paper->payment->formatted_amount }}</p>
                         </div>
                     </div>
 

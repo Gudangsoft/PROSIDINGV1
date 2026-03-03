@@ -330,7 +330,10 @@
                     {{-- Payment Amount --}}
                     <div>
                         <label for="payment_amount" class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Payment Amount (Rp) <span class="text-red-500">*</span>
+                            @php
+                                $curSymbol = ($preselectedPackage->currency === 'USD' ? '$' : 'Rp');
+                            @endphp
+                            Payment Amount ({{ $curSymbol }}) <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

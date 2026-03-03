@@ -610,7 +610,8 @@ class PaperDetail extends Component
                     $payment->invoice_number,
                     $payment->amount,
                     route('author.paper.payment', $this->paper),
-                    $this->paper->conference_id
+                    $this->paper->conference_id,
+                    'IDR'
                 )
             );
         } catch (\Exception $e) {
@@ -654,7 +655,8 @@ class PaperDetail extends Component
                     $this->paper->title,
                     route('author.paper.detail', $this->paper),
                     $this->paper->conference_id,
-                    $waGroupLink
+                    $waGroupLink,
+                    'IDR'
                 ));
             } catch (\Exception $e) {
                 \Log::error('PaymentVerifiedMail gagal: ' . $e->getMessage());

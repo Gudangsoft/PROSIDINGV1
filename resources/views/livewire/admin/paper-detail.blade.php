@@ -545,7 +545,7 @@
                                     </div>
                                     <div>
                                         <span class="text-gray-500 text-xs">Amount:</span>
-                                        <p class="font-bold text-lg">Rp {{ number_format($paper->payment->amount, 0, ',', '.') }}</p>
+                                        <p class="font-bold text-lg">{{ $paper->payment->formatted_amount }}</p>
                                     </div>
                                     <div>
                                         <span class="text-gray-500 text-xs">Status:</span>

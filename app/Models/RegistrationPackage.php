@@ -35,6 +35,17 @@ class RegistrationPackage extends Model
     public function getFormattedPriceAttribute(): string
     {
         if ($this->is_free) return 'Gratis';
-        return 'Rp. ' . number_format($this->price, 0, ',', '.');
+        
+        $currencySymbol = match($this->currency ?? 'IDR') {
+            'USD' => '$',
+            'IDR' => 'Rp',
+            default => $this->currency,
+        };
+        
+        if ($this->currency === 'USD') {
+            return $currencySymbol . ' ' . number_format($this->price, 2, '.', ',');
+        }
+        
+        return $currencySymbol . '. ' . number_format($this->price, 0, ',', '.');
     }
 }

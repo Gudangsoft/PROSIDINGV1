@@ -485,7 +485,7 @@ function dismissPopupPermanent(id) {
                     <p class="text-xs text-gray-400">{{ $payment->created_at->diffForHumans() }}</p>
                 </div>
                 <div class="text-right">
-                    <p class="font-semibold text-gray-800">Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}</p>
+                    <p class="font-semibold text-gray-800">{{ $payment->formatted_amount }}</p>
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
                         Menunggu
                     </span>

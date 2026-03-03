@@ -117,7 +117,7 @@
                                 Paket: <strong class="text-teal-600">{{ $payment->registrationPackage->name }}</strong>
                             </p>
                         @endif
-                        <p>Amount: <strong>Rp {{ number_format($payment->amount, 0, ',', '.') }}</strong></p>
+                        <p>Amount: <strong>{{ $payment->formatted_amount }}</strong></p>
                         @if($payment->payment_method)
                             <p>Method: {{ $payment->payment_method }}</p>
                         @endif

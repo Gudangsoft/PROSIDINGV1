@@ -621,14 +621,21 @@
                             </button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Nama Paket *</label>
                             <input wire:model="packages.{{ $index }}.name" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="cth: Peserta Seminar 2025">
                         </div>
                         <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Mata Uang</label>
+                            <select wire:model="packages.{{ $index }}.currency" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+                                <option value="IDR">IDR (Rp)</option>
+                                <option value="USD">USD ($)</option>
+                            </select>
+                        </div>
+                        <div>
                             @if(!($pkg['is_free'] ?? false))
-                            <label class="block text-xs font-medium text-gray-600 mb-1">Harga (Rp)</label>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Harga</label>
                             <input wire:model="packages.{{ $index }}.price" type="number" min="0" step="1000" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="50000">
                             @else
                             <label class="block text-xs font-medium text-gray-600 mb-1">Harga</label>

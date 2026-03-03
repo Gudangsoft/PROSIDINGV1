@@ -19,7 +19,7 @@
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-500">Jumlah</span>
-                    <span class="font-bold text-lg text-blue-700">Rp {{ number_format($payment->amount, 0, ',', '.') }}</span>
+                    <span class="font-bold text-lg text-blue-700">{{ $payment->formatted_amount }}</span>
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-500">Deskripsi</span>
@@ -75,7 +75,7 @@
                             </div>
                             <div class="text-right">
                                 <div class="text-xs text-gray-500">Nominal</div>
-                                <div class="text-lg font-bold text-blue-700">Rp {{ number_format($pm['amount'] ?? 0, 0, ',', '.') }}</div>
+                                <div class="text-lg font-bold text-blue-700">Rp. {{ number_format($pm['amount'] ?? 0, 0, ',', '.') }}</div>
                             </div>
                         </div>
                         <div class="space-y-1.5 text-sm">

@@ -14,6 +14,7 @@ class PaymentVerifiedMail extends Mailable
     public string $userName;
     public string $invoiceNumber;
     public int|float $amount;
+    public string $currency;
     public string $paymentType; // 'paper' or 'participant'
     public ?string $paperTitle;
     public string $dashboardUrl;
@@ -29,11 +30,13 @@ class PaymentVerifiedMail extends Mailable
         ?string $paperTitle,
         string $dashboardUrl,
         ?int $conferenceId = null,
-        ?string $waGroupLink = null
+        ?string $waGroupLink = null,
+        string $currency = 'IDR'
     ) {
         $this->userName     = $userName;
         $this->invoiceNumber = $invoiceNumber;
         $this->amount       = $amount;
+        $this->currency     = $currency;
         $this->paymentType  = $paymentType;
         $this->paperTitle   = $paperTitle;
         $this->dashboardUrl = $dashboardUrl;
@@ -45,6 +48,17 @@ class PaymentVerifiedMail extends Mailable
     public function build(): static
     {
         $tpl = EmailTemplate::forConference($this->conferenceId, 'payment_verified');
+        
+        // Format amount based on currency
+        $currencySymbol = match($this->currency) {
+            'USD' => '$',
+            'IDR' => 'Rp',
+            default => $this->currency,
+        };
+        $formattedAmount = $this->currency === 'USD' 
+            ? $currencySymbol . ' ' . number_format($this->amount, 2, '.', ',')
+            : $currencySymbol . '. ' . number_format($this->amount, 0, ',', '.');
+        
         if ($tpl) {
             $conference = $this->conferenceId
                 ? \App\Models\Conference::find($this->conferenceId)
@@ -55,7 +69,7 @@ class PaymentVerifiedMail extends Mailable
                 'package_name'    => $this->paymentType === 'paper' ? ($this->paperTitle ?? 'Paper') : 'Registrasi Peserta',
                 'invoice'         => $this->invoiceNumber,
                 'invoice_number'  => $this->invoiceNumber,
-                'amount'          => number_format($this->amount, 0, ',', '.'),
+                'amount'          => $formattedAmount,
                 'dashboard_url'   => $this->dashboardUrl,
                 'wa_group_link'   => $this->waGroupLink ?? '',
             ];

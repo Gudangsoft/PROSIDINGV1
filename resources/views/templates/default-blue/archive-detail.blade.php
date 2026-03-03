@@ -442,7 +442,7 @@
                                 <div class="flex justify-between items-start mb-1">
                                     <p class="text-sm font-bold text-gray-800">{{ $pkg->name }}</p>
                                 </div>
-                                <p class="text-lg font-extrabold text-emerald-600">{{ $pkg->currency ?? 'Rp' }} {{ number_format($pkg->price, 0, ',', '.') }}</p>
+                                <p class="text-lg font-extrabold text-emerald-600">{{ $pkg->formatted_price }}</p>
                                 @if($pkg->description)
                                 <p class="text-xs text-gray-400 mt-1.5">{{ $pkg->description }}</p>
                                 @endif

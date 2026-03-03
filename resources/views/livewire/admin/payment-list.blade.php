@@ -144,7 +144,7 @@
                         @endif
                     </td>
                     <td class="px-4 py-3 text-gray-600">{{ $payment->user->name ?? '-' }}</td>
-                    <td class="px-4 py-3 font-medium">Rp {{ number_format($payment->amount, 0, ',', '.') }}</td>
+                    <td class="px-4 py-3 font-medium">{{ $payment->formatted_amount }}</td>
                     <td class="px-4 py-3">
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
                             @if($payment->status==='verified') bg-green-100 text-green-800

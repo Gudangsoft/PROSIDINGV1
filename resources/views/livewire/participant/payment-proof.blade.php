@@ -57,7 +57,7 @@
                     @endif
                     <div>
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</p>
-                        <p class="text-lg font-bold text-gray-800 mt-1">Rp {{ number_format($payment->amount, 0, ',', '.') }}</p>
+                        <p class="text-lg font-bold text-gray-800 mt-1">{{ $payment->formatted_amount }}</p>
                     </div>
                     @if($payment->payment_method)
                     <div>
@@ -173,7 +173,7 @@
                         <option value="">-- Select Package --</option>
                         @foreach($packages as $pkg)
                             <option value="{{ $pkg->id }}">
-                                {{ $pkg->name }} — {{ $pkg->is_free ? 'FREE' : 'Rp ' . number_format($pkg->price, 0, ',', '.') }}
+                                {{ $pkg->name }} — {{ $pkg->formatted_price }}
                             </option>
                         @endforeach
                     </select>
@@ -219,7 +219,7 @@
                                         FREE
                                     </span>
                                 @else
-                                    <p class="text-2xl font-bold text-blue-600">Rp {{ number_format($selectedPackage->price, 0, ',', '.') }}</p>
+                                    <p class="text-2xl font-bold text-blue-600">{{ $selectedPackage->formatted_price }}</p>
                                 @endif
                             </div>
                         </div>
@@ -256,8 +256,16 @@
                                     </p>
                                     @endif
                                     
+                                    @php
+                                        $methodAmount = $method['amount'] ?? $selectedPackage->price;
+                                        $methodCurrency = $selectedPackage->currency ?? 'IDR';
+                                        $methodSymbol = ($methodCurrency === 'USD' ? '$' : 'Rp');
+                                        $methodFormatted = $methodCurrency === 'USD' 
+                                            ? $methodSymbol . ' ' . number_format($methodAmount, 2, '.', ',') 
+                                            : $methodSymbol . '. ' . number_format($methodAmount, 0, ',', '.');
+                                    @endphp
                                     <p class="text-lg font-bold text-teal-600 mt-1">
-                                        Rp {{ number_format($method['amount'] ?? $selectedPackage->price, 0, ',', '.') }}
+                                        {{ $methodFormatted }}
                                     </p>
                                     
                                     @if(isset($method['instructions']) && $method['instructions'])
@@ -277,7 +285,14 @@
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <div class="flex items-center justify-between">
                         <p class="text-sm font-medium text-gray-600">Total Payment:</p>
-                        <p class="text-2xl font-bold text-gray-800">Rp {{ number_format($finalAmount, 0, ',', '.') }}</p>
+                        @php
+                            $finalCurrency = $selectedPackage->currency ?? 'IDR';
+                            $finalSymbol = ($finalCurrency === 'USD' ? '$' : 'Rp');
+                            $finalFormatted = $finalCurrency === 'USD' 
+                                ? $finalSymbol . ' ' . number_format($finalAmount, 2, '.', ',') 
+                                : $finalSymbol . '. ' . number_format($finalAmount, 0, ',', '.');
+                        @endphp
+                        <p class="text-2xl font-bold text-gray-800">{{ $finalFormatted }}</p>
                     </div>
                 </div>
                 @endif {{-- end !is_free --}}

@@ -55,7 +55,7 @@
                     </div>
                     @if($paper->payment)
                         <div class="text-sm">
-                            <p class="text-gray-600">Tagihan: <span class="font-bold text-gray-800">Rp {{ number_format($paper->payment->amount, 0, ',', '.') }}</span></p>
+                            <p class="text-gray-600">Tagihan: <span class="font-bold text-gray-800">{{ $paper->payment->formatted_amount }}</span></p>
                             <p class="text-gray-500 text-xs mt-1">{{ $paper->payment->invoice_number }}</p>
 
                             {{-- Info Rekening --}}

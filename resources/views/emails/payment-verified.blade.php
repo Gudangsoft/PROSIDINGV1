@@ -62,7 +62,7 @@
                   @endif
                   <tr>
                     <td style="font-size:14px;color:#64748b;padding-top:10px;">Jumlah Dibayar</td>
-                    <td style="font-size:20px;font-weight:800;color:#16a34a;padding-top:10px;">Rp {{ number_format($amount, 0, ',', '.') }}</td>
+                    <td style="font-size:20px;font-weight:800;color:#16a34a;padding-top:10px;">{{ $amount }}</td>
                   </tr>
                 </table>
               </td>

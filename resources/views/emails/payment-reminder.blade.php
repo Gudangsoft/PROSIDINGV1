@@ -55,7 +55,7 @@
                   </tr>
                   <tr>
                     <td style="font-size:14px;color:#78350f;padding-top:10px;">Jumlah Tagihan</td>
-                    <td style="font-size:20px;font-weight:800;color:#d97706;padding-top:10px;">Rp {{ number_format($amount, 0, ',', '.') }}</td>
+                    <td style="font-size:20px;font-weight:800;color:#d97706;padding-top:10px;">{{ $amount }}</td>
                   </tr>
                 </table>
               </td>

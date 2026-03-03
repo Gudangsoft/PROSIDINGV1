@@ -14,6 +14,7 @@ class PaymentReminderMail extends Mailable
     public string $userName;
     public string $invoiceNumber;
     public int|float $amount;
+    public string $currency;
     public string $paymentUrl;
     public string $loginUrl;
     public ?int $conferenceId;
@@ -23,11 +24,13 @@ class PaymentReminderMail extends Mailable
         string $invoiceNumber,
         int|float $amount,
         string $paymentUrl,
-        ?int $conferenceId = null
+        ?int $conferenceId = null,
+        string $currency = 'IDR'
     ) {
         $this->userName     = $userName;
         $this->invoiceNumber = $invoiceNumber;
         $this->amount       = $amount;
+        $this->currency     = $currency;
         $this->paymentUrl   = $paymentUrl;
         $this->loginUrl     = route('login');
         $this->conferenceId = $conferenceId;
@@ -36,6 +39,17 @@ class PaymentReminderMail extends Mailable
     public function build(): static
     {
         $tpl = EmailTemplate::forConference($this->conferenceId, 'payment_reminder');
+        
+        // Format amount based on currency
+        $currencySymbol = match($this->currency) {
+            'USD' => '$',
+            'IDR' => 'Rp',
+            default => $this->currency,
+        };
+        $formattedAmount = $this->currency === 'USD' 
+            ? $currencySymbol . ' ' . number_format($this->amount, 2, '.', ',')
+            : $currencySymbol . '. ' . number_format($this->amount, 0, ',', '.');
+        
         if ($tpl) {
             $conference = $this->conferenceId
                 ? \App\Models\Conference::find($this->conferenceId)
@@ -46,7 +60,7 @@ class PaymentReminderMail extends Mailable
                 'package_name'    => 'Pembayaran Prosiding',
                 'invoice'         => $this->invoiceNumber,
                 'invoice_number'  => $this->invoiceNumber,
-                'amount'          => number_format($this->amount, 0, ',', '.'),
+                'amount'          => $formattedAmount,
                 'payment_url'     => $this->paymentUrl,
                 'dashboard_url'   => $this->paymentUrl,
             ];

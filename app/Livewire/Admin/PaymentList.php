@@ -37,12 +37,14 @@ class PaymentList extends Component
             : route('author.paper.payment', $payment->paper);
 
         try {
+            $currency = $payment->registrationPackage?->currency ?? 'IDR';
             Mail::to($payment->user->email)->send(new PaymentReminderMail(
                 $payment->user->name,
                 $payment->invoice_number,
                 $payment->amount,
                 $paymentUrl,
-                $payment->registrationPackage?->conference_id ?? $payment->paper?->conference_id
+                $payment->registrationPackage?->conference_id ?? $payment->paper?->conference_id,
+                $currency
             ));
 
             \App\Models\Notification::createForUser(
@@ -102,6 +104,7 @@ class PaymentList extends Component
                     ? $conference->wa_group_pemakalah
                     : $conference->wa_group_non_pemakalah;
             }
+            $currency = $payment->registrationPackage?->currency ?? 'IDR';
             Mail::to($payment->user->email)->send(new PaymentVerifiedMail(
                 $payment->user->name,
                 $payment->invoice_number,
@@ -110,7 +113,8 @@ class PaymentList extends Component
                 $payment->paper?->title,
                 $actionUrl,
                 $conferenceId,
-                $waGroupLink
+                $waGroupLink,
+                $currency
             ));
         } catch (\Exception $e) {
             \Log::error('PaymentVerifiedMail gagal: ' . $e->getMessage());

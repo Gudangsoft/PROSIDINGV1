@@ -49,4 +49,25 @@ class Payment extends Model
         $last = self::where('invoice_number', 'like', $prefix . '%')->count();
         return $prefix . '-' . str_pad($last + 1, 4, '0', STR_PAD_LEFT);
     }
+
+    public function getFormattedAmountAttribute(): string
+    {
+        // Get currency from related registration package if available
+        $currency = 'IDR';
+        if ($this->registrationPackage) {
+            $currency = $this->registrationPackage->currency ?? 'IDR';
+        }
+
+        $currencySymbol = match($currency) {
+            'USD' => '$',
+            'IDR' => 'Rp',
+            default => $currency,
+        };
+
+        if ($currency === 'USD') {
+            return $currencySymbol . ' ' . number_format($this->amount, 2, '.', ',');
+        }
+
+        return $currencySymbol . '. ' . number_format($this->amount, 0, ',', '.');
+    }
 }

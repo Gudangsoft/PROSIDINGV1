@@ -15,18 +15,20 @@ class InvoiceCreatedMail extends Mailable
     public $paperTitle;
     public $invoiceNumber;
     public $amount;
+    public $currency;
     public $paymentUrl;
     public ?int $conferenceId;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($userName, $paperTitle, $invoiceNumber, $amount, $paymentUrl, ?int $conferenceId = null)
+    public function __construct($userName, $paperTitle, $invoiceNumber, $amount, $paymentUrl, ?int $conferenceId = null, $currency = 'IDR')
     {
         $this->userName = $userName;
         $this->paperTitle = $paperTitle;
         $this->invoiceNumber = $invoiceNumber;
         $this->amount = $amount;
+        $this->currency = $currency;
         $this->paymentUrl = $paymentUrl;
         $this->conferenceId = $conferenceId;
     }
@@ -37,6 +39,17 @@ class InvoiceCreatedMail extends Mailable
     public function build()
     {
         $tpl = EmailTemplate::forConference($this->conferenceId, 'invoice_created');
+        
+        // Format amount based on currency
+        $currencySymbol = match($this->currency) {
+            'USD' => '$',
+            'IDR' => 'Rp',
+            default => $this->currency,
+        };
+        $formattedAmount = $this->currency === 'USD' 
+            ? $currencySymbol . ' ' . number_format($this->amount, 2, '.', ',')
+            : $currencySymbol . '. ' . number_format($this->amount, 0, ',', '.');
+        
         if ($tpl) {
             $conference = $this->conferenceId
                 ? \App\Models\Conference::find($this->conferenceId)
@@ -47,7 +60,7 @@ class InvoiceCreatedMail extends Mailable
                 'paper_title'      => $this->paperTitle ?? '',
                 'invoice'          => $this->invoiceNumber,
                 'invoice_number'   => $this->invoiceNumber,
-                'amount'           => number_format($this->amount, 0, ',', '.'),
+                'amount'           => $formattedAmount,
                 'due_date'         => '',
                 'payment_url'      => $this->paymentUrl,
                 'dashboard_url'    => $this->paymentUrl,
