@@ -121,7 +121,8 @@ class Conference extends Model
     {
         $parts = [];
         if ($this->venue_type === 'online') {
-            $parts[] = '(Link tersedia di Dashboard)';
+            // Return empty string, the Zoom link is shown separately
+            return '';
         } elseif ($this->venue_type === 'hybrid') {
             if ($this->venue) $parts[] = $this->venue;
             if ($this->city) $parts[] = ($this->venue ? ', ' : '') . $this->city;

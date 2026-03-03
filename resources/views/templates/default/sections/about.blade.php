@@ -175,6 +175,8 @@
                                         <p class="text-sm font-bold text-gray-800 mt-0.5">{{ $activeConference->venue_type_label }}</p>
                                         @if($activeConference->venue_display)
                                         <p class="text-xs text-gray-500 mt-0.5">{{ $activeConference->venue_display }}</p>
+                                        @elseif($activeConference->venue_type === 'online')
+                                        <p class="text-xs text-gray-500 mt-0.5">(Link untuk peserta terdaftar)</p>
                                         @endif
                                     </div>
                                 </div>

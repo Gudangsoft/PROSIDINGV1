@@ -148,7 +148,14 @@
                             </div>
                             <div>
                                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ __('welcome.conference.lokasi') }}</p>
-                                <p class="text-sm font-bold text-gray-800">{{ $activeConference->venue_type_label }} — {{ $activeConference->venue_display }}</p>
+                                <p class="text-sm font-bold text-gray-800">
+                                    {{ $activeConference->venue_type_label }}
+                                    @if($activeConference->venue_display)
+                                        — {{ $activeConference->venue_display }}
+                                    @elseif($activeConference->venue_type === 'online')
+                                        <span class="text-gray-500 font-normal">(Link untuk peserta terdaftar)</span>
+                                    @endif
+                                </p>
                             </div>
                         </div>
 

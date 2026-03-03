@@ -216,7 +216,11 @@
                                     <div class="space-y-1 text-sm">
                                         <p><span class="text-gray-500">Penyelenggara:</span> <span class="text-gray-800">{{ $conf->organizer ?? '-' }}</span></p>
                                         <p><span class="text-gray-500">Jenis:</span> <span class="px-1.5 py-0.5 rounded text-xs font-medium {{ \App\Models\Conference::CONFERENCE_TYPE_COLORS[$conf->conference_type ?? 'nasional'] ?? 'bg-sky-100 text-sky-700' }}">{{ $conf->conference_type_label }}</span></p>
-                                        <p><span class="text-gray-500">Lokasi:</span> <span class="text-gray-800">{{ $conf->venue_type_label }} — {{ $conf->venue_display }}</span></p>
+                                        <p><span class="text-gray-500">Lokasi:</span> <span class="text-gray-800">{{ $conf->venue_type_label }}@if($conf->venue_display) — {{ $conf->venue_display }}@endif</span>
+                                            @if(($conf->venue_type === 'online' || $conf->venue_type === 'hybrid') && $conf->online_url)
+                                                <a href="{{ $conf->online_url }}" target="_blank" class="text-blue-600 hover:underline ml-1">(Zoom)</a>
+                                            @endif
+                                        </p>
                                         <p><span class="text-gray-500">Tanggal:</span> <span class="text-gray-800">{{ $conf->date_range }}</span></p>
                                     </div>
                                 </div>
