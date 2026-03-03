@@ -1,0 +1,17 @@
+Nama,Email,Password,Institusi,Telepon,Role
+Dr. Aditya Pratama,aditya.pratama@ui.ac.id,password,Universitas Indonesia,081234567001,author
+Sinta Dewi M.Kom.,sinta.dewi@itb.ac.id,password,Institut Teknologi Bandung,081234567002,author
+Ir. Budi Setiawan M.T.,budi.setiawan@ugm.ac.id,password,Universitas Gadjah Mada,081234567003,author
+Rina Kartika S.Kom. M.Cs.,rina.kartika@its.ac.id,password,Institut Teknologi Sepuluh Nopember,081234567004,author
+Ahmad Rizki Mahasiswa,ahmad.rizki@student.ub.ac.id,password,Universitas Brawijaya,081234567005,author
+Dewi Safitri M.Kom.,dewi.safitri@unpad.ac.id,password,Universitas Padjadjaran,081234567006,author
+Dr. Fahmi Abdullah,fahmi.abdullah@undip.ac.id,password,Universitas Diponegoro,081234567007,author
+Gilang Ramadhan S.T.,gilang.ramadhan@telkomuniversity.ac.id,password,Telkom University,081234567008,author
+Hana Permata M.Ti.,hana.permata@binus.ac.id,password,Binus University,081234567009,author
+Irfan Maulana S.Kom.,irfan.maulana@upi.edu,password,Universitas Pendidikan Indonesia,081234567010,author
+Prof. Dr. Joko Susilo,joko.susilo@reviewer.ac.id,password,Universitas Indonesia,081234567020,reviewer
+Dr. Kartini Wulandari,kartini.wulandari@reviewer.ac.id,password,Institut Teknologi Bandung,081234567021,reviewer
+Dr. Lukman Hakim,lukman.hakim@reviewer.ac.id,password,Universitas Gadjah Mada,081234567022,reviewer
+Dr. Mega Puspita,mega.puspita@reviewer.ac.id,password,Institut Teknologi Sepuluh Nopember,081234567023,reviewer
+Dr. Nugroho Santoso,nugroho.santoso@reviewer.ac.id,password,Universitas Brawijaya,081234567024,reviewer
+Dr. Olivia Editor,olivia.editor@prosiding.test,password,Panitia SNTII 2026,081234567099,editor
