@@ -636,7 +636,13 @@
                         <div>
                             @if(!($pkg['is_free'] ?? false))
                             <label class="block text-xs font-medium text-gray-600 mb-1">Harga</label>
-                            <input wire:model="packages.{{ $index }}.price" type="number" min="0" step="{{ ($pkg['currency'] ?? 'IDR') === 'USD' ? '0.01' : '1000' }}" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="{{ ($pkg['currency'] ?? 'IDR') === 'USD' ? '99.99' : '50000' }}">
+                            <input id="pkg-price-{{ $index }}"
+                                wire:model="packages.{{ $index }}.price" 
+                                type="number" 
+                                min="0" 
+                                step="any"
+                                class="w-full px-3 py-2 border rounded-lg text-sm" 
+                                placeholder="{{ ($pkg['currency'] ?? 'IDR') === 'USD' ? '99.99' : '50000' }}">
                             @else
                             <label class="block text-xs font-medium text-gray-600 mb-1">Harga</label>
                             <div class="flex items-center gap-2 w-full px-3 py-2 border border-emerald-300 bg-emerald-50 rounded-lg text-sm font-bold text-emerald-700">
