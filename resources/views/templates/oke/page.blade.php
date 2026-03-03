@@ -6,7 +6,7 @@
     $siteLogo = \App\Models\Setting::getValue('site_logo');
     $siteFavicon = \App\Models\Setting::getValue('site_favicon');
     $footerText = \App\Models\Setting::getValue('footer_text');
-    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by Laravel');
+    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by gudangsoft.net');
 @endphp
 <html lang="{{ $siteLanguage }}">
 <head>

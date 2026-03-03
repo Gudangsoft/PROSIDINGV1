@@ -24,7 +24,7 @@
         $socialYoutube = \App\Models\Setting::getValue('social_youtube');
         $publicationInfo = \App\Models\Setting::getValue('publication_info', 'Setiap makalah yang diterima dipublikasikan di Prosiding Seminar Nasional.');
         $selectedPapersInfo = \App\Models\Setting::getValue('selected_papers_info', 'Makalah terpilih akan diterbitkan pada jurnal-jurnal terindeks SINTA dan Google Scholar.');
-        $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by Laravel');
+        $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by gudangsoft.net');
         $_dmvRaw = \App\Models\Setting::getValue('default_menu_visibility', '{}');
         $__dmv = is_array($_dmvRaw) ? $_dmvRaw : (json_decode($_dmvRaw, true) ?: []);
     @endphp

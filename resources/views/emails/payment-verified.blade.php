@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -13,7 +13,7 @@
       {{-- Header --}}
       <tr>
         <td style="background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);padding:40px 32px;text-align:center;">
-          <div style="font-size:44px;margin-bottom:12px;">âœ…</div>
+          <div style="font-size:44px;margin-bottom:12px;">✅</div>
           <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;">Pembayaran Lunas!</h1>
           <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">Pembayaran Anda telah berhasil diverifikasi</p>
         </td>
@@ -23,7 +23,7 @@
       <tr>
         <td style="padding:36px 32px;">
 
-          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! ðŸ‘‹</p>
+          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! 👋</p>
           <p style="margin:0 0 24px;color:#475569;font-size:15px;">
             Pembayaran Anda telah <strong>diverifikasi</strong> oleh tim {{ config('app.name') }}. Akun Anda sekarang <strong>aktif</strong>.
           </p>
@@ -33,7 +33,7 @@
             <tr>
               <td style="background:#f0fdf4;border-left:4px solid #16a34a;border-radius:0 8px 8px 0;padding:14px 18px;">
                 <p style="margin:0;font-size:14px;color:#15803d;">
-                  <strong>Status Pembayaran:</strong>&nbsp;âœ… Lunas / Terverifikasi
+                  <strong>Status Pembayaran:</strong>&nbsp;✅ Lunas / Terverifikasi
                 </p>
               </td>
             </tr>
@@ -78,7 +78,7 @@
             @foreach(['Login ke dashboard untuk akses penuh konferensi','Pantau informasi & jadwal kegiatan di dashboard','Unduh sertifikat setelah kegiatan selesai'] as $step)
             @endif
             <tr>
-              <td width="28" style="font-size:16px;color:#16a34a;vertical-align:top;padding-top:2px;">âœ“</td>
+              <td width="28" style="font-size:16px;color:#16a34a;vertical-align:top;padding-top:2px;">✓</td>
               <td style="font-size:14px;color:#334155;">{{ $step }}</td>
             </tr>
             @endforeach
@@ -90,7 +90,7 @@
               <td align="center">
                 <a href="{{ $dashboardUrl }}"
                    style="display:inline-block;background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);color:#ffffff;text-decoration:none;padding:14px 40px;border-radius:30px;font-size:15px;font-weight:700;">
-                  ðŸ“Š Buka Dashboard Saya
+                  📊 Buka Dashboard Saya
                 </a>
               </td>
             </tr>
@@ -101,14 +101,14 @@
           <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
             <tr>
               <td style="background:#f0fdf4;border:2px solid #86efac;border-radius:10px;padding:20px;">
-                <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#15803d;">ðŸ“± Grup WhatsApp Peserta</p>
+                <p style="margin:0 0 8px;font-size:15px;font-weight:700;color:#15803d;">📱 Grup WhatsApp Peserta</p>
                 <p style="margin:0 0 14px;font-size:14px;color:#166534;">Bergabunglah ke grup WhatsApp untuk info terkini seputar kegiatan:</p>
                 <table width="100%" cellpadding="0" cellspacing="0">
                   <tr>
                     <td align="center">
                       <a href="{{ $waGroupLink }}"
                          style="display:inline-block;background:linear-gradient(135deg,#25d366 0%,#128c7e 100%);color:#ffffff;text-decoration:none;padding:12px 30px;border-radius:30px;font-size:14px;font-weight:700;">
-                        ðŸ’¬ Gabung Grup WhatsApp
+                        💬 Gabung Grup WhatsApp
                       </a>
                     </td>
                   </tr>

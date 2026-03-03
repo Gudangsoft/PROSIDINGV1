@@ -4,15 +4,16 @@
         <p class="text-sm text-gray-500 mt-1">Pengaturan nama, logo, favicon, kontak, dan informasi umum website</p>
     </div>
 
-    @if(session('success'))
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
     <div class="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm flex items-center gap-2">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        {{ session('success') }}
+        <?php echo e(session('success')); ?>
+
     </div>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
     <form wire:submit.prevent="save">
-        {{-- ── Bahasa Website ── --}}
+        
         <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-800 mb-1">Bahasa & Tema</h2>
             <p class="text-xs text-gray-400 mb-5">Pilih bahasa dan tema tampilan halaman publik website</p>
@@ -29,18 +30,19 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tema Aktif</label>
                     <select wire:model="activePresetId" class="w-full border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
-                        @foreach($themePresets as $preset)
-                            <option value="{{ $preset->id }}">
-                                {{ $preset->name }}{{ $preset->linked_template ? ' — Template: ' . ucfirst($preset->linked_template) : '' }}
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $themePresets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $preset): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                            <option value="<?php echo e($preset->id); ?>">
+                                <?php echo e($preset->name); ?><?php echo e($preset->linked_template ? ' — Template: ' . ucfirst($preset->linked_template) : ''); ?>
+
                             </option>
-                        @endforeach
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                     </select>
-                    <p class="text-xs text-gray-400 mt-1">Pilih tema dari <a href="{{ url('/admin/settings/theme') }}" class="text-blue-600 hover:underline">Pengaturan Tema</a>. Warna, layout, dan template akan diterapkan otomatis.</p>
+                    <p class="text-xs text-gray-400 mt-1">Pilih tema dari <a href="<?php echo e(url('/admin/settings/theme')); ?>" class="text-blue-600 hover:underline">Pengaturan Tema</a>. Warna, layout, dan template akan diterapkan otomatis.</p>
                 </div>
             </div>
         </div>
 
-        {{-- ── Nama & Tagline ── --}}
+        
         <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-800 mb-1">Informasi Dasar</h2>
             <p class="text-xs text-gray-400 mb-5">Nama dan tagline website yang ditampilkan di header, browser, dan SEO</p>
@@ -49,7 +51,14 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama Website <span class="text-red-500">*</span></label>
                     <input type="text" wire:model="settings.site_name" class="w-full border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Prosiding LPKD-APJI">
-                    @error('settings.site_name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['settings.site_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
@@ -58,7 +67,7 @@
             </div>
 
             <div class="mt-4 pt-4 border-t border-gray-100"
-                 x-data="{ showTagline: @js(($settings['show_tagline_in_sidebar'] ?? '1') === '1') }">
+                 x-data="{ showTagline: <?php echo \Illuminate\Support\Js::from(($settings['show_tagline_in_sidebar'] ?? '1') === '1')->toHtml() ?> }">
                 <label class="flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" x-model="showTagline"
                            x-on:change="$wire.set('settings.show_tagline_in_sidebar', showTagline ? '1' : '0')"
@@ -71,27 +80,27 @@
             </div>
         </div>
 
-        {{-- ── Logo & Favicon ── --}}
+        
         <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-800 mb-1">Logo & Favicon</h2>
             <p class="text-xs text-gray-400 mb-5">Logo utama dan ikon browser website Anda</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {{-- Logo --}}
+                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-3">Logo Website</label>
                     <div class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
                         <div class="w-32 h-32 mx-auto bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden mb-4 border">
-                            @if($siteLogo)
-                                <img src="{{ $siteLogo->temporaryUrl() }}" class="max-w-full max-h-full object-contain">
-                            @elseif($settings['site_logo'] ?? false)
-                                <img src="{{ str_starts_with($settings['site_logo'], 'uploads/') ? asset($settings['site_logo']) : asset('storage/' . $settings['site_logo']) }}" class="max-w-full max-h-full object-contain">
-                            @else
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($siteLogo): ?>
+                                <img src="<?php echo e($siteLogo->temporaryUrl()); ?>" class="max-w-full max-h-full object-contain">
+                            <?php elseif($settings['site_logo'] ?? false): ?>
+                                <img src="<?php echo e(str_starts_with($settings['site_logo'], 'uploads/') ? asset($settings['site_logo']) : asset('storage/' . $settings['site_logo'])); ?>" class="max-w-full max-h-full object-contain">
+                            <?php else: ?>
                                 <div class="text-center">
                                     <svg class="w-12 h-12 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     <p class="text-xs text-gray-400 mt-1">Belum ada logo</p>
                                 </div>
-                            @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
                         <div>
                             <label class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium cursor-pointer hover:bg-blue-100 transition">
@@ -99,30 +108,37 @@
                                 Upload Logo
                                 <input type="file" wire:model="siteLogo" accept="image/png,image/svg+xml,image/jpeg,image/webp" class="sr-only">
                             </label>
-                            @if($settings['site_logo'] ?? false)
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($settings['site_logo'] ?? false): ?>
                             <button type="button" wire:click="removeLogo" wire:confirm="Hapus logo website?" class="ml-2 px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg text-sm transition">Hapus</button>
-                            @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
                         <p class="text-xs text-gray-400 mt-3">Format: PNG, SVG, JPG, WebP. Maks 2MB. Rekomendasi: 200x60 px</p>
-                        @error('siteLogo') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['siteLogo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </div>
                 </div>
 
-                {{-- Favicon --}}
+                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-3">Favicon</label>
                     <div class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
                         <div class="w-32 h-32 mx-auto bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden mb-4 border">
-                            @if($siteFavicon)
-                                <img src="{{ $siteFavicon->temporaryUrl() }}" class="w-16 h-16 object-contain">
-                            @elseif($settings['site_favicon'] ?? false)
-                                <img src="{{ str_starts_with($settings['site_favicon'], 'uploads/') ? asset($settings['site_favicon']) : asset('storage/' . $settings['site_favicon']) }}" class="w-16 h-16 object-contain">
-                            @else
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($siteFavicon): ?>
+                                <img src="<?php echo e($siteFavicon->temporaryUrl()); ?>" class="w-16 h-16 object-contain">
+                            <?php elseif($settings['site_favicon'] ?? false): ?>
+                                <img src="<?php echo e(str_starts_with($settings['site_favicon'], 'uploads/') ? asset($settings['site_favicon']) : asset('storage/' . $settings['site_favicon'])); ?>" class="w-16 h-16 object-contain">
+                            <?php else: ?>
                                 <div class="text-center">
                                     <svg class="w-12 h-12 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                                     <p class="text-xs text-gray-400 mt-1">Belum ada favicon</p>
                                 </div>
-                            @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
                         <div>
                             <label class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium cursor-pointer hover:bg-blue-100 transition">
@@ -130,18 +146,25 @@
                                 Upload Favicon
                                 <input type="file" wire:model="siteFavicon" accept="image/png,image/x-icon,image/svg+xml" class="sr-only">
                             </label>
-                            @if($settings['site_favicon'] ?? false)
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($settings['site_favicon'] ?? false): ?>
                             <button type="button" wire:click="removeFavicon" wire:confirm="Hapus favicon?" class="ml-2 px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg text-sm transition">Hapus</button>
-                            @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
                         <p class="text-xs text-gray-400 mt-3">Format: ICO, PNG, SVG. Maks 1MB. Rekomendasi: 32x32 px</p>
-                        @error('siteFavicon') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['siteFavicon'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- ── SEO & Meta ── --}}
+        
         <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-800 mb-1">SEO & Meta</h2>
             <p class="text-xs text-gray-400 mb-5">Pengaturan untuk optimisasi mesin pencari</p>
@@ -165,7 +188,7 @@
             </div>
         </div>
 
-        {{-- ── Kontak ── --}}
+        
         <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-800 mb-1">Informasi Kontak</h2>
             <p class="text-xs text-gray-400 mb-5">Kontak yang ditampilkan di website</p>
@@ -179,7 +202,14 @@
                         </span>
                     </label>
                     <input type="email" wire:model="settings.contact_email" class="w-full border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="info@prosiding.test">
-                    @error('settings.contact_email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['settings.contact_email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -202,7 +232,7 @@
             </div>
         </div>
 
-        {{-- ── Sosial Media ── --}}
+        
         <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-800 mb-1">Sosial Media</h2>
             <p class="text-xs text-gray-400 mb-5">Link sosial media yang ditampilkan di website</p>
@@ -247,7 +277,7 @@
             </div>
         </div>
 
-        {{-- ── Konten Homepage ── --}}
+        
         <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-800 mb-1">Konten Homepage</h2>
             <p class="text-xs text-gray-400 mb-5">Informasi publikasi dan makalah terpilih yang ditampilkan di homepage</p>
@@ -266,7 +296,7 @@
             </div>
         </div>
 
-        {{-- ── Footer ── --}}
+        
         <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-800 mb-1">Footer</h2>
             <p class="text-xs text-gray-400 mb-5">Teks yang ditampilkan di bagian bawah halaman</p>
@@ -282,7 +312,7 @@
             </div>
         </div>
 
-        {{-- ── Save Button ── --}}
+        
         <div class="flex justify-end">
             <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -291,3 +321,4 @@
         </div>
     </form>
 </div>
+<?php /**PATH D:\LPKD-APJI\PROSIDINGV1\resources\views/livewire/admin/general-settings.blade.php ENDPATH**/ ?>

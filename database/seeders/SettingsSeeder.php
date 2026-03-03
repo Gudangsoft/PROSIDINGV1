@@ -33,7 +33,7 @@ class SettingsSeeder extends Seeder
             ['group' => 'general', 'key' => 'payment_account_holder', 'value' => '', 'type' => 'text', 'label' => 'Atas Nama Rekening', 'description' => 'Nama pemilik rekening bank', 'sort_order' => 20],
             ['group' => 'general', 'key' => 'payment_contact_phone', 'value' => '', 'type' => 'text', 'label' => 'Kontak Pembayaran (Telp/WA)', 'description' => 'Nomor telepon/WA yang bisa dihubungi terkait pembayaran', 'sort_order' => 21],
             ['group' => 'general', 'key' => 'payment_instructions', 'value' => '', 'type' => 'textarea', 'label' => 'Instruksi Pembayaran', 'description' => 'Catatan atau instruksi tambahan terkait pembayaran', 'sort_order' => 22],
-            ['group' => 'general', 'key' => 'powered_by', 'value' => 'Powered by Laravel', 'type' => 'text', 'label' => 'Powered By', 'description' => 'Teks "Powered by" yang ditampilkan di footer website', 'sort_order' => 23],
+            ['group' => 'general', 'key' => 'powered_by', 'value' => 'Powered by gudangsoft.net', 'type' => 'text', 'label' => 'Powered By', 'description' => 'Teks "Powered by" di bagian bawah footer. Kosongkan jika tidak ingin ditampilkan.', 'sort_order' => 23],
             ['group' => 'general', 'key' => 'active_template', 'value' => 'default', 'type' => 'select', 'label' => 'Template Aktif', 'description' => 'Template/tema yang digunakan untuk halaman publik website', 'sort_order' => 24],
             ['group' => 'general', 'key' => 'site_language', 'value' => 'id', 'type' => 'select', 'label' => 'Bahasa Website', 'description' => 'Bahasa default website', 'options' => json_encode(['id' => 'Bahasa Indonesia', 'en' => 'English']), 'sort_order' => 25],
 

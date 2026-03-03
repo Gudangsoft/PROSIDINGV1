@@ -6,7 +6,7 @@
     $siteTagline = \App\Models\Setting::getValue('site_tagline', '');
     $siteLogo    = \App\Models\Setting::getValue('site_logo');
     $footerText  = \App\Models\Setting::getValue('footer_text');
-    $poweredBy   = \App\Models\Setting::getValue('powered_by', 'Powered by Laravel');
+    $poweredBy   = \App\Models\Setting::getValue('powered_by', 'Powered by gudangsoft.net');
     $headerMenus = \App\Models\Menu::getTree('header');
 @endphp
 <html lang="{{ $siteLanguage }}">

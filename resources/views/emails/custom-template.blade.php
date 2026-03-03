@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -13,7 +13,7 @@
       {{-- Header --}}
       <tr>
         <td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:36px 32px;text-align:center;">
-          <div style="font-size:40px;margin-bottom:10px;">{{ $icon ?? '✉️' }}</div>
+          <div style="font-size:40px;margin-bottom:10px;">{{ $icon ?? '??' }}</div>
           <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;line-height:1.3;">{{ $subject ?? config('app.name') }}</h1>
           <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:13px;">{{ config('app.name') }}</p>
         </td>

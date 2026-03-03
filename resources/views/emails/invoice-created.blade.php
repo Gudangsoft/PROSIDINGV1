@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -13,7 +13,7 @@
       {{-- Header --}}
       <tr>
         <td style="background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);padding:40px 32px;text-align:center;">
-          <div style="font-size:44px;margin-bottom:12px;">💳</div>
+          <div style="font-size:44px;margin-bottom:12px;">??</div>
           <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;">Tagihan Pembayaran</h1>
           <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">Invoice baru telah dibuat untuk Anda</p>
         </td>
@@ -23,7 +23,7 @@
       <tr>
         <td style="padding:36px 32px;">
 
-          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! 👋</p>
+          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! ??</p>
           <p style="margin:0 0 24px;color:#475569;font-size:15px;">
             Tagihan pembayaran telah dibuat. Silakan selesaikan pembayaran sesuai nominal di bawah ini.
           </p>
@@ -33,7 +33,7 @@
             <tr>
               <td style="background:#eef2ff;border-left:4px solid #6366f1;border-radius:0 8px 8px 0;padding:14px 18px;">
                 <p style="margin:0;font-size:14px;color:#3730a3;">
-                  <strong>Status Invoice:</strong>&nbsp;📄 Menunggu Pembayaran
+                  <strong>Status Invoice:</strong>&nbsp;?? Menunggu Pembayaran
                 </p>
               </td>
             </tr>
@@ -89,7 +89,7 @@
               <td align="center">
                 <a href="{{ $paymentUrl }}"
                    style="display:inline-block;background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);color:#ffffff;text-decoration:none;padding:14px 40px;border-radius:30px;font-size:15px;font-weight:700;">
-                  💳 Lihat &amp; Bayar Invoice
+                  ?? Lihat &amp; Bayar Invoice
                 </a>
               </td>
             </tr>

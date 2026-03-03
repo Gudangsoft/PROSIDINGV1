@@ -339,7 +339,7 @@ Route::get('/publikasi', function () {
     $siteTagline = \App\Models\Setting::getValue('site_tagline');
     $siteLogo = \App\Models\Setting::getValue('site_logo');
     $footerText = \App\Models\Setting::getValue('footer_text');
-    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by Laravel');
+    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by gudangsoft.net');
     $headerMenus = \App\Models\Menu::getTree('header');
 
     return view(Template::view('proceedings'), compact(
@@ -387,7 +387,7 @@ Route::get('/publikasi/{conference}', function (\App\Models\Conference $conferen
     $siteTagline = \App\Models\Setting::getValue('site_tagline');
     $siteLogo = \App\Models\Setting::getValue('site_logo');
     $footerText = \App\Models\Setting::getValue('footer_text');
-    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by Laravel');
+    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by gudangsoft.net');
     $headerMenus = \App\Models\Menu::getTree('header');
 
     return view(Template::view('proceedings-detail'), compact(
@@ -423,7 +423,7 @@ Route::get('/arsip', function () {
     $siteTagline = \App\Models\Setting::getValue('site_tagline');
     $siteLogo = \App\Models\Setting::getValue('site_logo');
     $footerText = \App\Models\Setting::getValue('footer_text');
-    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by Laravel');
+    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by gudangsoft.net');
     $headerMenus = \App\Models\Menu::getTree('header');
     return view(Template::view('archive'), compact('conferences', 'siteName', 'siteTagline', 'siteLogo', 'footerText', 'poweredBy', 'headerMenus'));
 })->name('archive');
@@ -440,7 +440,7 @@ Route::get('/arsip/{conference}', function (\App\Models\Conference $conference) 
     $siteTagline = \App\Models\Setting::getValue('site_tagline');
     $siteLogo = \App\Models\Setting::getValue('site_logo');
     $footerText = \App\Models\Setting::getValue('footer_text');
-    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by Laravel');
+    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by gudangsoft.net');
     $headerMenus = \App\Models\Menu::getTree('header');
 
     return view(Template::view('archive-detail'), compact(
@@ -465,7 +465,7 @@ Route::get('/news/{news:slug}', function (\App\Models\News $news) {
     $siteTagline = \App\Models\Setting::getValue('site_tagline');
     $siteLogo = \App\Models\Setting::getValue('site_logo');
     $footerText = \App\Models\Setting::getValue('footer_text');
-    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by Laravel');
+    $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by gudangsoft.net');
     return view(Template::view('news-detail'), compact('news', 'relatedNews', 'latestNews', 'siteName', 'siteTagline', 'siteLogo', 'footerText', 'poweredBy'));
 })->name('news.detail');
 
@@ -489,6 +489,7 @@ Route::prefix('setup')->name('setup.')->group(function () {
     Route::post ('/test-db',     [SetupController::class, 'testDb'])      ->name('test-db');
     Route::post ('/migrate',     [SetupController::class, 'migrate'])     ->name('migrate');
     Route::post ('/seed',        [SetupController::class, 'seed'])        ->name('seed');
+    Route::post ('/create-admin',[SetupController::class, 'createAdmin']) ->name('create-admin');
     Route::post ('/finalize',    [SetupController::class, 'finalize'])    ->name('finalize');
     Route::post ('/reset-lock',  [SetupController::class, 'resetLock'])   ->name('reset-lock');
 });

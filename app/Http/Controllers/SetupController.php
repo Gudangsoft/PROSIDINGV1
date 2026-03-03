@@ -9,8 +9,36 @@ use Illuminate\Support\Str;
 
 class SetupController extends Controller
 {
-    // Token keamanan - ganti sebelum upload ke server!
-    private const SETUP_TOKEN = 'setup-prosiding';
+    // Token keamanan - baca dari file .setup-token atau gunakan default
+    private function getSetupToken(): string
+    {
+        $tokenFile = base_path('.setup-token');
+        if (file_exists($tokenFile)) {
+            return trim(file_get_contents($tokenFile));
+        }
+        return 'setup-prosiding'; // Default token
+    }
+
+    // Rate limiting - max 5 attempts per 15 minutes
+    private function isRateLimited(Request $request): bool
+    {
+        $key = 'setup_attempts_' . $request->ip();
+        $attempts = cache()->get($key, 0);
+        return $attempts >= 5;
+    }
+
+    private function incrementAttempts(Request $request): void
+    {
+        $key = 'setup_attempts_' . $request->ip();
+        $attempts = cache()->get($key, 0);
+        cache()->put($key, $attempts + 1, now()->addMinutes(15));
+    }
+
+    private function clearAttempts(Request $request): void
+    {
+        $key = 'setup_attempts_' . $request->ip();
+        cache()->forget($key);
+    }
 
     // File penanda bahwa setup sudah selesai
     private function completedFlagPath(): string
@@ -34,9 +62,16 @@ class SetupController extends Controller
     public function index(Request $request)
     {
         if ($this->isCompleted()) {
-            return view('setup.index', ['completed' => true]);
+            return view('setup.index', ['completed' => true, 'envValues' => []]);
         }
-        return view('setup.index', ['completed' => false]);
+        
+        // Load existing .env values for pre-fill
+        $envValues = $this->getEnvValues();
+        
+        return view('setup.index', [
+            'completed' => false,
+            'envValues' => $envValues,
+        ]);
     }
 
     // -------------------------------------------------------------------------
@@ -44,11 +79,22 @@ class SetupController extends Controller
     // -------------------------------------------------------------------------
     public function auth(Request $request)
     {
+        // Check rate limiting
+        if ($this->isRateLimited($request)) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Terlalu banyak percobaan. Coba lagi dalam 15 menit.'
+            ], 429);
+        }
+
         $token = $request->input('token');
-        if ($token === self::SETUP_TOKEN) {
+        if ($token === $this->getSetupToken()) {
+            $this->clearAttempts($request);
             $request->session()->put('setup_authenticated', true);
             return response()->json(['success' => true]);
         }
+        
+        $this->incrementAttempts($request);
         return response()->json(['success' => false, 'message' => 'Token tidak valid.'], 401);
     }
 
@@ -124,6 +170,7 @@ class SetupController extends Controller
             'app_url'      => 'required|url',
             'app_env'      => 'required|in:local,production,staging',
             'app_debug'    => 'required|in:true,false',
+            'app_timezone' => 'required|string',
             'db_host'      => 'required|string',
             'db_port'      => 'required|string',
             'db_database'  => 'required|string',
@@ -153,6 +200,7 @@ class SetupController extends Controller
             'APP_NAME'            => '"' . $data['app_name'] . '"',
             'APP_ENV'             => $data['app_env'],
             'APP_DEBUG'           => $data['app_debug'],
+            'APP_TIMEZONE'        => $data['app_timezone'],
             'APP_URL'             => $data['app_url'],
             'DB_CONNECTION'       => 'mysql',
             'DB_HOST'             => $data['db_host'],
@@ -349,7 +397,7 @@ class SetupController extends Controller
     // -------------------------------------------------------------------------
     public function resetLock(Request $request)
     {
-        if ($request->input('token') !== self::SETUP_TOKEN) {
+        if ($request->input('token') !== $this->getSetupToken()) {
             return response()->json(['success' => false, 'message' => 'Token tidak valid.'], 401);
         }
         if (file_exists($this->completedFlagPath())) {
@@ -382,6 +430,113 @@ class SetupController extends Controller
                 $_ENV[$key]    = $value;
                 $_SERVER[$key] = $value;
             }
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Helper: Get existing .env values for pre-fill
+    // -------------------------------------------------------------------------
+    private function getEnvValues(): array
+    {
+        $envPath = base_path('.env');
+        if (!file_exists($envPath)) {
+            return [];
+        }
+
+        $values = [];
+        $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (str_starts_with(trim($line), '#')) {
+                continue;
+            }
+            [$key, $value] = array_pad(explode('=', $line, 2), 2, '');
+            $key   = trim($key);
+            $value = trim($value, " \t\n\r\0\x0B\"'");
+            if (!empty($key)) {
+                $values[$key] = $value;
+            }
+        }
+
+        return [
+            'app_name'     => $values['APP_NAME'] ?? 'Prosiding Conference',
+            'app_url'      => $values['APP_URL'] ?? '',
+            'app_env'      => $values['APP_ENV'] ?? 'production',
+            'app_debug'    => $values['APP_DEBUG'] ?? 'false',
+            'app_timezone' => $values['APP_TIMEZONE'] ?? 'Asia/Jakarta',
+            'db_host'      => $values['DB_HOST'] ?? 'localhost',
+            'db_port'      => $values['DB_PORT'] ?? '3306',
+            'db_database'  => $values['DB_DATABASE'] ?? '',
+            'db_username'  => $values['DB_USERNAME'] ?? '',
+            'mail_mailer'  => $values['MAIL_MAILER'] ?? 'log',
+            'mail_host'    => $values['MAIL_HOST'] ?? '',
+            'mail_port'    => $values['MAIL_PORT'] ?? '587',
+            'mail_username'=> $values['MAIL_USERNAME'] ?? '',
+            'mail_from_address' => $values['MAIL_FROM_ADDRESS'] ?? '',
+        ];
+    }
+
+    // -------------------------------------------------------------------------
+    // POST /setup/create-admin  →  Buat admin user custom
+    // -------------------------------------------------------------------------
+    public function createAdmin(Request $request)
+    {
+        if (!$this->checkToken($request)) {
+            return response()->json(['success' => false, 'message' => 'Tidak terautentikasi.'], 401);
+        }
+
+        $data = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|max:255',
+            'password' => 'required|string|min:8',
+        ]);
+
+        try {
+            $this->reloadEnv();
+            config([
+                'database.connections.mysql.host'     => env('DB_HOST', '127.0.0.1'),
+                'database.connections.mysql.port'     => env('DB_PORT', '3306'),
+                'database.connections.mysql.database' => env('DB_DATABASE', ''),
+                'database.connections.mysql.username' => env('DB_USERNAME', ''),
+                'database.connections.mysql.password' => env('DB_PASSWORD', ''),
+            ]);
+            DB::purge('mysql');
+
+            // Check if user exists
+            $exists = DB::table('users')->where('email', $data['email'])->exists();
+            if ($exists) {
+                // Update existing user
+                DB::table('users')->where('email', $data['email'])->update([
+                    'name' => $data['name'],
+                    'password' => bcrypt($data['password']),
+                    'updated_at' => now(),
+                ]);
+                return response()->json(['success' => true, 'message' => 'Admin berhasil diupdate.']);
+            }
+
+            // Create new admin user
+            $userId = DB::table('users')->insertGetId([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => bcrypt($data['password']),
+                'email_verified_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Assign admin role if roles table exists
+            if (\Schema::hasTable('roles')) {
+                $adminRole = DB::table('roles')->where('name', 'admin')->first();
+                if ($adminRole && \Schema::hasTable('role_user')) {
+                    DB::table('role_user')->insert([
+                        'user_id' => $userId,
+                        'role_id' => $adminRole->id,
+                    ]);
+                }
+            }
+
+            return response()->json(['success' => true, 'message' => 'Admin berhasil dibuat.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal membuat admin: ' . $e->getMessage()]);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -13,7 +13,7 @@
       {{-- Header --}}
       <tr>
         <td style="background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);padding:40px 32px;text-align:center;">
-          <div style="font-size:44px;margin-bottom:12px;">📢</div>
+          <div style="font-size:44px;margin-bottom:12px;">??</div>
           <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;">Kegiatan Baru!</h1>
           <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">{{ config('app.name') }}</p>
         </td>
@@ -23,7 +23,7 @@
       <tr>
         <td style="padding:36px 32px;">
 
-          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! 👋</p>
+          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! ??</p>
           <p style="margin:0 0 24px;color:#475569;font-size:15px;">
             Kami dengan senang hati mengumumkan kegiatan baru yang telah dipublikasikan!
           </p>
@@ -34,10 +34,10 @@
               <td style="padding:20px 22px;">
                 <p style="margin:0 0 10px;font-size:17px;font-weight:800;color:#0c4a6e;">{{ $eventName }}</p>
                 @if($eventDate)
-                <p style="margin:0 0 6px;font-size:14px;color:#075985;">📅 <strong>Tanggal:</strong> {{ $eventDate }}</p>
+                <p style="margin:0 0 6px;font-size:14px;color:#075985;">?? <strong>Tanggal:</strong> {{ $eventDate }}</p>
                 @endif
                 @if(!empty($conferenceVenue))
-                <p style="margin:0;font-size:14px;color:#075985;">📍 <strong>Lokasi:</strong> {{ $conferenceVenue }}</p>
+                <p style="margin:0;font-size:14px;color:#075985;">?? <strong>Lokasi:</strong> {{ $conferenceVenue }}</p>
                 @endif
               </td>
             </tr>
@@ -54,7 +54,7 @@
               'Pengembangan profesional & karir akademik'
             ] as $item)
             <tr>
-              <td width="28" style="font-size:16px;color:#0284c7;vertical-align:top;padding-top:2px;">✓</td>
+              <td width="28" style="font-size:16px;color:#0284c7;vertical-align:top;padding-top:2px;">?</td>
               <td style="font-size:14px;color:#334155;padding-bottom:4px;">{{ $item }}</td>
             </tr>
             @endforeach
@@ -66,7 +66,7 @@
               <td align="center">
                 <a href="{{ $eventUrl }}"
                    style="display:inline-block;background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);color:#ffffff;text-decoration:none;padding:14px 40px;border-radius:30px;font-size:15px;font-weight:700;">
-                  🔗 Lihat Detail &amp; Daftar
+                  ?? Lihat Detail &amp; Daftar
                 </a>
               </td>
             </tr>

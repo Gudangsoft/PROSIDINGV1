@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -13,7 +13,7 @@
       {{-- Header --}}
       <tr>
         <td style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);padding:40px 32px;text-align:center;">
-          <div style="font-size:44px;margin-bottom:12px;">🔒</div>
+          <div style="font-size:44px;margin-bottom:12px;">??</div>
           <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;">Password Berhasil Direset</h1>
           <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">{{ config('app.name') }}</p>
         </td>
@@ -23,7 +23,7 @@
       <tr>
         <td style="padding:36px 32px;">
 
-          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! 👋</p>
+          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! ??</p>
           <p style="margin:0 0 24px;color:#475569;font-size:15px;">
             Password akun Anda di <strong>{{ config('app.name') }}</strong> telah berhasil diubah.
           </p>
@@ -33,7 +33,7 @@
             <tr>
               <td style="background:#ecfdf5;border-left:4px solid #10b981;border-radius:0 8px 8px 0;padding:14px 18px;">
                 <p style="margin:0;font-size:14px;color:#065f46;">
-                  <strong>Status:</strong>&nbsp;🔑 Password berhasil diperbarui
+                  <strong>Status:</strong>&nbsp;?? Password berhasil diperbarui
                 </p>
               </td>
             </tr>
@@ -44,7 +44,7 @@
             <tr>
               <td style="background:#fffbeb;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;padding:14px 18px;">
                 <p style="margin:0;font-size:14px;color:#92400e;">
-                  ⚠️ <strong>Bukan Anda yang mereset?</strong> Segera hubungi tim kami dan amankan akun Anda.
+                  ?? <strong>Bukan Anda yang mereset?</strong> Segera hubungi tim kami dan amankan akun Anda.
                 </p>
               </td>
             </tr>
@@ -60,7 +60,7 @@
               'Logout setelah selesai menggunakan perangkat bersama'
             ] as $item)
             <tr>
-              <td width="28" style="font-size:16px;color:#059669;vertical-align:top;padding-top:2px;">✓</td>
+              <td width="28" style="font-size:16px;color:#059669;vertical-align:top;padding-top:2px;">?</td>
               <td style="font-size:14px;color:#334155;padding-bottom:4px;">{{ $item }}</td>
             </tr>
             @endforeach
@@ -72,7 +72,7 @@
               <td align="center">
                 <a href="{{ $loginUrl }}"
                    style="display:inline-block;background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:#ffffff;text-decoration:none;padding:14px 40px;border-radius:30px;font-size:15px;font-weight:700;">
-                  🚀 Login Sekarang
+                  ?? Login Sekarang
                 </a>
               </td>
             </tr>

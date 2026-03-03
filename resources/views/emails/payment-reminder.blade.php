@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -13,7 +13,7 @@
       {{-- Header --}}
       <tr>
         <td style="background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);padding:40px 32px;text-align:center;">
-          <div style="font-size:44px;margin-bottom:12px;">⏰</div>
+          <div style="font-size:44px;margin-bottom:12px;">?</div>
           <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;">Pembayaran Menunggu</h1>
           <p style="margin:8px 0 0;color:rgba(255,255,255,0.87);font-size:14px;">Segera selesaikan pembayaran Anda</p>
         </td>
@@ -23,7 +23,7 @@
       <tr>
         <td style="padding:36px 32px;">
 
-          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! 👋</p>
+          <p style="font-size:20px;font-weight:700;margin:0 0 4px;">Halo, {{ $userName }}! ??</p>
           <p style="margin:0 0 24px;color:#475569;font-size:15px;">
             Kami mengingatkan bahwa pembayaran Anda <strong>belum selesai</strong>. Selesaikan pembayaran untuk mengaktifkan akun Anda sepenuhnya.
           </p>
@@ -33,7 +33,7 @@
             <tr>
               <td style="background:#fffbeb;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;padding:14px 18px;">
                 <p style="margin:0;font-size:14px;color:#92400e;">
-                  <strong>Status Pembayaran:</strong>&nbsp;⏳ Menunggu Bukti Transfer
+                  <strong>Status Pembayaran:</strong>&nbsp;? Menunggu Bukti Transfer
                 </p>
               </td>
             </tr>
@@ -69,7 +69,7 @@
               ['num'=>'1','title'=>'Lakukan Transfer','desc'=>'Transfer sesuai nominal tagihan ke rekening yang tertera.'],
               ['num'=>'2','title'=>'Login ke Sistem','desc'=>'Masuk menggunakan email dan password Anda.'],
               ['num'=>'3','title'=>'Upload Bukti Transfer','desc'=>'Upload foto/scan bukti transfer di menu Pembayaran pada dashboard.'],
-              ['num'=>'4','title'=>'Tunggu Verifikasi','desc'=>'Admin memverifikasi dalam 1×24 jam. Anda akan mendapat email konfirmasi.'],
+              ['num'=>'4','title'=>'Tunggu Verifikasi','desc'=>'Admin memverifikasi dalam 1�24 jam. Anda akan mendapat email konfirmasi.'],
             ] @endphp
             @foreach($steps as $s)
             <tr>
@@ -90,7 +90,7 @@
               <td align="center">
                 <a href="{{ $paymentUrl }}"
                    style="display:inline-block;background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);color:#ffffff;text-decoration:none;padding:14px 40px;border-radius:30px;font-size:15px;font-weight:700;">
-                  💳 Login &amp; Upload Bukti Bayar
+                  ?? Login &amp; Upload Bukti Bayar
                 </a>
               </td>
             </tr>

@@ -11,7 +11,7 @@
         $siteName = \App\Models\Setting::getValue('site_name', 'Prosiding LPKD-APJI');
         $siteLogo = \App\Models\Setting::getValue('site_logo');
         $footerText = \App\Models\Setting::getValue('footer_text');
-        $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by Laravel');
+        $poweredBy = \App\Models\Setting::getValue('powered_by', 'Powered by gudangsoft.net');
         $contactEmail = \App\Models\Setting::getValue('contact_email');
         $contactPhone = \App\Models\Setting::getValue('contact_phone');
         $socialFacebook = \App\Models\Setting::getValue('social_facebook');
