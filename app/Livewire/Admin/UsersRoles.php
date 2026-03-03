@@ -180,18 +180,24 @@ class UsersRoles extends Component
             return;
         }
 
-        // Map base role to role slug
+        // Map base role to role definition [slug, name, permission_level]
         $roleMap = [
-            'reviewer' => 'reviewer',
-            'author'   => 'author',
-            'editor'   => 'section-editor',
+            'reviewer'    => ['slug' => 'reviewer', 'name' => 'Reviewer', 'permission_level' => 'reviewer'],
+            'author'      => ['slug' => 'author', 'name' => 'Author', 'permission_level' => 'author'],
+            'editor'      => ['slug' => 'section-editor', 'name' => 'Section Editor', 'permission_level' => 'editor'],
+            'participant' => ['slug' => 'participant', 'name' => 'Participant', 'permission_level' => 'author'],
+            'keuangan'    => ['slug' => 'finance-manager', 'name' => 'Finance Manager', 'permission_level' => 'manager'],
+            'admin'       => ['slug' => 'administrator', 'name' => 'Administrator', 'permission_level' => 'admin'],
         ];
 
         if (isset($roleMap[$user->role])) {
-            $role = Role::where('slug', $roleMap[$user->role])->first();
-            if ($role) {
-                $user->roles()->attach($role->id);
-            }
+            $roleData = $roleMap[$user->role];
+            // Find or create the role
+            $role = Role::firstOrCreate(
+                ['slug' => $roleData['slug']],
+                ['name' => $roleData['name'], 'permission_level' => $roleData['permission_level']]
+            );
+            $user->roles()->syncWithoutDetaching([$role->id]);
         }
     }
 
@@ -373,24 +379,29 @@ class UsersRoles extends Component
      */
     public function autoAssignAllRoles(): void
     {
+        // Map base role to role definition [slug, name, permission_level]
         $roleMap = [
-            'reviewer' => 'reviewer',
-            'author'   => 'author',
-            'editor'   => 'section-editor',
+            'reviewer'    => ['slug' => 'reviewer', 'name' => 'Reviewer', 'permission_level' => 'reviewer'],
+            'author'      => ['slug' => 'author', 'name' => 'Author', 'permission_level' => 'author'],
+            'editor'      => ['slug' => 'section-editor', 'name' => 'Section Editor', 'permission_level' => 'editor'],
+            'participant' => ['slug' => 'participant', 'name' => 'Participant', 'permission_level' => 'author'],
+            'keuangan'    => ['slug' => 'finance-manager', 'name' => 'Finance Manager', 'permission_level' => 'manager'],
+            'admin'       => ['slug' => 'administrator', 'name' => 'Administrator', 'permission_level' => 'admin'],
         ];
 
-        $usersWithoutRoles = User::doesntHave('roles')
-            ->whereIn('role', array_keys($roleMap))
-            ->get();
+        $usersWithoutRoles = User::doesntHave('roles')->get();
 
         $count = 0;
         foreach ($usersWithoutRoles as $user) {
             if (isset($roleMap[$user->role])) {
-                $role = Role::where('slug', $roleMap[$user->role])->first();
-                if ($role) {
-                    $user->roles()->attach($role->id);
-                    $count++;
-                }
+                $roleData = $roleMap[$user->role];
+                // Find or create the role
+                $role = Role::firstOrCreate(
+                    ['slug' => $roleData['slug']],
+                    ['name' => $roleData['name'], 'permission_level' => $roleData['permission_level']]
+                );
+                $user->roles()->syncWithoutDetaching([$role->id]);
+                $count++;
             }
         }
 
