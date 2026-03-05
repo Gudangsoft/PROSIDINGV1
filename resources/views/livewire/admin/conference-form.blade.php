@@ -165,9 +165,25 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
                 <div class="space-y-2">
+                    {{-- Loading indicator --}}
+                    <div wire:loading wire:target="cover_image" class="flex items-center gap-2 text-sm text-blue-600">
+                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        Mengupload...
+                    </div>
                     @if($cover_image)
-                    <div class="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden border">
-                        <img src="{{ $cover_image->temporaryUrl() }}" class="w-full h-full object-cover" alt="Preview">
+                    <div class="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden border" wire:loading.remove wire:target="cover_image">
+                        @php
+                            try {
+                                $previewUrl = $cover_image->temporaryUrl();
+                            } catch (\Exception $e) {
+                                $previewUrl = null;
+                            }
+                        @endphp
+                        @if($previewUrl)
+                        <img src="{{ $previewUrl }}" class="w-full h-full object-cover" alt="Preview">
+                        @else
+                        <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm">Preview tidak tersedia</div>
+                        @endif
                         <button type="button" wire:click="$set('cover_image', null)" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
@@ -188,9 +204,25 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Logo</label>
                 <div class="space-y-2">
+                    {{-- Loading indicator --}}
+                    <div wire:loading wire:target="logo" class="flex items-center gap-2 text-sm text-blue-600">
+                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        Mengupload...
+                    </div>
                     @if($logo)
-                    <div class="relative w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border">
-                        <img src="{{ $logo->temporaryUrl() }}" class="w-full h-full object-contain" alt="Preview">
+                    <div class="relative w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border" wire:loading.remove wire:target="logo">
+                        @php
+                            try {
+                                $logoPreviewUrl = $logo->temporaryUrl();
+                            } catch (\Exception $e) {
+                                $logoPreviewUrl = null;
+                            }
+                        @endphp
+                        @if($logoPreviewUrl)
+                        <img src="{{ $logoPreviewUrl }}" class="w-full h-full object-contain" alt="Preview">
+                        @else
+                        <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center">Preview N/A</div>
+                        @endif
                         <button type="button" wire:click="$set('logo', null)" class="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
@@ -211,9 +243,25 @@
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Brosur / Pamflet</label>
                 <div class="space-y-2">
+                    {{-- Loading indicator --}}
+                    <div wire:loading wire:target="brochure" class="flex items-center gap-2 text-sm text-blue-600">
+                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        Mengupload...
+                    </div>
                     @if($brochure)
-                    <div class="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border">
-                        <img src="{{ $brochure->temporaryUrl() }}" class="w-full h-full object-contain" alt="Preview">
+                    <div class="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border" wire:loading.remove wire:target="brochure">
+                        @php
+                            try {
+                                $brochurePreviewUrl = $brochure->temporaryUrl();
+                            } catch (\Exception $e) {
+                                $brochurePreviewUrl = null;
+                            }
+                        @endphp
+                        @if($brochurePreviewUrl)
+                        <img src="{{ $brochurePreviewUrl }}" class="w-full h-full object-contain" alt="Preview">
+                        @else
+                        <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm">Preview tidak tersedia</div>
+                        @endif
                         <button type="button" wire:click="$set('brochure', null)" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
