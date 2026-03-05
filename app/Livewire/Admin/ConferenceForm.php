@@ -621,19 +621,34 @@ class ConferenceForm extends Component
             if ($this->isEdit && $this->conference->cover_image) {
                 Storage::disk('public')->delete($this->conference->cover_image);
             }
-            $data['cover_image'] = $this->cover_image->store('conferences', 'public');
+            try {
+                $data['cover_image'] = $this->cover_image->store('conferences', 'public');
+                \Log::info('Cover image stored: ' . $data['cover_image']);
+            } catch (\Exception $e) {
+                \Log::error('Failed to store cover_image: ' . $e->getMessage());
+            }
         }
         if ($this->logo) {
             if ($this->isEdit && $this->conference->logo) {
                 Storage::disk('public')->delete($this->conference->logo);
             }
-            $data['logo'] = $this->logo->store('conferences', 'public');
+            try {
+                $data['logo'] = $this->logo->store('conferences', 'public');
+                \Log::info('Logo stored: ' . $data['logo']);
+            } catch (\Exception $e) {
+                \Log::error('Failed to store logo: ' . $e->getMessage());
+            }
         }
         if ($this->brochure) {
             if ($this->isEdit && $this->conference->brochure) {
                 Storage::disk('public')->delete($this->conference->brochure);
             }
-            $data['brochure'] = $this->brochure->store('conferences', 'public');
+            try {
+                $data['brochure'] = $this->brochure->store('conferences', 'public');
+                \Log::info('Brochure stored: ' . $data['brochure']);
+            } catch (\Exception $e) {
+                \Log::error('Failed to store brochure: ' . $e->getMessage());
+            }
         }
 
         if ($this->isEdit) {

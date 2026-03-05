@@ -1,36 +1,37 @@
 <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
     <div class="mb-6">
-        <a href="{{ route('admin.conferences') }}" class="text-sm text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
+        <a href="<?php echo e(route('admin.conferences')); ?>" class="text-sm text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             Kembali ke Daftar Kegiatan
         </a>
-        <h2 class="text-2xl font-bold text-gray-800 mt-2">{{ $isEdit ? 'Edit Kegiatan' : 'Tambah Kegiatan Baru' }}</h2>
-        @if($isEdit)
-        <p class="text-sm text-gray-500 mt-1">Mengedit: {{ $name }}</p>
-        @endif
+        <h2 class="text-2xl font-bold text-gray-800 mt-2"><?php echo e($isEdit ? 'Edit Kegiatan' : 'Tambah Kegiatan Baru'); ?></h2>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isEdit): ?>
+        <p class="text-sm text-gray-500 mt-1">Mengedit: <?php echo e($name); ?></p>
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     </div>
 
-    @if(session('success'))
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
         <div class="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 mb-4 text-sm flex items-center gap-2">
             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            {{ session('success') }}
-        </div>
-    @endif
+            <?php echo e(session('success')); ?>
 
-    @if($errors->any())
+        </div>
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->any()): ?>
         <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-4 text-sm">
             <p class="font-medium">Mohon perbaiki kesalahan berikut:</p>
             <ul class="list-disc list-inside mt-1">
-                @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                <li><?php echo e($error); ?></li>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             </ul>
         </div>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    {{-- Tabs --}}
+    
     <div class="flex gap-1 mb-6 overflow-x-auto border-b">
-        @php
+        <?php
             $tabConfig = [
                 'general' => ['label' => 'Umum', 'count' => null, 'icon' => 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
                 'dates' => ['label' => 'Tanggal Penting', 'count' => count($importantDates), 'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'],
@@ -45,29 +46,37 @@
                 'email_templates' => ['label' => 'Template Email', 'count' => count($emailTemplates), 'icon' => 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
                 'whatsapp' => ['label' => 'Grup WhatsApp', 'count' => null, 'icon' => 'M12 18h.01M8 21l4-4 4 4M3 9.5A8.5 8.5 0 1112 3a8.5 8.5 0 01-9 6.5'],
             ];
-        @endphp
-        @foreach($tabConfig as $tab => $cfg)
-        <button type="button" wire:click="$set('activeTab', '{{ $tab }}')"
+        ?>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $tabConfig; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tab => $cfg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+        <button type="button" wire:click="$set('activeTab', '<?php echo e($tab); ?>')"
             class="group flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition
-            {{ $activeTab === $tab ? 'border-blue-600 text-blue-700' : 'border-transparent text-gray-500 hover:text-gray-700' }}">
-            <svg class="w-4 h-4 {{ $activeTab === $tab ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $cfg['icon'] }}"/></svg>
-            {{ $cfg['label'] }}
-            @if($cfg['count'] !== null && $cfg['count'] > 0)
-            <span class="ml-1 px-1.5 py-0.5 rounded-full text-xs {{ $activeTab === $tab ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600' }}">{{ $cfg['count'] }}</span>
-            @endif
+            <?php echo e($activeTab === $tab ? 'border-blue-600 text-blue-700' : 'border-transparent text-gray-500 hover:text-gray-700'); ?>">
+            <svg class="w-4 h-4 <?php echo e($activeTab === $tab ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo e($cfg['icon']); ?>"/></svg>
+            <?php echo e($cfg['label']); ?>
+
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($cfg['count'] !== null && $cfg['count'] > 0): ?>
+            <span class="ml-1 px-1.5 py-0.5 rounded-full text-xs <?php echo e($activeTab === $tab ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'); ?>"><?php echo e($cfg['count']); ?></span>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </button>
-        @endforeach
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
     </div>
 
     <form wire:submit="save">
 
-    {{-- TAB: General - Always keep in DOM for file uploads to work --}}
-    <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4" @if($activeTab !== 'general') style="display:none" @endif>
+    
+    <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4" <?php if($activeTab !== 'general'): ?> style="display:none" <?php endif; ?>>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kegiatan *</label>
                 <input wire:model="name" type="text" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500" required>
-                @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Akronim</label>
@@ -88,7 +97,14 @@
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Link "Baca Selengkapnya" <span class="text-gray-400 font-normal">(opsional)</span></label>
                 <input wire:model="read_more_url" type="url" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="https://example.com/tentang-konferensi">
-                @error('read_more_url') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['read_more_url'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 <p class="text-xs text-gray-400 mt-1">Jika diisi, tombol "Baca Selengkapnya" di halaman publik akan mengarah ke URL ini.</p>
             </div>
             <div>
@@ -118,15 +134,15 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kegiatan</label>
                 <div class="flex gap-3">
-                    <label class="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg border text-sm font-medium transition {{ $conferenceType === 'nasional' ? 'bg-sky-50 border-sky-400 text-sky-700' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50' }}">
+                    <label class="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg border text-sm font-medium transition <?php echo e($conferenceType === 'nasional' ? 'bg-sky-50 border-sky-400 text-sky-700' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'); ?>">
                         <input type="radio" wire:model.live="conferenceType" value="nasional" class="accent-sky-600"> Nasional
                     </label>
-                    <label class="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg border text-sm font-medium transition {{ $conferenceType === 'internasional' ? 'bg-violet-50 border-violet-400 text-violet-700' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50' }}">
+                    <label class="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg border text-sm font-medium transition <?php echo e($conferenceType === 'internasional' ? 'bg-violet-50 border-violet-400 text-violet-700' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'); ?>">
                         <input type="radio" wire:model.live="conferenceType" value="internasional" class="accent-violet-600"> Internasional
                     </label>
                 </div>
             </div>
-            @if($venue_type === 'offline' || $venue_type === 'hybrid')
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($venue_type === 'offline' || $venue_type === 'hybrid'): ?>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tempat / Venue</label>
                 <input wire:model="venue" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Nama gedung / lokasi">
@@ -135,8 +151,8 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Kota</label>
                 <input wire:model="city" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Nama kota">
             </div>
-            @endif
-            @if($venue_type === 'online' || $venue_type === 'hybrid')
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($venue_type === 'online' || $venue_type === 'hybrid'): ?>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Link / URL Online</label>
                 <input wire:model="online_url" type="url" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="https://zoom.us/meeting/...">
@@ -159,76 +175,104 @@
                         YouTube Live / Webex
                     </span>
                 </div>
-                @error('online_url') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['online_url'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="mt-1 text-xs text-red-600"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
                 <div class="space-y-2">
-                    @if($cover_image)
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($cover_image): ?>
                     <div class="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden border">
-                        <img src="{{ $cover_image->temporaryUrl() }}" class="w-full h-full object-cover" alt="Preview">
+                        <img src="<?php echo e($cover_image->temporaryUrl()); ?>" class="w-full h-full object-cover" alt="Preview">
                         <button type="button" wire:click="$set('cover_image', null)" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
-                    @elseif($existing_cover_image)
+                    <?php elseif($existing_cover_image): ?>
                     <div class="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden border">
-                        <img src="{{ asset('storage/' . $existing_cover_image) }}" class="w-full h-full object-cover" alt="Cover">
+                        <img src="<?php echo e(asset('storage/' . $existing_cover_image)); ?>" class="w-full h-full object-cover" alt="Cover">
                         <button type="button" wire:click="removeCoverImage" wire:confirm="Hapus cover image?" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
-                    @endif
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     <input wire:model="cover_image" type="file" accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700">
                     <p class="text-xs text-gray-400">Maks 2MB. Format: JPG, PNG</p>
-                    @error('cover_image')<p class="text-red-500 text-xs">{{ $message }}</p>@enderror
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['cover_image'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="text-red-500 text-xs"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Logo</label>
                 <div class="space-y-2">
-                    @if($logo)
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($logo): ?>
                     <div class="relative w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border">
-                        <img src="{{ $logo->temporaryUrl() }}" class="w-full h-full object-contain" alt="Preview">
+                        <img src="<?php echo e($logo->temporaryUrl()); ?>" class="w-full h-full object-contain" alt="Preview">
                         <button type="button" wire:click="$set('logo', null)" class="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
-                    @elseif($existing_logo)
+                    <?php elseif($existing_logo): ?>
                     <div class="relative w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border">
-                        <img src="{{ asset('storage/' . $existing_logo) }}" class="w-full h-full object-contain" alt="Logo">
+                        <img src="<?php echo e(asset('storage/' . $existing_logo)); ?>" class="w-full h-full object-contain" alt="Logo">
                         <button type="button" wire:click="removeLogo" wire:confirm="Hapus logo?" class="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
-                    @endif
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     <input wire:model="logo" type="file" accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700">
                     <p class="text-xs text-gray-400">Maks 1MB. Format: JPG, PNG</p>
-                    @error('logo')<p class="text-red-500 text-xs">{{ $message }}</p>@enderror
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['logo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="text-red-500 text-xs"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
             </div>
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Brosur / Pamflet</label>
                 <div class="space-y-2">
-                    @if($brochure)
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($brochure): ?>
                     <div class="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border">
-                        <img src="{{ $brochure->temporaryUrl() }}" class="w-full h-full object-contain" alt="Preview">
+                        <img src="<?php echo e($brochure->temporaryUrl()); ?>" class="w-full h-full object-contain" alt="Preview">
                         <button type="button" wire:click="$set('brochure', null)" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
-                    @elseif($existing_brochure)
+                    <?php elseif($existing_brochure): ?>
                     <div class="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border">
-                        <img src="{{ asset('storage/' . $existing_brochure) }}" class="w-full h-full object-contain" alt="Brosur">
+                        <img src="<?php echo e(asset('storage/' . $existing_brochure)); ?>" class="w-full h-full object-contain" alt="Brosur">
                         <button type="button" wire:click="removeBrochure" wire:confirm="Hapus brosur/pamflet?" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
-                    @endif
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     <input wire:model="brochure" type="file" accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700">
                     <p class="text-xs text-gray-400">Maks 5MB. Format: JPG, PNG. Gambar brosur/pamflet yang tampil di halaman utama.</p>
-                    @error('brochure')<p class="text-red-500 text-xs">{{ $message }}</p>@enderror
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['brochure'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="text-red-500 text-xs"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
             </div>
             <div>
@@ -242,216 +286,217 @@
         </div>
     </div>
 
-    {{-- TAB: Important Dates --}}
-    @if($activeTab === 'dates')
+    
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeTab === 'dates'): ?>
     <div class="bg-white rounded-xl shadow-sm border p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="font-semibold text-gray-800">Tanggal Penting</h3>
             <button type="button" wire:click="addDate" class="text-sm px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100">+ Tambah</button>
         </div>
         <div class="space-y-3">
-            @forelse($importantDates as $i => $date)
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $importantDates; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $date): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
             <div class="flex gap-3 items-start p-3 bg-gray-50 rounded-lg">
                 <div class="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-3">
-                    <input wire:model="importantDates.{{ $i }}.title" type="text" placeholder="Judul" class="px-3 py-2 border rounded-lg text-sm">
-                    <input wire:model="importantDates.{{ $i }}.date" type="date" class="px-3 py-2 border rounded-lg text-sm">
-                    <select wire:model="importantDates.{{ $i }}.type" class="px-3 py-2 border rounded-lg text-sm">
-                        @foreach(\App\Models\ImportantDate::TYPE_LABELS as $val => $lbl)<option value="{{ $val }}">{{ $lbl }}</option>@endforeach
+                    <input wire:model="importantDates.<?php echo e($i); ?>.title" type="text" placeholder="Judul" class="px-3 py-2 border rounded-lg text-sm">
+                    <input wire:model="importantDates.<?php echo e($i); ?>.date" type="date" class="px-3 py-2 border rounded-lg text-sm">
+                    <select wire:model="importantDates.<?php echo e($i); ?>.type" class="px-3 py-2 border rounded-lg text-sm">
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = \App\Models\ImportantDate::TYPE_LABELS; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $lbl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?><option value="<?php echo e($val); ?>"><?php echo e($lbl); ?></option><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                     </select>
-                    <input wire:model="importantDates.{{ $i }}.description" type="text" placeholder="Keterangan" class="px-3 py-2 border rounded-lg text-sm">
+                    <input wire:model="importantDates.<?php echo e($i); ?>.description" type="text" placeholder="Keterangan" class="px-3 py-2 border rounded-lg text-sm">
                 </div>
-                <button type="button" wire:click="removeDate({{ $i }})" class="text-red-500 hover:text-red-700 mt-2">
+                <button type="button" wire:click="removeDate(<?php echo e($i); ?>)" class="text-red-500 hover:text-red-700 mt-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
             </div>
-            @empty
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             <p class="text-gray-400 text-sm text-center py-4">Belum ada tanggal penting. Klik "+ Tambah" untuk menambahkan.</p>
-            @endforelse
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </div>
     </div>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    {{-- TAB: Committees --}}
-    @if($activeTab === 'committees')
+    
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeTab === 'committees'): ?>
     <div class="bg-white rounded-xl shadow-sm border p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="font-semibold text-gray-800">Panitia / Committee</h3>
             <button type="button" wire:click="addCommittee" class="text-sm px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100">+ Tambah</button>
         </div>
         <div class="space-y-3">
-            @forelse($committees as $i => $comm)
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $committees; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $comm): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
             <div class="flex gap-3 items-start p-3 bg-gray-50 rounded-lg">
                 <div class="flex-1 grid grid-cols-1 sm:grid-cols-5 gap-3">
-                    <input wire:model="committees.{{ $i }}.name" type="text" placeholder="Nama" class="px-3 py-2 border rounded-lg text-sm">
-                    <input wire:model="committees.{{ $i }}.title" type="text" placeholder="Gelar (Dr., Prof.)" class="px-3 py-2 border rounded-lg text-sm">
-                    <input wire:model="committees.{{ $i }}.institution" type="text" placeholder="Institusi" class="px-3 py-2 border rounded-lg text-sm">
-                    <select wire:model="committees.{{ $i }}.type" class="px-3 py-2 border rounded-lg text-sm">
-                        @foreach(\App\Models\Committee::TYPE_LABELS as $val => $lbl)<option value="{{ $val }}">{{ $lbl }}</option>@endforeach
+                    <input wire:model="committees.<?php echo e($i); ?>.name" type="text" placeholder="Nama" class="px-3 py-2 border rounded-lg text-sm">
+                    <input wire:model="committees.<?php echo e($i); ?>.title" type="text" placeholder="Gelar (Dr., Prof.)" class="px-3 py-2 border rounded-lg text-sm">
+                    <input wire:model="committees.<?php echo e($i); ?>.institution" type="text" placeholder="Institusi" class="px-3 py-2 border rounded-lg text-sm">
+                    <select wire:model="committees.<?php echo e($i); ?>.type" class="px-3 py-2 border rounded-lg text-sm">
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = \App\Models\Committee::TYPE_LABELS; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $lbl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?><option value="<?php echo e($val); ?>"><?php echo e($lbl); ?></option><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                     </select>
-                    <input wire:model="committees.{{ $i }}.role" type="text" placeholder="Jabatan (Ketua, Anggota)" class="px-3 py-2 border rounded-lg text-sm">
+                    <input wire:model="committees.<?php echo e($i); ?>.role" type="text" placeholder="Jabatan (Ketua, Anggota)" class="px-3 py-2 border rounded-lg text-sm">
                 </div>
-                <button type="button" wire:click="removeCommittee({{ $i }})" class="text-red-500 hover:text-red-700 mt-2">
+                <button type="button" wire:click="removeCommittee(<?php echo e($i); ?>)" class="text-red-500 hover:text-red-700 mt-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
             </div>
-            @empty
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             <p class="text-gray-400 text-sm text-center py-4">Belum ada panitia. Klik "+ Tambah" untuk menambahkan.</p>
-            @endforelse
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </div>
     </div>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    {{-- TAB: Topics --}}
-    @if($activeTab === 'topics')
+    
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeTab === 'topics'): ?>
     <div class="bg-white rounded-xl shadow-sm border p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="font-semibold text-gray-800">Topik / Bidang Kajian</h3>
             <button type="button" wire:click="addTopic" class="text-sm px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100">+ Tambah</button>
         </div>
         <div class="space-y-3">
-            @forelse($topics as $i => $topic)
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $topics; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $topic): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
             <div class="flex gap-3 items-start p-3 bg-gray-50 rounded-lg">
                 <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <input wire:model="topics.{{ $i }}.code" type="text" placeholder="Kode (cth: T01)" class="px-3 py-2 border rounded-lg text-sm">
-                    <input wire:model="topics.{{ $i }}.name" type="text" placeholder="Nama Topik" class="px-3 py-2 border rounded-lg text-sm sm:col-span-2">
-                    <input wire:model="topics.{{ $i }}.description" type="text" placeholder="Deskripsi (opsional)" class="px-3 py-2 border rounded-lg text-sm sm:col-span-3">
+                    <input wire:model="topics.<?php echo e($i); ?>.code" type="text" placeholder="Kode (cth: T01)" class="px-3 py-2 border rounded-lg text-sm">
+                    <input wire:model="topics.<?php echo e($i); ?>.name" type="text" placeholder="Nama Topik" class="px-3 py-2 border rounded-lg text-sm sm:col-span-2">
+                    <input wire:model="topics.<?php echo e($i); ?>.description" type="text" placeholder="Deskripsi (opsional)" class="px-3 py-2 border rounded-lg text-sm sm:col-span-3">
                 </div>
-                <button type="button" wire:click="removeTopic({{ $i }})" class="text-red-500 hover:text-red-700 mt-2">
+                <button type="button" wire:click="removeTopic(<?php echo e($i); ?>)" class="text-red-500 hover:text-red-700 mt-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
             </div>
-            @empty
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             <p class="text-gray-400 text-sm text-center py-4">Belum ada topik. Klik "+ Tambah" untuk menambahkan.</p>
-            @endforelse
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </div>
     </div>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    {{-- TAB: Speakers - Always keep in DOM for file uploads --}}
-    <div class="bg-white rounded-xl shadow-sm border p-6" @if($activeTab !== 'speakers') style="display:none" @endif>
+    
+    <div class="bg-white rounded-xl shadow-sm border p-6" <?php if($activeTab !== 'speakers'): ?> style="display:none" <?php endif; ?>>
         <div class="flex justify-between items-center mb-4">
             <h3 class="font-semibold text-gray-800">Pembicara & Moderator</h3>
             <div class="flex gap-2 flex-wrap">
-                @foreach(\App\Models\KeynoteSpeaker::TYPE_LABELS as $typeKey => $typeLabel)
-                <button type="button" wire:click="addSpeaker('{{ $typeKey }}')"
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = \App\Models\KeynoteSpeaker::TYPE_LABELS; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $typeKey => $typeLabel): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                <button type="button" wire:click="addSpeaker('<?php echo e($typeKey); ?>')"
                     class="text-xs px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 whitespace-nowrap">
-                    + {{ $typeLabel }}
+                    + <?php echo e($typeLabel); ?>
+
                 </button>
-                @endforeach
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             </div>
         </div>
 
-        @php
+        <?php
             $speakerTypes = \App\Models\KeynoteSpeaker::TYPE_LABELS;
             $typeColors = \App\Models\KeynoteSpeaker::TYPE_COLORS;
             $typeIcons = \App\Models\KeynoteSpeaker::TYPE_ICONS;
-        @endphp
+        ?>
 
-        @foreach($speakerTypes as $typeKey => $typeLabel)
-            @php
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $speakerTypes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $typeKey => $typeLabel): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+            <?php
                 $filtered = collect($speakers)->filter(fn($s) => ($s['type'] ?? 'keynote_speaker') === $typeKey);
                 $color = $typeColors[$typeKey] ?? 'gray';
                 $icon = $typeIcons[$typeKey] ?? '';
-            @endphp
+            ?>
 
             <div class="mb-6">
                 <div class="flex items-center gap-2 mb-3 pb-2 border-b">
-                    <svg class="w-5 h-5 text-{{ $color }}-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $icon }}"/></svg>
-                    <h4 class="font-semibold text-gray-700 text-sm">{{ $typeLabel }}</h4>
-                    @if($filtered->count() > 0)
-                    <span class="px-1.5 py-0.5 rounded-full text-xs bg-{{ $color }}-100 text-{{ $color }}-700">{{ $filtered->count() }}</span>
-                    @endif
+                    <svg class="w-5 h-5 text-<?php echo e($color); ?>-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo e($icon); ?>"/></svg>
+                    <h4 class="font-semibold text-gray-700 text-sm"><?php echo e($typeLabel); ?></h4>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($filtered->count() > 0): ?>
+                    <span class="px-1.5 py-0.5 rounded-full text-xs bg-<?php echo e($color); ?>-100 text-<?php echo e($color); ?>-700"><?php echo e($filtered->count()); ?></span>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     <div class="ml-auto">
-                        @php $typeHidden = in_array($typeKey, $hiddenSpeakerTypes); @endphp
-                        <button type="button" wire:click="toggleSpeakerType('{{ $typeKey }}')"
-                            title="{{ $typeHidden ? 'Tampilkan di website' : 'Sembunyikan dari website' }}"
-                            class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition {{ $typeHidden ? 'bg-gray-100 text-gray-500 hover:bg-gray-200' : 'bg-green-50 text-green-700 hover:bg-green-100' }}">
-                            @if($typeHidden)
+                        <?php $typeHidden = in_array($typeKey, $hiddenSpeakerTypes); ?>
+                        <button type="button" wire:click="toggleSpeakerType('<?php echo e($typeKey); ?>')"
+                            title="<?php echo e($typeHidden ? 'Tampilkan di website' : 'Sembunyikan dari website'); ?>"
+                            class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition <?php echo e($typeHidden ? 'bg-gray-100 text-gray-500 hover:bg-gray-200' : 'bg-green-50 text-green-700 hover:bg-green-100'); ?>">
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($typeHidden): ?>
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
                                 Disembunyikan
-                            @else
+                            <?php else: ?>
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 Tampil di Web
-                            @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </button>
                     </div>
                 </div>
 
                 <div class="space-y-3">
-                    @php $hasItems = false; @endphp
-                    @foreach($speakers as $i => $speaker)
-                        @if(($speaker['type'] ?? 'keynote_speaker') !== $typeKey) @continue @endif
-                        @php $hasItems = true; @endphp
-                        <div class="flex gap-3 items-start p-3 bg-gray-50 rounded-lg border-l-4 border-{{ $color }}-400">
-                            {{-- Speaker Photo --}}
+                    <?php $hasItems = false; ?>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $speakers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $speaker): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(($speaker['type'] ?? 'keynote_speaker') !== $typeKey): ?> <?php continue; ?> <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        <?php $hasItems = true; ?>
+                        <div class="flex gap-3 items-start p-3 bg-gray-50 rounded-lg border-l-4 border-<?php echo e($color); ?>-400">
+                            
                             <div class="shrink-0 w-24">
                                 <div class="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 overflow-hidden bg-white flex items-center justify-center relative group">
-                                    @if(isset($speakerPhotos[$i]) && $speakerPhotos[$i])
-                                        <img src="{{ $speakerPhotos[$i]->temporaryUrl() }}" alt="Preview" class="w-full h-full object-cover">
-                                        <button type="button" wire:click="removeSpeakerPhoto({{ $i }})"
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($speakerPhotos[$i]) && $speakerPhotos[$i]): ?>
+                                        <img src="<?php echo e($speakerPhotos[$i]->temporaryUrl()); ?>" alt="Preview" class="w-full h-full object-cover">
+                                        <button type="button" wire:click="removeSpeakerPhoto(<?php echo e($i); ?>)"
                                             class="absolute top-0 right-0 bg-red-500 text-white rounded-bl-lg p-0.5 opacity-0 group-hover:opacity-100 transition">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                         </button>
-                                    @elseif(!empty($speaker['existing_photo']))
-                                        <img src="{{ asset('storage/' . $speaker['existing_photo']) }}" alt="Photo" class="w-full h-full object-cover">
-                                        <button type="button" wire:click="removeSpeakerPhoto({{ $i }})"
+                                    <?php elseif(!empty($speaker['existing_photo'])): ?>
+                                        <img src="<?php echo e(asset('storage/' . $speaker['existing_photo'])); ?>" alt="Photo" class="w-full h-full object-cover">
+                                        <button type="button" wire:click="removeSpeakerPhoto(<?php echo e($i); ?>)"
                                             class="absolute top-0 right-0 bg-red-500 text-white rounded-bl-lg p-0.5 opacity-0 group-hover:opacity-100 transition">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                         </button>
-                                    @else
+                                    <?php else: ?>
                                         <label class="cursor-pointer flex flex-col items-center justify-center w-full h-full hover:bg-gray-50 transition">
                                             <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                             <span class="text-[10px] text-gray-400 mt-0.5">Foto</span>
-                                            <input type="file" wire:model="speakerPhotos.{{ $i }}" accept="image/*" class="hidden">
+                                            <input type="file" wire:model="speakerPhotos.<?php echo e($i); ?>" accept="image/*" class="hidden">
                                         </label>
-                                    @endif
+                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 </div>
-                                <div wire:loading wire:target="speakerPhotos.{{ $i }}" class="text-[10px] text-blue-600 text-center mt-1">Uploading...</div>
+                                <div wire:loading wire:target="speakerPhotos.<?php echo e($i); ?>" class="text-[10px] text-blue-600 text-center mt-1">Uploading...</div>
                             </div>
 
                             <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <div>
                                     <label class="block text-xs font-medium text-gray-500 mb-0.5">Nama *</label>
-                                    <input wire:model="speakers.{{ $i }}.name" type="text" placeholder="Nama lengkap" class="w-full px-3 py-2 border rounded-lg text-sm">
+                                    <input wire:model="speakers.<?php echo e($i); ?>.name" type="text" placeholder="Nama lengkap" class="w-full px-3 py-2 border rounded-lg text-sm">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-500 mb-0.5">Gelar</label>
-                                    <input wire:model="speakers.{{ $i }}.title" type="text" placeholder="Prof. Dr. / M.Pd." class="w-full px-3 py-2 border rounded-lg text-sm">
+                                    <input wire:model="speakers.<?php echo e($i); ?>.title" type="text" placeholder="Prof. Dr. / M.Pd." class="w-full px-3 py-2 border rounded-lg text-sm">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-500 mb-0.5">Institusi</label>
-                                    <input wire:model="speakers.{{ $i }}.institution" type="text" placeholder="Universitas / Lembaga" class="w-full px-3 py-2 border rounded-lg text-sm">
+                                    <input wire:model="speakers.<?php echo e($i); ?>.institution" type="text" placeholder="Universitas / Lembaga" class="w-full px-3 py-2 border rounded-lg text-sm">
                                 </div>
                                 <div class="sm:col-span-3">
                                     <label class="block text-xs font-medium text-gray-500 mb-0.5">Topik / Materi</label>
-                                    <input wire:model="speakers.{{ $i }}.topic" type="text" placeholder="Judul atau topik yang disampaikan" class="w-full px-3 py-2 border rounded-lg text-sm">
+                                    <input wire:model="speakers.<?php echo e($i); ?>.topic" type="text" placeholder="Judul atau topik yang disampaikan" class="w-full px-3 py-2 border rounded-lg text-sm">
                                 </div>
                                 <div class="sm:col-span-3">
                                     <label class="block text-xs font-medium text-gray-500 mb-0.5">Bio Singkat</label>
-                                    <textarea wire:model="speakers.{{ $i }}.bio" placeholder="Bio singkat pembicara..." rows="2" class="w-full px-3 py-2 border rounded-lg text-sm"></textarea>
+                                    <textarea wire:model="speakers.<?php echo e($i); ?>.bio" placeholder="Bio singkat pembicara..." rows="2" class="w-full px-3 py-2 border rounded-lg text-sm"></textarea>
                                 </div>
                             </div>
-                            <button type="button" wire:click="removeSpeaker({{ $i }})" class="text-red-500 hover:text-red-700 mt-2">
+                            <button type="button" wire:click="removeSpeaker(<?php echo e($i); ?>)" class="text-red-500 hover:text-red-700 mt-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             </button>
                         </div>
-                    @endforeach
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
 
-                    @if(!$hasItems)
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$hasItems): ?>
                     <p class="text-gray-400 text-sm text-center py-3">
-                        Belum ada {{ strtolower($typeLabel) }}.
-                        <button type="button" wire:click="addSpeaker('{{ $typeKey }}')" class="text-blue-600 hover:underline">+ Tambah</button>
+                        Belum ada <?php echo e(strtolower($typeLabel)); ?>.
+                        <button type="button" wire:click="addSpeaker('<?php echo e($typeKey); ?>')" class="text-blue-600 hover:underline">+ Tambah</button>
                     </p>
-                    @endif
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
             </div>
-        @endforeach
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
     </div>
 
-    {{-- TAB: Pricing / Registration Packages --}}
-    @if($activeTab === 'pricing')
+    
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeTab === 'pricing'): ?>
     <div class="space-y-6">
-        {{-- Informasi Pembayaran --}}
+        
         <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4">
             <div class="flex items-center gap-2 mb-1">
                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
@@ -499,7 +544,7 @@
             </div>
         </div>
 
-        {{-- Metode Pembayaran (Multiple) --}}
+        
         <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-sm border-2 border-blue-200 p-6 space-y-4">
             <div class="flex justify-between items-center">
                 <div>
@@ -516,16 +561,16 @@
             </div>
 
             <div class="space-y-3">
-                @forelse($paymentMethods as $index => $method)
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $paymentMethods; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $method): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
                 <div class="bg-white rounded-lg border-2 border-gray-200 p-4 space-y-3 shadow-sm">
                     <div class="flex justify-between items-start">
-                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Metode #{{ $index + 1 }}</span>
+                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Metode #<?php echo e($index + 1); ?></span>
                         <div class="flex items-center gap-3">
                             <label class="flex items-center gap-1.5 cursor-pointer">
-                                <input type="checkbox" wire:model="paymentMethods.{{ $index }}.is_active" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                                <input type="checkbox" wire:model="paymentMethods.<?php echo e($index); ?>.is_active" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
                                 <span class="text-xs text-gray-600 font-medium">Aktif</span>
                             </label>
-                            <button type="button" wire:click="removePaymentMethod({{ $index }})" wire:confirm="Hapus metode pembayaran ini?" class="text-red-500 hover:text-red-700">
+                            <button type="button" wire:click="removePaymentMethod(<?php echo e($index); ?>)" wire:confirm="Hapus metode pembayaran ini?" class="text-red-500 hover:text-red-700">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             </button>
                         </div>
@@ -534,7 +579,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Jenis Metode *</label>
-                            <select wire:model="paymentMethods.{{ $index }}.type" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <select wire:model="paymentMethods.<?php echo e($index); ?>.type" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
                                 <option value="Bank Transfer">Bank Transfer</option>
                                 <option value="E-Wallet">E-Wallet (OVO, GoPay, Dana)</option>
                                 <option value="QRIS">QRIS</option>
@@ -545,41 +590,41 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Nama Bank/E-Wallet *</label>
-                            <input wire:model="paymentMethods.{{ $index }}.name" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="cth: Bank Mandiri, OVO, Dana">
+                            <input wire:model="paymentMethods.<?php echo e($index); ?>.name" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="cth: Bank Mandiri, OVO, Dana">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Nominal (Rp) *</label>
-                            <input wire:model="paymentMethods.{{ $index }}.amount" type="number" min="0" step="1000" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="500000">
+                            <input wire:model="paymentMethods.<?php echo e($index); ?>.amount" type="number" min="0" step="1000" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="500000">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">No. Rekening / No. HP</label>
-                            <input wire:model="paymentMethods.{{ $index }}.account_number" type="text" class="w-full px-3 py-2 border rounded-lg text-sm font-mono" placeholder="1234567890">
+                            <input wire:model="paymentMethods.<?php echo e($index); ?>.account_number" type="text" class="w-full px-3 py-2 border rounded-lg text-sm font-mono" placeholder="1234567890">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Atas Nama</label>
-                            <input wire:model="paymentMethods.{{ $index }}.account_holder" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Nama pemegang akun">
+                            <input wire:model="paymentMethods.<?php echo e($index); ?>.account_holder" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Nama pemegang akun">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Instruksi Khusus <span class="text-gray-400">(opsional)</span></label>
-                        <textarea wire:model="paymentMethods.{{ $index }}.instructions" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Instruksi tambahan untuk metode pembayaran ini..."></textarea>
+                        <textarea wire:model="paymentMethods.<?php echo e($index); ?>.instructions" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Instruksi tambahan untuk metode pembayaran ini..."></textarea>
                     </div>
                 </div>
-                @empty
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                 <div class="text-center py-8 bg-white/50 rounded-lg border-2 border-dashed border-gray-300">
                     <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     <p class="text-gray-500 text-sm">Belum ada metode pembayaran</p>
                     <p class="text-gray-400 text-xs mt-1">Klik "Tambah Metode" untuk menambahkan opsi pembayaran</p>
                 </div>
-                @endforelse
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
         </div>
 
-        {{-- Paket Biaya --}}
+        
         <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4">
             <div class="flex justify-between items-center">
                 <h3 class="font-semibold text-gray-800">Paket Biaya Pendaftaran</h3>
@@ -589,30 +634,30 @@
                 </button>
             </div>
             <div class="space-y-4">
-                @forelse($packages as $index => $pkg)
-                <div class="border rounded-xl p-4 space-y-3 {{ ($pkg['is_featured'] ?? false) ? 'border-blue-400 bg-blue-50/50 ring-1 ring-blue-200' : 'border-gray-200' }}">
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $packages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $pkg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                <div class="border rounded-xl p-4 space-y-3 <?php echo e(($pkg['is_featured'] ?? false) ? 'border-blue-400 bg-blue-50/50 ring-1 ring-blue-200' : 'border-gray-200'); ?>">
                     <div class="flex justify-between items-start">
-                        <span class="text-xs font-semibold text-gray-400 uppercase">Paket #{{ $index + 1 }}</span>
+                        <span class="text-xs font-semibold text-gray-400 uppercase">Paket #<?php echo e($index + 1); ?></span>
                         <div class="flex items-center gap-3">
                             <label class="flex items-center gap-1.5 cursor-pointer">
-                                <input type="checkbox" wire:model.live="packages.{{ $index }}.is_free" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                                <input type="checkbox" wire:model.live="packages.<?php echo e($index); ?>.is_free" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
                                 <span class="text-xs font-medium text-emerald-700">Gratis</span>
                             </label>
-                            @if(!($pkg['is_free'] ?? false))
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!($pkg['is_free'] ?? false)): ?>
                             <label class="flex items-center gap-1.5 cursor-pointer" title="Tampilkan field upload bukti bayar di form pendaftaran">
-                                <input type="checkbox" wire:model="packages.{{ $index }}.require_payment_proof" class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                <input type="checkbox" wire:model="packages.<?php echo e($index); ?>.require_payment_proof" class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
                                 <span class="text-xs font-medium text-orange-600">Upload Bukti Bayar</span>
                             </label>
-                            @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             <label class="flex items-center gap-1.5 cursor-pointer">
-                                <input type="checkbox" wire:model="packages.{{ $index }}.is_featured" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <input type="checkbox" wire:model="packages.<?php echo e($index); ?>.is_featured" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span class="text-xs text-gray-500">Featured</span>
                             </label>
                             <label class="flex items-center gap-1.5 cursor-pointer">
-                                <input type="checkbox" wire:model="packages.{{ $index }}.is_active" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                                <input type="checkbox" wire:model="packages.<?php echo e($index); ?>.is_active" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
                                 <span class="text-xs text-gray-500">Aktif</span>
                             </label>
-                            <button type="button" wire:click="removePackage({{ $index }})" wire:confirm="Hapus paket ini?" class="text-red-400 hover:text-red-600">
+                            <button type="button" wire:click="removePackage(<?php echo e($index); ?>)" wire:confirm="Hapus paket ini?" class="text-red-400 hover:text-red-600">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             </button>
                         </div>
@@ -620,57 +665,57 @@
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Nama Paket *</label>
-                            <input wire:model="packages.{{ $index }}.name" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="cth: Peserta Seminar 2025">
+                            <input wire:model="packages.<?php echo e($index); ?>.name" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="cth: Peserta Seminar 2025">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Mata Uang</label>
-                            <select wire:model="packages.{{ $index }}.currency" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <select wire:model="packages.<?php echo e($index); ?>.currency" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
                                 <option value="IDR">IDR (Rp)</option>
                                 <option value="USD">USD ($)</option>
                             </select>
                         </div>
                         <div>
-                            @if(!($pkg['is_free'] ?? false))
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!($pkg['is_free'] ?? false)): ?>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Harga</label>
-                            <input id="pkg-price-{{ $index }}"
-                                wire:model="packages.{{ $index }}.price" 
+                            <input id="pkg-price-<?php echo e($index); ?>"
+                                wire:model="packages.<?php echo e($index); ?>.price" 
                                 type="number" 
                                 min="0" 
                                 step="any"
                                 class="w-full px-3 py-2 border rounded-lg text-sm" 
-                                placeholder="{{ ($pkg['currency'] ?? 'IDR') === 'USD' ? '99.99' : '50000' }}">
-                            @else
+                                placeholder="<?php echo e(($pkg['currency'] ?? 'IDR') === 'USD' ? '99.99' : '50000'); ?>">
+                            <?php else: ?>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Harga</label>
                             <div class="flex items-center gap-2 w-full px-3 py-2 border border-emerald-300 bg-emerald-50 rounded-lg text-sm font-bold text-emerald-700">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 GRATIS
                             </div>
-                            @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Deskripsi Singkat</label>
-                            <input wire:model="packages.{{ $index }}.description" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="cth: Pemakalah Mahasiswa Luar (S1/S2/S3)">
+                            <input wire:model="packages.<?php echo e($index); ?>.description" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="cth: Pemakalah Mahasiswa Luar (S1/S2/S3)">
                         </div>
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Fasilitas <span class="text-gray-400">(satu per baris)</span></label>
-                        <textarea wire:model="packages.{{ $index }}.features" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm font-mono" placeholder="Akses Full Day Seminar&#10;Softcopy Presentasi Pembicara&#10;E-Sertificate&#10;E-Prosiding"></textarea>
+                        <textarea wire:model="packages.<?php echo e($index); ?>.features" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm font-mono" placeholder="Akses Full Day Seminar&#10;Softcopy Presentasi Pembicara&#10;E-Sertificate&#10;E-Prosiding"></textarea>
                     </div>
                 </div>
-                @empty
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                 <div class="text-center py-10 text-gray-400">
                     <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     <p class="text-sm">Belum ada paket biaya.</p>
                     <button type="button" wire:click="addPackage" class="mt-2 text-sm text-blue-600 hover:underline">+ Tambah Paket Pertama</button>
                 </div>
-                @endforelse
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
         </div>
     </div>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    {{-- TAB: Reviewers --}}
-    @if($activeTab === 'reviewers')
+    
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeTab === 'reviewers'): ?>
     <div class="bg-white rounded-xl shadow-sm border p-6">
         <div class="flex justify-between items-center mb-4">
             <div>
@@ -680,46 +725,47 @@
             <button type="button" wire:click="addReviewer" class="text-sm px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100">+ Tambah Reviewer</button>
         </div>
         <div class="space-y-3">
-            @forelse($reviewers as $i => $rev)
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $reviewers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $rev): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
             <div class="flex gap-3 items-start p-3 bg-gray-50 rounded-lg">
                 <div class="shrink-0 w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">
-                    {{ $i + 1 }}
+                    <?php echo e($i + 1); ?>
+
                 </div>
                 <div class="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-0.5">Nama *</label>
-                        <input wire:model="reviewers.{{ $i }}.name" type="text" placeholder="Nama lengkap" class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <input wire:model="reviewers.<?php echo e($i); ?>.name" type="text" placeholder="Nama lengkap" class="w-full px-3 py-2 border rounded-lg text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-0.5">Email *</label>
-                        <input wire:model="reviewers.{{ $i }}.email" type="email" placeholder="email@example.com" class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <input wire:model="reviewers.<?php echo e($i); ?>.email" type="email" placeholder="email@example.com" class="w-full px-3 py-2 border rounded-lg text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-0.5">Institusi</label>
-                        <input wire:model="reviewers.{{ $i }}.institution" type="text" placeholder="Universitas / Lembaga" class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <input wire:model="reviewers.<?php echo e($i); ?>.institution" type="text" placeholder="Universitas / Lembaga" class="w-full px-3 py-2 border rounded-lg text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-0.5">Telepon</label>
-                        <input wire:model="reviewers.{{ $i }}.phone" type="text" placeholder="08xxxxxxxxxx" class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <input wire:model="reviewers.<?php echo e($i); ?>.phone" type="text" placeholder="08xxxxxxxxxx" class="w-full px-3 py-2 border rounded-lg text-sm">
                     </div>
                 </div>
-                <button type="button" wire:click="removeReviewer({{ $i }})" wire:confirm="Hapus reviewer ini? Akun user akan dihapus permanen." class="text-red-500 hover:text-red-700 mt-2">
+                <button type="button" wire:click="removeReviewer(<?php echo e($i); ?>)" wire:confirm="Hapus reviewer ini? Akun user akan dihapus permanen." class="text-red-500 hover:text-red-700 mt-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
             </div>
-            @empty
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             <div class="text-center py-10 text-gray-400">
                 <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                 <p class="text-sm">Belum ada reviewer.</p>
                 <button type="button" wire:click="addReviewer" class="mt-2 text-sm text-blue-600 hover:underline">+ Tambah Reviewer Pertama</button>
             </div>
-            @endforelse
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </div>
     </div>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    {{-- TAB: Guidelines - Always keep in DOM for file uploads --}}
-    <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4" @if($activeTab !== 'guidelines') style="display:none" @endif>
+    
+    <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4" <?php if($activeTab !== 'guidelines'): ?> style="display:none" <?php endif; ?>>
         <h3 class="font-semibold text-gray-800">Panduan Submission</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="md:col-span-2">
@@ -745,21 +791,28 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Template File</label>
                 <div class="space-y-2">
-                    @if($existing_template_file)
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($existing_template_file): ?>
                     <div class="flex items-center gap-3 p-2 bg-blue-50 rounded-lg border border-blue-200">
                         <svg class="w-8 h-8 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm text-gray-700 font-medium truncate">{{ basename($existing_template_file) }}</p>
-                            <a href="{{ asset('storage/' . $existing_template_file) }}" target="_blank" class="text-xs text-blue-600 hover:underline">Download</a>
+                            <p class="text-sm text-gray-700 font-medium truncate"><?php echo e(basename($existing_template_file)); ?></p>
+                            <a href="<?php echo e(asset('storage/' . $existing_template_file)); ?>" target="_blank" class="text-xs text-blue-600 hover:underline">Download</a>
                         </div>
                         <button type="button" wire:click="removeTemplateFile" wire:confirm="Hapus template file?" class="text-red-500 hover:text-red-700 shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
-                    @endif
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     <input wire:model="template_file" type="file" class="w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700">
                     <p class="text-xs text-gray-400">Maks 5MB. Format: DOC, DOCX, PDF, ZIP</p>
-                    @error('template_file')<p class="text-red-500 text-xs">{{ $message }}</p>@enderror
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['template_file'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="text-red-500 text-xs"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
             </div>
             <div class="md:col-span-2">
@@ -769,8 +822,8 @@
         </div>
     </div>
 
-    {{-- TAB: Template Luaran - Always keep in DOM for file uploads --}}
-    <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4" @if($activeTab !== 'templates') style="display:none" @endif>
+    
+    <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4" <?php if($activeTab !== 'templates'): ?> style="display:none" <?php endif; ?>>
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="font-semibold text-gray-800">Template Luaran</h3>
@@ -782,71 +835,78 @@
             </button>
         </div>
 
-        @if(count($deliverableTemplates) === 0)
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(count($deliverableTemplates) === 0): ?>
         <div class="text-center py-10 border-2 border-dashed border-gray-200 rounded-xl">
             <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
             <p class="text-sm text-gray-500">Belum ada template luaran.</p>
             <p class="text-xs text-gray-400 mt-1">Klik "Tambah Template" untuk mulai menambahkan.</p>
         </div>
-        @endif
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
         <div class="space-y-4">
-            @foreach($deliverableTemplates as $i => $tpl)
-            <div class="border border-gray-200 rounded-xl p-4 relative group" wire:key="template-{{ $i }}">
-                {{-- Remove button --}}
-                <button type="button" wire:click="removeTemplate({{ $i }})" wire:confirm="Hapus template ini?"
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $deliverableTemplates; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $tpl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+            <div class="border border-gray-200 rounded-xl p-4 relative group" <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processElementKey('template-{{ $i }}', get_defined_vars()); ?>wire:key="template-<?php echo e($i); ?>">
+                
+                <button type="button" wire:click="removeTemplate(<?php echo e($i); ?>)" wire:confirm="Hapus template ini?"
                     class="absolute top-3 right-3 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {{-- Type --}}
+                    
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Jenis Luaran</label>
-                        <select wire:model="deliverableTemplates.{{ $i }}.type" class="w-full px-3 py-2 border rounded-lg text-sm">
-                            @foreach(\App\Models\DeliverableTemplate::TYPE_OPTIONS as $val => $lbl)
-                            <option value="{{ $val }}">{{ $lbl }}</option>
-                            @endforeach
+                        <select wire:model="deliverableTemplates.<?php echo e($i); ?>.type" class="w-full px-3 py-2 border rounded-lg text-sm">
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = \App\Models\DeliverableTemplate::TYPE_OPTIONS; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $lbl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+                            <option value="<?php echo e($val); ?>"><?php echo e($lbl); ?></option>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                         </select>
                     </div>
 
-                    {{-- Label --}}
+                    
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Nama Template <span class="text-red-500">*</span></label>
-                        <input type="text" wire:model="deliverableTemplates.{{ $i }}.label" class="w-full px-3 py-2 border rounded-lg text-sm"
+                        <input type="text" wire:model="deliverableTemplates.<?php echo e($i); ?>.label" class="w-full px-3 py-2 border rounded-lg text-sm"
                             placeholder="cth: Template Poster A1">
                     </div>
 
-                    {{-- Description --}}
+                    
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Keterangan</label>
-                        <input type="text" wire:model="deliverableTemplates.{{ $i }}.description" class="w-full px-3 py-2 border rounded-lg text-sm"
+                        <input type="text" wire:model="deliverableTemplates.<?php echo e($i); ?>.description" class="w-full px-3 py-2 border rounded-lg text-sm"
                             placeholder="cth: Ukuran A1, landscape">
                     </div>
 
-                    {{-- File Upload --}}
+                    
                     <div class="md:col-span-3">
                         <label class="block text-xs font-medium text-gray-600 mb-1">File Template</label>
-                        @if(!empty($tpl['existing_file']))
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($tpl['existing_file'])): ?>
                         <div class="flex items-center gap-3 p-2 bg-green-50 rounded-lg border border-green-200 mb-2">
                             <svg class="w-6 h-6 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm text-gray-700 font-medium truncate">{{ $tpl['original_name'] ?? basename($tpl['existing_file']) }}</p>
-                                <a href="{{ asset('storage/' . $tpl['existing_file']) }}" target="_blank" class="text-xs text-blue-600 hover:underline">Download</a>
+                                <p class="text-sm text-gray-700 font-medium truncate"><?php echo e($tpl['original_name'] ?? basename($tpl['existing_file'])); ?></p>
+                                <a href="<?php echo e(asset('storage/' . $tpl['existing_file'])); ?>" target="_blank" class="text-xs text-blue-600 hover:underline">Download</a>
                             </div>
                             <span class="text-xs text-green-600 font-medium">Tersimpan</span>
                         </div>
-                        @endif
-                        <input type="file" wire:model="templateFiles.{{ $i }}" class="w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700">
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        <input type="file" wire:model="templateFiles.<?php echo e($i); ?>" class="w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700">
                         <p class="text-xs text-gray-400 mt-1">Maks 10MB. Format: PDF, DOC, DOCX, PPT, PPTX, ZIP, dll.</p>
-                        @error("templateFiles.{$i}")<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ["templateFiles.{$i}"];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </div>
                 </div>
             </div>
-            @endforeach
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
         </div>
         
-        {{-- Document Generation Settings --}}
+        
         <div class="mt-8 pt-6 border-t border-gray-200">
             <h4 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -855,13 +915,13 @@
             <p class="text-xs text-gray-500 mb-5">Pilih mode generate untuk LOA dan Sertifikat</p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {{-- LOA Generation Mode --}}
+                
                 <div class="border border-gray-200 rounded-lg p-4">
                     <label class="block text-sm font-medium text-gray-700 mb-3">
                         📜 LOA (Letter of Acceptance) Mode
                     </label>
                     <div class="space-y-3">
-                        <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition" :class="{'bg-blue-50 border-blue-500': @js($loaGenerationMode) === 'auto'}">
+                        <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition" :class="{'bg-blue-50 border-blue-500': <?php echo \Illuminate\Support\Js::from($loaGenerationMode)->toHtml() ?> === 'auto'}">
                             <input type="radio" wire:model.live="loaGenerationMode" value="auto" class="mt-1">
                             <div class="flex-1">
                                 <p class="font-medium text-gray-800">Auto-Generate</p>
@@ -869,7 +929,7 @@
                                 <span class="inline-block mt-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">✨ Recommended</span>
                             </div>
                         </label>
-                        <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition" :class="{'bg-blue-50 border-blue-500': @js($loaGenerationMode) === 'manual'}">
+                        <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition" :class="{'bg-blue-50 border-blue-500': <?php echo \Illuminate\Support\Js::from($loaGenerationMode)->toHtml() ?> === 'manual'}">
                             <input type="radio" wire:model.live="loaGenerationMode" value="manual" class="mt-1">
                             <div class="flex-1">
                                 <p class="font-medium text-gray-800">Manual</p>
@@ -879,13 +939,13 @@
                     </div>
                 </div>
                 
-                {{-- Certificate Generation Mode --}}
+                
                 <div class="border border-gray-200 rounded-lg p-4">
                     <label class="block text-sm font-medium text-gray-700 mb-3">
                         🎓 Sertifikat Mode
                     </label>
                     <div class="space-y-3">
-                        <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition" :class="{'bg-blue-50 border-blue-500': @js($certificateGenerationMode) === 'auto'}">
+                        <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition" :class="{'bg-blue-50 border-blue-500': <?php echo \Illuminate\Support\Js::from($certificateGenerationMode)->toHtml() ?> === 'auto'}">
                             <input type="radio" wire:model.live="certificateGenerationMode" value="auto" class="mt-1">
                             <div class="flex-1">
                                 <p class="font-medium text-gray-800">Auto-Generate</p>
@@ -893,7 +953,7 @@
                                 <span class="inline-block mt-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">⚡ Scalable</span>
                             </div>
                         </label>
-                        <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition" :class="{'bg-blue-50 border-blue-500': @js($certificateGenerationMode) === 'manual'}">
+                        <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition" :class="{'bg-blue-50 border-blue-500': <?php echo \Illuminate\Support\Js::from($certificateGenerationMode)->toHtml() ?> === 'manual'}">
                             <input type="radio" wire:model.live="certificateGenerationMode" value="manual" class="mt-1">
                             <div class="flex-1">
                                 <p class="font-medium text-gray-800">Manual</p>
@@ -918,8 +978,8 @@
         </div>
     </div>
 
-    {{-- TAB: Jurnal Publikasi - Always keep in DOM for file uploads --}}
-    <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4" @if($activeTab !== 'journals') style="display:none" @endif>
+    
+    <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4" <?php if($activeTab !== 'journals'): ?> style="display:none" <?php endif; ?>>
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="font-semibold text-gray-800">Jurnal Publikasi</h3>
@@ -931,43 +991,43 @@
             </button>
         </div>
 
-        @if(count($journals) === 0)
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(count($journals) === 0): ?>
         <div class="text-center py-10 border-2 border-dashed border-gray-200 rounded-xl">
             <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
             <p class="text-sm text-gray-500">Belum ada jurnal publikasi.</p>
             <p class="text-xs text-gray-400 mt-1">Klik "Tambah Jurnal" untuk mulai menambahkan.</p>
         </div>
-        @endif
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
         <div class="space-y-4">
-            @foreach($journals as $i => $journal)
-            <div class="border border-gray-200 rounded-xl p-4 relative group" wire:key="journal-{{ $i }}">
-                {{-- Remove button --}}
-                <button type="button" wire:click="removeJournal({{ $i }})" wire:confirm="Hapus jurnal ini?"
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $journals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $journal): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+            <div class="border border-gray-200 rounded-xl p-4 relative group" <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processElementKey('journal-{{ $i }}', get_defined_vars()); ?>wire:key="journal-<?php echo e($i); ?>">
+                
+                <button type="button" wire:click="removeJournal(<?php echo e($i); ?>)" wire:confirm="Hapus jurnal ini?"
                     class="absolute top-3 right-3 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
 
                 <div class="flex items-start gap-2 mb-3">
-                    <span class="text-xs font-semibold text-gray-400 uppercase">Jurnal #{{ $i + 1 }}</span>
+                    <span class="text-xs font-semibold text-gray-400 uppercase">Jurnal #<?php echo e($i + 1); ?></span>
                     <label class="flex items-center gap-1.5 cursor-pointer ml-auto mr-8">
-                        <input type="checkbox" wire:model="journals.{{ $i }}.is_active" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                        <input type="checkbox" wire:model="journals.<?php echo e($i); ?>.is_active" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
                         <span class="text-xs text-gray-500">Aktif</span>
                     </label>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {{-- Name --}}
+                    
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Nama Jurnal <span class="text-red-500">*</span></label>
-                        <input type="text" wire:model="journals.{{ $i }}.name" class="w-full px-3 py-2 border rounded-lg text-sm"
+                        <input type="text" wire:model="journals.<?php echo e($i); ?>.name" class="w-full px-3 py-2 border rounded-lg text-sm"
                             placeholder="cth: Jurnal Pendidikan Kejuruan Indonesia">
                     </div>
 
-                    {{-- SINTA Rank --}}
+                    
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Peringkat SINTA</label>
-                        <select wire:model="journals.{{ $i }}.sinta_rank" class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <select wire:model="journals.<?php echo e($i); ?>.sinta_rank" class="w-full px-3 py-2 border rounded-lg text-sm">
                             <option value="">— Pilih —</option>
                             <option value="SINTA 1">SINTA 1</option>
                             <option value="SINTA 2">SINTA 2</option>
@@ -978,46 +1038,53 @@
                         </select>
                     </div>
 
-                    {{-- URL --}}
+                    
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">URL Jurnal</label>
-                        <input type="url" wire:model="journals.{{ $i }}.url" class="w-full px-3 py-2 border rounded-lg text-sm"
+                        <input type="url" wire:model="journals.<?php echo e($i); ?>.url" class="w-full px-3 py-2 border rounded-lg text-sm"
                             placeholder="https://journal.example.com">
                     </div>
 
-                    {{-- Description --}}
+                    
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Keterangan Singkat</label>
-                        <input type="text" wire:model="journals.{{ $i }}.description" class="w-full px-3 py-2 border rounded-lg text-sm"
+                        <input type="text" wire:model="journals.<?php echo e($i); ?>.description" class="w-full px-3 py-2 border rounded-lg text-sm"
                             placeholder="cth: Terindeks Scopus, Google Scholar">
                     </div>
 
-                    {{-- Logo Upload --}}
+                    
                     <div class="md:col-span-2">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Logo Jurnal</label>
-                        @if(!empty($journal['existing_logo']))
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($journal['existing_logo'])): ?>
                         <div class="flex items-center gap-3 p-2 bg-green-50 rounded-lg border border-green-200 mb-2">
-                            <img src="{{ asset('storage/' . $journal['existing_logo']) }}" alt="Logo" class="w-12 h-12 object-contain rounded border bg-white">
+                            <img src="<?php echo e(asset('storage/' . $journal['existing_logo'])); ?>" alt="Logo" class="w-12 h-12 object-contain rounded border bg-white">
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm text-gray-700 font-medium">Logo tersimpan</p>
                             </div>
-                            <button type="button" wire:click="removeJournalLogo({{ $i }})" class="text-xs text-red-500 hover:text-red-700 font-medium">Hapus</button>
+                            <button type="button" wire:click="removeJournalLogo(<?php echo e($i); ?>)" class="text-xs text-red-500 hover:text-red-700 font-medium">Hapus</button>
                         </div>
-                        @endif
-                        <input type="file" wire:model="journalLogos.{{ $i }}" accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700">
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        <input type="file" wire:model="journalLogos.<?php echo e($i); ?>" accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700">
                         <p class="text-xs text-gray-400 mt-1">Maks 2MB. Format: JPG, PNG, SVG, WebP.</p>
-                        @error("journalLogos.{$i}")<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ["journalLogos.{$i}"];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </div>
                 </div>
             </div>
-            @endforeach
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
         </div>
     </div>
 
-    {{-- TAB: Template Email --}}
-    @if($activeTab === 'email_templates')
+    
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeTab === 'email_templates'): ?>
     <div class="space-y-4">
-        {{-- Info banner --}}
+        
         <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
             <svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <div class="text-sm text-blue-700">
@@ -1026,7 +1093,7 @@
             </div>
         </div>
 
-        @php
+        <?php
             $emailTypeList = \App\Models\EmailTemplate::TYPES;
             $colorMap = [
                 'blue'    => ['bg' => 'bg-blue-50',    'border' => 'border-blue-300',  'badge' => 'bg-blue-100 text-blue-700',   'icon' => 'text-blue-500',   'title' => 'text-blue-800'],
@@ -1038,47 +1105,47 @@
                 'red'     => ['bg' => 'bg-red-50',     'border' => 'border-red-300',   'badge' => 'bg-red-100 text-red-700',    'icon' => 'text-red-500',    'title' => 'text-red-800'],
                 'orange'  => ['bg' => 'bg-orange-50',  'border' => 'border-orange-300','badge' => 'bg-orange-100 text-orange-700','icon' => 'text-orange-500', 'title' => 'text-orange-800'],
             ];
-        @endphp
+        ?>
 
-        @foreach($emailTypeList as $typeKey => $typeCfg)
-        @php
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $emailTypeList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $typeKey => $typeCfg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+        <?php
             $color = $typeCfg['color'] ?? 'blue';
             $cm = $colorMap[$color] ?? $colorMap['blue'];
             $isCustomized = isset($emailTemplates[$typeKey]) && (
                 !empty($emailTemplates[$typeKey]['subject']) || !empty($emailTemplates[$typeKey]['body'])
             );
-        @endphp
-        <div class="bg-white rounded-xl shadow-sm border overflow-hidden" wire:key="email-type-{{ $typeKey }}">
-            {{-- Header --}}
-            <div class="flex items-center gap-3 px-5 py-4 {{ $cm['bg'] }} border-b {{ $cm['border'] }}">
-                <div class="w-9 h-9 rounded-lg {{ $cm['bg'] }} border {{ $cm['border'] }} flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 {{ $cm['icon'] }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $typeCfg['icon'] }}"/>
+        ?>
+        <div class="bg-white rounded-xl shadow-sm border overflow-hidden" <?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processElementKey('email-type-{{ $typeKey }}', get_defined_vars()); ?>wire:key="email-type-<?php echo e($typeKey); ?>">
+            
+            <div class="flex items-center gap-3 px-5 py-4 <?php echo e($cm['bg']); ?> border-b <?php echo e($cm['border']); ?>">
+                <div class="w-9 h-9 rounded-lg <?php echo e($cm['bg']); ?> border <?php echo e($cm['border']); ?> flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 <?php echo e($cm['icon']); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo e($typeCfg['icon']); ?>"/>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-gray-800 text-sm">{{ $typeCfg['label'] }}</h4>
-                        @if($isCustomized)
-                        <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $cm['badge'] }}">Dikustomisasi</span>
-                        @else
+                        <h4 class="font-semibold text-gray-800 text-sm"><?php echo e($typeCfg['label']); ?></h4>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isCustomized): ?>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium <?php echo e($cm['badge']); ?>">Dikustomisasi</span>
+                        <?php else: ?>
                         <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Default</span>
-                        @endif
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </div>
-                    <p class="text-xs text-gray-500 mt-0.5">{{ $typeCfg['desc'] }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5"><?php echo e($typeCfg['desc']); ?></p>
                 </div>
-                @if($isCustomized)
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isCustomized): ?>
                 <button type="button"
-                    wire:click="resetEmailTemplate('{{ $typeKey }}')"
+                    wire:click="resetEmailTemplate('<?php echo e($typeKey); ?>')"
                     wire:confirm="Reset template ini ke default? Kustomisasi Anda akan dihapus."
                     class="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition flex items-center gap-1.5">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                     Reset Default
                 </button>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
 
-            {{-- Fields --}}
+            
             <div class="p-5 space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1.5">
@@ -1086,9 +1153,9 @@
                         <span class="text-gray-400 font-normal ml-1">— kosongkan untuk menggunakan default</span>
                     </label>
                     <input type="text"
-                        wire:model="emailTemplates.{{ $typeKey }}.subject"
-                        placeholder="{{ $typeCfg['default_subject'] }}"
-                        class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 {{ $isCustomized && !empty($emailTemplates[$typeKey]['subject']) ? 'bg-white' : 'bg-gray-50' }}">
+                        wire:model="emailTemplates.<?php echo e($typeKey); ?>.subject"
+                        placeholder="<?php echo e($typeCfg['default_subject']); ?>"
+                        class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 <?php echo e($isCustomized && !empty($emailTemplates[$typeKey]['subject']) ? 'bg-white' : 'bg-gray-50'); ?>">
                 </div>
 
                 <div>
@@ -1097,30 +1164,30 @@
                         <span class="text-gray-400 font-normal ml-1">— kosongkan untuk menggunakan default</span>
                     </label>
                     <textarea
-                        wire:model="emailTemplates.{{ $typeKey }}.body"
+                        wire:model="emailTemplates.<?php echo e($typeKey); ?>.body"
                         rows="6"
                         placeholder="Tulis isi email di sini... HTML diperbolehkan untuk format teks (bold, link, dll)."
-                        class="w-full px-3 py-2 border rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 {{ $isCustomized && !empty($emailTemplates[$typeKey]['body']) ? 'bg-white' : 'bg-gray-50' }}"></textarea>
+                        class="w-full px-3 py-2 border rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 <?php echo e($isCustomized && !empty($emailTemplates[$typeKey]['body']) ? 'bg-white' : 'bg-gray-50'); ?>"></textarea>
                 </div>
 
-                {{-- Variables --}}
+                
                 <div>
                     <p class="text-xs font-medium text-gray-500 mb-2">Variabel yang tersedia:</p>
                     <div class="flex flex-wrap gap-1.5">
-                        @foreach($typeCfg['vars'] as $var)
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $typeCfg['vars']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $var): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
                         <code class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-mono border border-gray-200 cursor-pointer hover:bg-gray-200 transition"
                             title="Klik untuk menyalin"
-                            onclick="navigator.clipboard.writeText('{{ $var }}')">{{ $var }}</code>
-                        @endforeach
+                            onclick="navigator.clipboard.writeText('<?php echo e($var); ?>')"><?php echo e($var); ?></code>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                     </div>
                     <p class="text-xs text-gray-400 mt-1.5">Klik variabel untuk menyalin. Variabel akan diganti otomatis saat email dikirim.</p>
                 </div>
 
-                {{-- Active toggle --}}
+                
                 <div class="flex items-center gap-2 pt-1">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox"
-                            wire:model="emailTemplates.{{ $typeKey }}.is_active"
+                            wire:model="emailTemplates.<?php echo e($typeKey); ?>.is_active"
                             class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                         <span class="text-sm text-gray-600">Aktifkan template ini</span>
                     </label>
@@ -1128,19 +1195,19 @@
                 </div>
             </div>
         </div>
-        @endforeach
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
     </div>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    {{-- TAB: Tampilkan di Web (removed - handled in Pengaturan Tema) --}}
-    @if(false)
+    
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(false): ?>
     <div class="bg-white rounded-xl shadow-sm border p-6">
         <div class="mb-6">
             <h3 class="text-lg font-semibold text-gray-800">Tampilkan di Web</h3>
             <p class="text-sm text-gray-500 mt-1">Pilih bagian yang ingin ditampilkan di halaman publik website. Centang bagian yang ingin diaktifkan, hapus centang untuk menyembunyikannya.</p>
         </div>
 
-        @php
+        <?php
             $sectionList = \App\Models\Conference::SECTIONS;
             $sectionIcons = [
                 'hero'          => 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z',
@@ -1164,39 +1231,40 @@
                 'journals'      => 'Informasi jurnal publikasi terindeks.',
                 'cta'           => 'Tombol ajakan untuk submit makalah / mendaftar.',
             ];
-        @endphp
+        ?>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            @foreach($sectionList as $sectionId => $sectionLabel)
-            @php $isVisible = in_array($sectionId, $visibleSections); @endphp
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $sectionList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sectionId => $sectionLabel): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+            <?php $isVisible = in_array($sectionId, $visibleSections); ?>
             <label class="flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all
-                {{ $isVisible ? 'border-blue-400 bg-blue-50' : 'border-gray-200 bg-gray-50 opacity-70' }}">
+                <?php echo e($isVisible ? 'border-blue-400 bg-blue-50' : 'border-gray-200 bg-gray-50 opacity-70'); ?>">
                 <input type="checkbox"
                     wire:model.live="visibleSections"
-                    value="{{ $sectionId }}"
+                    value="<?php echo e($sectionId); ?>"
                     class="mt-0.5 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 mb-1">
-                        <svg class="w-4 h-4 {{ $isVisible ? 'text-blue-600' : 'text-gray-400' }} shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sectionIcons[$sectionId] ?? '' }}"/>
+                        <svg class="w-4 h-4 <?php echo e($isVisible ? 'text-blue-600' : 'text-gray-400'); ?> shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo e($sectionIcons[$sectionId] ?? ''); ?>"/>
                         </svg>
-                        <span class="text-sm font-semibold {{ $isVisible ? 'text-blue-800' : 'text-gray-600' }}">{{ $sectionLabel }}</span>
+                        <span class="text-sm font-semibold <?php echo e($isVisible ? 'text-blue-800' : 'text-gray-600'); ?>"><?php echo e($sectionLabel); ?></span>
                     </div>
-                    <p class="text-xs {{ $isVisible ? 'text-blue-600' : 'text-gray-400' }} leading-relaxed">
-                        {{ $sectionDescriptions[$sectionId] ?? '' }}
+                    <p class="text-xs <?php echo e($isVisible ? 'text-blue-600' : 'text-gray-400'); ?> leading-relaxed">
+                        <?php echo e($sectionDescriptions[$sectionId] ?? ''); ?>
+
                     </p>
                 </div>
-                @if($isVisible)
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isVisible): ?>
                 <svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                 </svg>
-                @else
+                <?php else: ?>
                 <svg class="w-5 h-5 text-gray-300 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                 </svg>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </label>
-            @endforeach
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
         </div>
 
         <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
@@ -1209,10 +1277,10 @@
             </div>
         </div>
     </div>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    {{-- TAB: Grup WhatsApp --}}
-    @if($activeTab === 'whatsapp')
+    
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeTab === 'whatsapp'): ?>
     <div class="bg-white rounded-xl shadow-sm border p-6">
         <div class="mb-6">
             <h3 class="text-lg font-semibold text-gray-800">Link Grup WhatsApp</h3>
@@ -1220,7 +1288,7 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {{-- Pemakalah --}}
+            
             <div class="p-5 rounded-xl border-2 border-green-200 bg-green-50">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center shrink-0">
@@ -1235,10 +1303,17 @@
                     wire:model.defer="wa_group_pemakalah"
                     placeholder="https://chat.whatsapp.com/..."
                     class="w-full border border-green-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-400 focus:border-transparent bg-white">
-                @error('wa_group_pemakalah') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['wa_group_pemakalah'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
 
-            {{-- Non-Pemakalah --}}
+            
             <div class="p-5 rounded-xl border-2 border-blue-200 bg-blue-50">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center shrink-0">
@@ -1253,10 +1328,17 @@
                     wire:model.defer="wa_group_non_pemakalah"
                     placeholder="https://chat.whatsapp.com/..."
                     class="w-full border border-blue-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white">
-                @error('wa_group_non_pemakalah') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['wa_group_non_pemakalah'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
 
-            {{-- Reviewer --}}
+            
             <div class="p-5 rounded-xl border-2 border-purple-200 bg-purple-50">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center shrink-0">
@@ -1271,10 +1353,17 @@
                     wire:model.defer="wa_group_reviewer"
                     placeholder="https://chat.whatsapp.com/..."
                     class="w-full border border-purple-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 focus:border-transparent bg-white">
-                @error('wa_group_reviewer') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['wa_group_reviewer'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
 
-            {{-- Editor --}}
+            
             <div class="p-5 rounded-xl border-2 border-orange-200 bg-orange-50">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center shrink-0">
@@ -1289,7 +1378,14 @@
                     wire:model.defer="wa_group_editor"
                     placeholder="https://chat.whatsapp.com/..."
                     class="w-full border border-orange-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white">
-                @error('wa_group_editor') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['wa_group_editor'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500 text-xs mt-1"><?php echo e($message); ?></p> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
         </div>
 
@@ -1304,36 +1400,37 @@
             </div>
         </div>
     </div>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    {{-- Save Button --}}
+    
     <div class="mt-6 flex justify-between items-center">
-        <a href="{{ route('admin.conferences') }}" class="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-50 inline-flex items-center gap-2">
+        <a href="<?php echo e(route('admin.conferences')); ?>" class="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-50 inline-flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             Batal
         </a>
         <div class="flex items-center gap-3">
-            {{-- Tab navigation hints --}}
+            
             <div class="hidden sm:flex items-center gap-1 text-xs text-gray-400">
-                @php
+                <?php
                     $tabs = ['general', 'dates', 'committees', 'topics', 'speakers', 'pricing', 'reviewers', 'guidelines', 'templates', 'journals', 'email_templates', 'whatsapp'];
                     $currentIdx = array_search($activeTab, $tabs);
-                @endphp
-                @if($currentIdx > 0)
-                <button type="button" wire:click="$set('activeTab', '{{ $tabs[$currentIdx - 1] }}')" class="px-3 py-1.5 border rounded-lg text-gray-600 hover:bg-gray-50 text-sm">
+                ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($currentIdx > 0): ?>
+                <button type="button" wire:click="$set('activeTab', '<?php echo e($tabs[$currentIdx - 1]); ?>')" class="px-3 py-1.5 border rounded-lg text-gray-600 hover:bg-gray-50 text-sm">
                     &larr; Sebelumnya
                 </button>
-                @endif
-                @if($currentIdx < count($tabs) - 1)
-                <button type="button" wire:click="$set('activeTab', '{{ $tabs[$currentIdx + 1] }}')" class="px-3 py-1.5 border rounded-lg text-gray-600 hover:bg-gray-50 text-sm">
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($currentIdx < count($tabs) - 1): ?>
+                <button type="button" wire:click="$set('activeTab', '<?php echo e($tabs[$currentIdx + 1]); ?>')" class="px-3 py-1.5 border rounded-lg text-gray-600 hover:bg-gray-50 text-sm">
                     Selanjutnya &rarr;
                 </button>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
             <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm inline-flex items-center gap-2">
                 <span wire:loading.remove wire:target="save">
                     <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    {{ $isEdit ? 'Simpan Perubahan' : 'Buat Kegiatan' }}
+                    <?php echo e($isEdit ? 'Simpan Perubahan' : 'Buat Kegiatan'); ?>
+
                 </span>
                 <span wire:loading wire:target="save" class="inline-flex items-center gap-2">
                     <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
@@ -1343,4 +1440,4 @@
         </div>
     </div>
     </form>
-</div>
+</div><?php /**PATH D:\LPKD-APJI\PROSIDINGV1\resources\views\livewire\admin\conference-form.blade.php ENDPATH**/ ?>
