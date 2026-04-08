@@ -27,3 +27,4 @@ Thumbs.db
 
 # Setup token
 .setup-token
+public/.user.ini
