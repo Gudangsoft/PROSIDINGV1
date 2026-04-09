@@ -55,12 +55,12 @@
             
             <div class="flex items-center justify-between h-16 px-5 border-b border-gray-200 shrink-0">
                 <?php
-                    $adminSiteLogo = \App\Models\Setting::getValue('site_logo');
+                    $adminSiteLogoUrl = \App\Models\Setting::getLogoUrl();
                     $adminSiteName = \App\Models\Setting::getValue('site_name', 'Prosiding');
                 ?>
                 <a href="<?php echo e(url('/')); ?>" class="flex items-center gap-2.5 min-w-0">
-                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($adminSiteLogo): ?>
-                        <img src="<?php echo e(asset('storage/' . $adminSiteLogo)); ?>" alt="<?php echo e($adminSiteName); ?>" class="h-8 w-8 object-contain rounded-lg shrink-0">
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($adminSiteLogoUrl): ?>
+                        <img src="<?php echo e($adminSiteLogoUrl); ?>" alt="<?php echo e($adminSiteName); ?>" class="h-8 w-8 object-contain rounded-lg shrink-0">
                     <?php else: ?>
                         <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>

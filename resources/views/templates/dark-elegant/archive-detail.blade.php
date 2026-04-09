@@ -49,7 +49,7 @@
             <div class="flex items-center justify-between h-16">
                 <a href="/" class="flex items-center gap-2">
                     @if($siteLogo)
-                        <img src="{{ asset('storage/' . $siteLogo) }}" class="h-8" alt="{{ $siteName }}">
+                        <img src="{{ (str_starts_with($siteLogo, 'uploads/') ? asset($siteLogo) : asset('storage/' . $siteLogo)) }}" class="h-8" alt="{{ $siteName }}">
                     @endif
                     @include('partials.navbar-brand')
                 </a>
