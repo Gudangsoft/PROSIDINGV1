@@ -28,3 +28,12 @@ Thumbs.db
 # Setup token
 .setup-token
 public/.user.ini
+
+# Laravel generated/cache files - do not commit
+/bootstrap/cache/*.php
+!/bootstrap/cache/.gitignore
+/storage/framework/cache/data/*
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
