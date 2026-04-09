@@ -8,8 +8,12 @@
         $__siteName = \App\Models\Setting::getValue('site_name', 'Prosiding');
         $__siteTagline = \App\Models\Setting::getValue('site_tagline');
         $__siteTitle = $__siteName . ($__siteTagline ? ' | ' . $__siteTagline : '');
+        $__faviconUrl = \App\Models\Setting::getFaviconUrl();
     @endphp
     <title>@yield('title', $__siteTitle)</title>
+    @if($__faviconUrl)
+    <link rel="icon" type="image/png" href="{{ $__faviconUrl }}">
+    @endif
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         [x-cloak] { display: none !important; }

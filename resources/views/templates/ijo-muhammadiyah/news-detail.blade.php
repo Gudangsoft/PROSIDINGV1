@@ -11,7 +11,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $news->title }} — {{ $siteName }}</title>
-    @if($siteFavicon)<link rel="icon" type="image/png" href="{{ asset('storage/' . $siteFavicon) }}">@endif
+    @if($siteFavicon)<link rel="icon" type="image/png" href="{{ (str_starts_with($siteFavicon, 'uploads/') ? asset($siteFavicon) : asset('storage/' . $siteFavicon)) }}">@endif
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:300,400,500,600,700,800" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>

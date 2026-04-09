@@ -41,7 +41,7 @@
     @endif
     @php $siteFavicon = \App\Models\Setting::getValue('site_favicon'); @endphp
     @if($siteFavicon)
-    <link rel="icon" type="image/png" href="{{ asset('storage/' . $siteFavicon) }}">
+    <link rel="icon" type="image/png" href="{{ (str_starts_with($siteFavicon, 'uploads/') ? asset($siteFavicon) : asset('storage/' . $siteFavicon)) }}">
     @endif
     <script src="https://cdn.tailwindcss.com"></script>
     @include('templates.default-blue.partials.theme-config')

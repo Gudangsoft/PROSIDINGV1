@@ -13,7 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $page->meta_title ?: $page->title }} — {{ $siteName }}</title>
-    @if($siteFavicon)<link rel="icon" type="image/png" href="{{ asset('storage/' . $siteFavicon) }}">@endif
+    @if($siteFavicon)<link rel="icon" type="image/png" href="{{ (str_starts_with($siteFavicon, 'uploads/') ? asset($siteFavicon) : asset('storage/' . $siteFavicon)) }}">@endif
     @if($page->meta_description)
     <meta name="description" content="{{ $page->meta_description }}">
     @elseif($page->excerpt)
