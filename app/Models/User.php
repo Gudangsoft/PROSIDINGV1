@@ -15,7 +15,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'photo', 'email', 'password', 'role', 'gender', 'institution', 'country',
-        'participation', 'research_interest', 'phone', 'other_info',
+        'participation', 'participant_type_id', 'research_interest', 'phone', 'other_info',
         'proof_of_payment', 'signature',
     ];
 
@@ -43,6 +43,11 @@ class User extends Authenticatable
     public function canManagePayments(): bool { return in_array($this->role, ['admin', 'editor', 'keuangan']); }
 
     // Relationships
+    public function participantType()
+    {
+        return $this->belongsTo(ParticipantType::class);
+    }
+
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'role_user')->withTimestamps();

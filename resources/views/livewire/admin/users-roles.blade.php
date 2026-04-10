@@ -599,6 +599,15 @@
                         <p class="text-xs font-medium text-gray-500 uppercase mb-1">Research Interest</p>
                         <p class="text-gray-800">{{ $detailUser->research_interest ?? '-' }}</p>
                     </div>
+                    @if($detailUser->participantType)
+                    <div class="bg-purple-50 rounded-lg p-3">
+                        <p class="text-xs font-medium text-purple-600 uppercase mb-1">Jenis Peserta</p>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            {{ $detailUser->participantType->name }}
+                        </span>
+                    </div>
+                    @endif
                     <div class="bg-gray-50 rounded-lg p-3 md:col-span-2">
                         <p class="text-xs font-medium text-gray-500 uppercase mb-1">Informasi Lainnya</p>
                         <p class="text-gray-800">{{ $detailUser->other_info ?? '-' }}</p>

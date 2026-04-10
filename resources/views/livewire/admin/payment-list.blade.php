@@ -128,7 +128,12 @@
                     <td class="px-4 py-3 font-mono text-xs">{{ $payment->invoice_number }}</td>
                     <td class="px-4 py-3">
                         @if($payment->type === 'participant')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">Partisipan</span>
+                            @php $ptName = $payment->registrationPackage?->participantType?->name; @endphp
+                            @if($ptName)
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">{{ $ptName }}</span>
+                            @else
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">Partisipan</span>
+                            @endif
                         @else
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">Paper</span>
                         @endif

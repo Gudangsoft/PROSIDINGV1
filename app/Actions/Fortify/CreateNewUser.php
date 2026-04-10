@@ -45,6 +45,11 @@ class CreateNewUser implements CreatesNewUsers
         $rules['other_info'] = ['nullable', 'string', 'max:1000'];
         $rules['signature_data'] = ['nullable', 'string']; // Base64 signature from canvas
 
+        // Validate participant_type_id if provided (must belong to the active conference)
+        if (!empty($input['participant_type_id'])) {
+            $rules['participant_type_id'] = ['nullable', 'integer', 'exists:participant_types,id'];
+        }
+
         // Check if selected package is free (before validation)
         $isFreePackage = false;
         $packageObj = null;
@@ -73,6 +78,9 @@ class CreateNewUser implements CreatesNewUsers
             'phone' => $input['phone'],
             'research_interest' => $input['research_interest'] ?? null,
             'other_info' => $input['other_info'] ?? null,
+            'participant_type_id' => ($packageObj && $packageObj->participant_type_id)
+                ? $packageObj->participant_type_id
+                : (!empty($input['participant_type_id']) ? (int) $input['participant_type_id'] : null),
         ];
 
         // Handle canvas signature (base64)

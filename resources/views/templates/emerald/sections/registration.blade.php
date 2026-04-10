@@ -18,6 +18,12 @@
                     <div class="p-6 text-center flex-1">
                         <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-3">{{ $package->name }}</h3>
                         <p class="text-3xl font-extrabold text-teal-700 mb-4">{{ $package->formatted_price }}</p>
+                        @if($package->participantType)
+                        <div class="flex items-center justify-center gap-2 mb-3">
+                            <span class="text-xs text-gray-400 font-medium">Tipe</span>
+                            <span class="inline-block bg-teal-100 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">{{ $package->participantType->name }}</span>
+                        </div>
+                        @endif
                         @if($package->description)
                         <p class="text-xs text-gray-500 italic mb-4">{{ $package->description }}</p>
                         @endif
@@ -33,11 +39,13 @@
                         @endif
                     </div>
                     <div class="px-6 pb-6">
+                        @if($package->show_register_button ?? true)
                         @auth
                             <a href="{{ route('participant.payment', ['package' => $package->id]) }}" class="block w-full bg-teal-600 text-white text-center py-2.5 rounded-full font-semibold hover:bg-teal-700 transition text-sm">{{ __('welcome.pricing.book_now') }}</a>
                         @else
                             <a href="{{ route('register', ['package' => $package->id]) }}" class="block w-full bg-teal-600 text-white text-center py-2.5 rounded-full font-semibold hover:bg-teal-700 transition text-sm">{{ __('welcome.pricing.book_now') }}</a>
                         @endauth
+                        @endif
                     </div>
                 </div>
                 @endforeach

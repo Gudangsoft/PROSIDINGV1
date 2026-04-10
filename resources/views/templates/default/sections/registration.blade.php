@@ -25,6 +25,12 @@
 
                     {{-- Body --}}
                     <div class="flex-1 px-6 py-6">
+                        @if($package->participantType)
+                        <div class="flex items-center justify-center gap-2 mb-3">
+                            <span class="text-xs text-gray-400 font-medium">Tipe</span>
+                            <span class="inline-block bg-teal-100 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">{{ $package->participantType->name }}</span>
+                        </div>
+                        @endif
                         @if($package->description)
                         <p class="text-sm text-gray-600 text-center italic mb-4">{{ $package->description }}</p>
                         @endif
@@ -40,11 +46,13 @@
 
                     {{-- Button --}}
                     <div class="px-6 pb-6">
+                        @if($package->show_register_button ?? true)
                         @auth
                             <a href="{{ route('participant.payment', ['package' => $package->id]) }}" class="block w-full bg-amber-600 text-white text-center py-3 rounded-lg font-bold uppercase text-sm hover:bg-amber-700 transition shadow">{{ __('welcome.pricing.book_now') }}</a>
                         @else
                             <a href="{{ route('register', ['package' => $package->id]) }}" class="block w-full bg-amber-600 text-white text-center py-3 rounded-lg font-bold uppercase text-sm hover:bg-amber-700 transition shadow">{{ __('welcome.pricing.book_now') }}</a>
                         @endauth
+                        @endif
                     </div>
                 </div>
                 @endforeach

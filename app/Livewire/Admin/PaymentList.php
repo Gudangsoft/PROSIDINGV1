@@ -217,7 +217,7 @@ class PaymentList extends Component
 
     public function render()
     {
-        $payments = Payment::with(['paper.user', 'user'])
+        $payments = Payment::with(['paper.user', 'user', 'registrationPackage.participantType'])
             ->when($this->typeFilter, fn($q) => $q->where('type', $this->typeFilter))
             ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
             ->latest()

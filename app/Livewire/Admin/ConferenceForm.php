@@ -45,6 +45,7 @@ class ConferenceForm extends Component
     public string $conferenceType = 'nasional';
     public string $loaGenerationMode = 'manual';
     public string $certificateGenerationMode = 'manual';
+    public bool $showRegisterButton = true;
     public $cover_image;
     public $logo;
     public $brochure;
@@ -98,6 +99,9 @@ class ConferenceForm extends Component
     public string $wa_group_reviewer = '';
     public string $wa_group_editor = '';
 
+    // Participant types
+    public array $participantTypes = [];
+
     // Active tab
     public string $activeTab = 'general';
 
@@ -131,6 +135,7 @@ class ConferenceForm extends Component
                 'conferenceType' => $conference->conference_type ?? 'nasional',
                 'loaGenerationMode' => $conference->loa_generation_mode ?? 'manual',
                 'certificateGenerationMode' => $conference->certificate_generation_mode ?? 'manual',
+                'showRegisterButton' => $conference->show_register_button ?? true,
                 'existing_cover_image' => $conference->cover_image,
                 'existing_logo' => $conference->logo,
                 'existing_brochure' => $conference->brochure,
@@ -248,6 +253,8 @@ class ConferenceForm extends Component
                 'is_free' => $p->is_free,
                 'require_payment_proof' => $p->require_payment_proof,
                 'is_active' => $p->is_active,
+                'show_register_button' => $p->show_register_button ?? true,
+                'participant_type_id' => $p->participant_type_id,
             ])->toArray();
         }
 
@@ -259,6 +266,16 @@ class ConferenceForm extends Component
             'institution' => $u->institution ?? '',
             'phone' => $u->phone ?? '',
         ])->toArray();
+
+        // Load participant types
+        if ($this->isEdit) {
+            $this->participantTypes = $conference->participantTypes->map(fn($pt) => [
+                'id' => $pt->id,
+                'name' => $pt->name,
+                'description' => $pt->description ?? '',
+                'is_active' => $pt->is_active,
+            ])->toArray();
+        }
 
         // Default visibleSections for new conferences
         if (empty($this->visibleSections)) {
@@ -408,7 +425,7 @@ class ConferenceForm extends Component
     // -- Registration Packages --
     public function addPackage()
     {
-        $this->packages[] = ['id' => null, 'name' => '', 'price' => 0, 'currency' => 'IDR', 'description' => '', 'features' => '', 'is_featured' => false, 'is_free' => false, 'require_payment_proof' => false, 'is_active' => true];
+        $this->packages[] = ['id' => null, 'name' => '', 'price' => 0, 'currency' => 'IDR', 'description' => '', 'features' => '', 'is_featured' => false, 'is_free' => false, 'require_payment_proof' => false, 'is_active' => true, 'show_register_button' => true, 'participant_type_id' => null];
     }
 
     // -- Deliverable templates --
@@ -444,6 +461,21 @@ class ConferenceForm extends Component
         }
         unset($this->packages[$index]);
         $this->packages = array_values($this->packages);
+    }
+
+    // -- Participant Types --
+    public function addParticipantType()
+    {
+        $this->participantTypes[] = ['id' => null, 'name' => '', 'description' => '', 'is_active' => true];
+    }
+
+    public function removeParticipantType($index)
+    {
+        if (isset($this->participantTypes[$index]['id']) && $this->participantTypes[$index]['id']) {
+            \App\Models\ParticipantType::find($this->participantTypes[$index]['id'])?->delete();
+        }
+        unset($this->participantTypes[$index]);
+        $this->participantTypes = array_values($this->participantTypes);
     }
 
     // -- Payment Methods --
@@ -596,6 +628,7 @@ class ConferenceForm extends Component
             'status' => $this->status,
             'loa_generation_mode' => $this->loaGenerationMode,
             'certificate_generation_mode' => $this->certificateGenerationMode,
+            'show_register_button' => $this->showRegisterButton,
         ];
 
         // Only include visible_sections if the column exists (production migration safety)
@@ -857,12 +890,35 @@ class ConferenceForm extends Component
                 'is_free' => (bool) ($pkg['is_free'] ?? false),
                 'require_payment_proof' => (bool) ($pkg['require_payment_proof'] ?? false),
                 'is_active' => (bool) ($pkg['is_active'] ?? true),
+                'show_register_button' => (bool) ($pkg['show_register_button'] ?? true),
+                'participant_type_id' => $pkg['participant_type_id'] ?: null,
                 'sort_order' => $i,
             ];
             if (!empty($pkg['id'])) {
                 RegistrationPackage::find($pkg['id'])?->update($pkgData);
             } else {
                 RegistrationPackage::create($pkgData);
+            }
+        }
+
+        // Save participant types
+        $existingPtIds = collect($this->participantTypes)->pluck('id')->filter()->toArray();
+        if ($this->isEdit) {
+            $conference->participantTypes()->whereNotIn('id', $existingPtIds)->delete();
+        }
+        foreach ($this->participantTypes as $i => $pt) {
+            if (empty($pt['name'])) continue;
+            $ptData = [
+                'conference_id' => $conference->id,
+                'name' => $pt['name'],
+                'description' => $pt['description'] ?? null,
+                'is_active' => (bool) ($pt['is_active'] ?? true),
+                'sort_order' => $i,
+            ];
+            if (!empty($pt['id'])) {
+                \App\Models\ParticipantType::find($pt['id'])?->update($ptData);
+            } else {
+                \App\Models\ParticipantType::create($ptData);
             }
         }
 

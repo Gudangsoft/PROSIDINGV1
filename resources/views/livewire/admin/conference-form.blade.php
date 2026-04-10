@@ -38,6 +38,7 @@
                 'topics' => ['label' => 'Topik', 'count' => count($topics), 'icon' => 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'],
                 'speakers' => ['label' => 'Speaker', 'count' => count($speakers), 'icon' => 'M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z'],
                 'pricing' => ['label' => 'Biaya', 'count' => count($packages), 'icon' => 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z'],
+                'participant_types' => ['label' => 'Jenis Peserta', 'count' => count($participantTypes), 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
                 'reviewers' => ['label' => 'Reviewer', 'count' => count($reviewers), 'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'],
                 'guidelines' => ['label' => 'Panduan', 'count' => null, 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
                 'templates' => ['label' => 'Template Luaran', 'count' => count($deliverableTemplates), 'icon' => 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4'],
@@ -642,6 +643,10 @@
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-semibold text-gray-400 uppercase">Paket #{{ $index + 1 }}</span>
                         <div class="flex items-center gap-3">
+                            <label class="flex items-center gap-1.5 cursor-pointer" title="Tampilkan tombol Register Now di halaman publik">
+                                <input type="checkbox" wire:model.live="packages.{{ $index }}.show_register_button" class="rounded border-gray-300 text-amber-500 focus:ring-amber-400">
+                                <span class="text-xs font-medium {{ ($pkg['show_register_button'] ?? true) ? 'text-amber-600' : 'text-gray-400 line-through' }}">Tombol Daftar</span>
+                            </label>
                             <label class="flex items-center gap-1.5 cursor-pointer">
                                 <input type="checkbox" wire:model.live="packages.{{ $index }}.is_free" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
                                 <span class="text-xs font-medium text-emerald-700">Gratis</span>
@@ -704,6 +709,22 @@
                         <label class="block text-xs font-medium text-gray-600 mb-1">Fasilitas <span class="text-gray-400">(satu per baris)</span></label>
                         <textarea wire:model="packages.{{ $index }}.features" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm font-mono" placeholder="Akses Full Day Seminar&#10;Softcopy Presentasi Pembicara&#10;E-Sertificate&#10;E-Prosiding"></textarea>
                     </div>
+                    @if(!empty($participantTypes))
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">
+                            Jenis Peserta
+                            <span class="text-gray-400">(opsional – akan otomatis dipilih saat pendaftaran)</span>
+                        </label>
+                        <select wire:model="packages.{{ $index }}.participant_type_id" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500">
+                            <option value="">— Tidak dikaitkan —</option>
+                            @foreach($participantTypes as $pt)
+                                @if($pt['is_active'] ?? true)
+                                <option value="{{ $pt['id'] }}">{{ $pt['name'] }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
                 </div>
                 @empty
                 <div class="text-center py-10 text-gray-400">
@@ -713,6 +734,70 @@
                 </div>
                 @endforelse
             </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- TAB: Jenis Peserta --}}
+    @if($activeTab === 'participant_types')
+    <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Jenis Peserta
+                </h3>
+                <p class="text-xs text-gray-500 mt-0.5">Tentukan kategori peserta yang tersedia pada form pendaftaran (cth: Peserta Umum, Pemakalah Oral, Peserta Mahasiswa, dll)</p>
+            </div>
+            <button type="button" wire:click="addParticipantType"
+                class="text-sm px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-1.5 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                Tambah Jenis
+            </button>
+        </div>
+
+        <div class="space-y-3">
+            @forelse($participantTypes as $index => $pt)
+            <div class="border-2 rounded-xl p-4 space-y-3 {{ ($pt['is_active'] ?? true) ? 'border-purple-200 bg-purple-50/30' : 'border-gray-200 bg-gray-50' }}">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-purple-600 uppercase tracking-wide">Jenis #{{ $index + 1 }}</span>
+                    <div class="flex items-center gap-3">
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" wire:model.live="participantTypes.{{ $index }}.is_active"
+                                class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                            <span class="text-xs font-medium text-gray-600">Aktif</span>
+                        </label>
+                        <button type="button" wire:click="removeParticipantType({{ $index }})"
+                            wire:confirm="Hapus jenis peserta ini?"
+                            class="text-red-400 hover:text-red-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Nama Jenis Peserta *</label>
+                        <input wire:model="participantTypes.{{ $index }}.name" type="text"
+                            class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500"
+                            placeholder="cth: Peserta, Pemakalah, Peserta Mahasiswa, Peserta Umum…">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Keterangan <span class="text-gray-400">(opsional)</span></label>
+                        <input wire:model="participantTypes.{{ $index }}.description" type="text"
+                            class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500"
+                            placeholder="cth: Peserta tanpa makalah, hanya menghadiri seminar">
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="text-center py-12 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
+                <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <p class="text-sm font-medium">Belum ada jenis peserta</p>
+                <p class="text-xs text-gray-400 mt-1">Jika kosong, form pendaftaran tidak menampilkan pilihan jenis peserta</p>
+                <button type="button" wire:click="addParticipantType"
+                    class="mt-3 text-sm text-purple-600 hover:underline">+ Tambah Jenis Pertama</button>
+            </div>
+            @endforelse
         </div>
     </div>
     @endif

@@ -7,9 +7,10 @@
     $preselectedPackage = null;
     $packageQueryId = request()->query('package');
     if ($packageQueryId) {
-        $preselectedPackage = \App\Models\RegistrationPackage::find($packageQueryId);
+        $preselectedPackage = \App\Models\RegistrationPackage::with('participantType')->find($packageQueryId);
     }
     $defaultRole = $preselectedPackage ? 'participant' : old('role', 'author');
+    $packageParticipantTypeId = $preselectedPackage?->participant_type_id;
 @endphp
 
 <div class="max-w-4xl mx-auto" x-data="registerForm('{{ $defaultRole }}', {{ $preselectedPackage ? $preselectedPackage->price : 'null' }}, {{ $preselectedPackage && $preselectedPackage->is_free ? 'true' : 'false' }})">
@@ -118,6 +119,77 @@
                     <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                 @enderror
             </div>
+
+            @php
+                $activeConference = \App\Models\Conference::active()->first();
+                $availableParticipantTypes = $activeConference
+                    ? $activeConference->participantTypes()->active()->orderBy('sort_order')->get()
+                    : collect();
+            @endphp
+
+            {{-- ── SEKSI 1B: Jenis Peserta (jika dikonfigurasi) ──────────────── --}}
+            @if($availableParticipantTypes->isNotEmpty())
+            <div class="px-8 py-6 border-b border-gray-100">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Jenis Peserta <span class="text-red-500">*</span></h3>
+                </div>
+                @if($packageParticipantTypeId && ($lockedType = $availableParticipantTypes->firstWhere('id', $packageParticipantTypeId)))
+                {{-- Locked: participant type is determined by selected package --}}
+                <input type="hidden" name="participant_type_id" value="{{ $lockedType->id }}">
+                <div class="flex items-center gap-3 border-2 border-purple-500 bg-purple-50 px-4 py-3 rounded-xl shadow-sm">
+                    <div class="w-9 h-9 rounded-full bg-purple-500 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-sm text-purple-800">{{ $lockedType->name }}</p>
+                        @if($lockedType->description)
+                        <p class="text-xs text-purple-600 mt-0.5">{{ $lockedType->description }}</p>
+                        @endif
+                    </div>
+                    <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">Sesuai paket</span>
+                </div>
+                @else
+                {{-- Selectable: user picks the participant type --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-data="{ selectedType: '{{ old('participant_type_id') }}' }">
+                    @foreach($availableParticipantTypes as $pType)
+                    <label class="relative flex items-start gap-3 border-2 px-4 py-3 cursor-pointer rounded-xl transition-all hover:shadow-md"
+                        :class="selectedType == '{{ $pType->id }}' ? 'border-purple-500 bg-purple-50 shadow-sm' : 'border-gray-200 hover:border-purple-300'">
+                        <input type="radio" name="participant_type_id" value="{{ $pType->id }}"
+                            x-model="selectedType"
+                            class="sr-only"
+                            {{ old('participant_type_id') == $pType->id ? 'checked' : '' }}>
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition"
+                            :class="selectedType == '{{ $pType->id }}' ? 'bg-purple-500' : 'bg-gray-100'">
+                            <svg class="w-4 h-4 transition" :class="selectedType == '{{ $pType->id }}' ? 'text-white' : 'text-gray-400'"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-semibold text-sm text-gray-800">{{ $pType->name }}</p>
+                            @if($pType->description)
+                            <p class="text-xs text-gray-500 mt-0.5">{{ $pType->description }}</p>
+                            @endif
+                        </div>
+                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition"
+                            :class="selectedType == '{{ $pType->id }}' ? 'border-purple-500' : 'border-gray-300'">
+                            <div class="w-2.5 h-2.5 rounded-full bg-purple-500 transition"
+                                x-show="selectedType == '{{ $pType->id }}'"></div>
+                        </div>
+                    </label>
+                    @endforeach
+                </div>
+                @endif
+                @error('participant_type_id')<p class="text-red-500 text-xs mt-2">{{ $message }}</p>@enderror
+            </div>
+            @endif
 
             {{-- ── SEKSI 2: Data Pribadi ─────────────────────────────────────── --}}
             <div class="px-8 py-6 border-b border-gray-100">
