@@ -51,6 +51,18 @@
             @endif
 
             {{-- ── SEKSI 1: Kategori Pendaftaran ────────────────────────────── --}}
+            @if($preselectedPackage)
+            {{-- Paket sudah dipilih dari halaman publik: sembunyikan pilihan, simpan sebagai hidden --}}
+            <input type="hidden" name="role" value="participant">
+            @php
+                $lockedParticipantType = $packageParticipantTypeId
+                    ? \App\Models\ParticipantType::find($packageParticipantTypeId)
+                    : null;
+            @endphp
+            @if($lockedParticipantType)
+                <input type="hidden" name="participant_type_id" value="{{ $lockedParticipantType->id }}">
+            @endif
+            @else
             <div class="px-8 pt-8 pb-6 border-b border-gray-100">
                 <div class="flex items-center gap-3 mb-5">
                     <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center shrink-0">
@@ -60,22 +72,6 @@
                     </div>
                     <h3 class="font-semibold text-gray-800">Registration Category</h3>
                 </div>
-
-                @if($preselectedPackage)
-                <input type="hidden" name="role" value="participant">
-                <div class="flex items-center gap-4 border-2 border-teal-400 bg-teal-50 px-5 py-4 rounded-xl">
-                    <div class="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-bold text-gray-800">Participant</p>
-                        <p class="text-xs text-teal-600 mt-0.5">Registered for package <strong>{{ $preselectedPackage->name }}</strong></p>
-                    </div>
-                    <span class="text-xs text-teal-700 bg-teal-100 border border-teal-200 px-3 py-1 rounded-full font-semibold">🔒 Locked</span>
-                </div>
-                @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <label class="relative flex items-center gap-4 border-2 px-5 py-4 cursor-pointer rounded-xl transition-all hover:shadow-md"
                         :class="role === 'author' ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-gray-200 hover:border-blue-300'">
@@ -114,11 +110,11 @@
                         </div>
                     </label>
                 </div>
-                @endif
                 @error('role')
                     <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                 @enderror
             </div>
+            @endif
 
             @php
                 $activeConference = \App\Models\Conference::active()->first();
@@ -127,8 +123,8 @@
                     : collect();
             @endphp
 
-            {{-- ── SEKSI 1B: Jenis Peserta (jika dikonfigurasi) ──────────────── --}}
-            @if($availableParticipantTypes->isNotEmpty())
+            {{-- ── SEKSI 1B: Jenis Peserta (hanya tampil jika tidak dikunci dari paket) ── --}}
+            @if($availableParticipantTypes->isNotEmpty() && !$packageParticipantTypeId)
             <div class="px-8 py-6 border-b border-gray-100">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center shrink-0">
@@ -138,24 +134,6 @@
                     </div>
                     <h3 class="font-semibold text-gray-800">Jenis Peserta <span class="text-red-500">*</span></h3>
                 </div>
-                @if($packageParticipantTypeId && ($lockedType = $availableParticipantTypes->firstWhere('id', $packageParticipantTypeId)))
-                {{-- Locked: participant type is determined by selected package --}}
-                <input type="hidden" name="participant_type_id" value="{{ $lockedType->id }}">
-                <div class="flex items-center gap-3 border-2 border-purple-500 bg-purple-50 px-4 py-3 rounded-xl shadow-sm">
-                    <div class="w-9 h-9 rounded-full bg-purple-500 flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-semibold text-sm text-purple-800">{{ $lockedType->name }}</p>
-                        @if($lockedType->description)
-                        <p class="text-xs text-purple-600 mt-0.5">{{ $lockedType->description }}</p>
-                        @endif
-                    </div>
-                    <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">Sesuai paket</span>
-                </div>
-                @else
                 {{-- Selectable: user picks the participant type --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-data="{ selectedType: '{{ old('participant_type_id') }}' }">
                     @foreach($availableParticipantTypes as $pType)
@@ -186,7 +164,6 @@
                     </label>
                     @endforeach
                 </div>
-                @endif
                 @error('participant_type_id')<p class="text-red-500 text-xs mt-2">{{ $message }}</p>@enderror
             </div>
             @endif
