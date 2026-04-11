@@ -1,5 +1,5 @@
     {{-- -------------------------------------------------------------------
-         ABOUT CONFERENCE — Redesigned Premium Layout
+         ABOUT CONFERENCE ï¿½ Redesigned Premium Layout
     ------------------------------------------------------------------- --}}
     @if($activeConference && $activeConference->isSectionVisible('about'))
     <section id="conference" class="relative py-24 overflow-hidden bg-white">
@@ -157,7 +157,7 @@
                                         <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">{{ __('welcome.conference.tanggal') }}</p>
                                         <p class="text-sm font-bold text-gray-800 mt-0.5">
                                             {{ $activeConference->start_date->translatedFormat('d F Y') }}
-                                            @if($activeConference->end_date && $activeConference->end_date->ne($activeConference->start_date)) — {{ $activeConference->end_date->translatedFormat('d F Y') }} @endif
+                                            @if($activeConference->end_date && $activeConference->end_date->ne($activeConference->start_date)) â€” {{ $activeConference->end_date->translatedFormat('d F Y') }} @endif
                                         </p>
                                         @if($activeConference->formatted_time)
                                         <p class="text-xs text-gray-400 mt-0.5">{{ $activeConference->formatted_time }}</p>
