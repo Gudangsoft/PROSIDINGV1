@@ -25,6 +25,7 @@ use App\Livewire\Admin\SliderList;
 use App\Livewire\Admin\SliderForm;
 use App\Livewire\Admin\ThemeSettings;
 use App\Livewire\Admin\MenuManager;
+use App\Livewire\Admin\WaBlaster;
 use App\Livewire\Admin\SupporterManager;
 use App\Livewire\Admin\UsersRoles;
 use App\Livewire\Admin\PageList;
@@ -271,6 +272,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/settings/general', GeneralSettings::class)->name('admin.settings.general');
         Route::get('/settings/email', EmailSettings::class)->name('admin.settings.email');
         Route::get('/settings/theme', ThemeSettings::class)->name('admin.settings.theme');
+        Route::get('/settings/wa-blaster', WaBlaster::class)->name('admin.settings.wa-blaster');
 
         // Database Manager (Backup & Restore)
         Route::get('/database', DatabaseManager::class)->name('admin.database');
