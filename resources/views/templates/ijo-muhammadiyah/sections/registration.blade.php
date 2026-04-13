@@ -41,7 +41,11 @@
                     <div class="px-6 pb-6">
                         @if($package->show_register_button ?? true)
                         @auth
-                            <a href="{{ route('participant.payment', ['package' => $package->id]) }}" class="block w-full bg-teal-600 text-white text-center py-2.5 rounded-full font-semibold hover:bg-teal-700 transition text-sm">{{ __('welcome.pricing.book_now') }}</a>
+                            @if(auth()->user()->isParticipant())
+                                <a href="{{ route('participant.payment', ['package' => $package->id]) }}" class="block w-full bg-teal-600 text-white text-center py-2.5 rounded-full font-semibold hover:bg-teal-700 transition text-sm">{{ __('welcome.pricing.book_now') }}</a>
+                            @else
+                                <a href="{{ route('register', ['package' => $package->id]) }}" class="block w-full bg-teal-600 text-white text-center py-2.5 rounded-full font-semibold hover:bg-teal-700 transition text-sm">{{ __('welcome.pricing.book_now') }}</a>
+                            @endif
                         @else
                             <a href="{{ route('register', ['package' => $package->id]) }}" class="block w-full bg-teal-600 text-white text-center py-2.5 rounded-full font-semibold hover:bg-teal-700 transition text-sm">{{ __('welcome.pricing.book_now') }}</a>
                         @endauth

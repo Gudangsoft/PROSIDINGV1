@@ -30,6 +30,13 @@ class RoleMiddleware
         }
 
         if (!in_array($user->role, $allowedRoles)) {
+            // Redirect non-participants trying to access the participant payment page
+            // instead of showing a 403 (e.g. authors who click "Book Now" on homepage)
+            if ($request->routeIs('participant.payment')) {
+                $package = $request->query('package');
+                return redirect()->route('register', $package ? ['package' => $package] : [])
+                    ->with('info', 'Silakan daftar akun baru sebagai peserta untuk melanjutkan pembayaran.');
+            }
             abort(403, 'Unauthorized.');
         }
 
