@@ -115,39 +115,49 @@ class SubmitPaper extends Component
         ]);
 
         // Upload abstract file (wajib)
+        // Capture metadata BEFORE store() — store() moves the temp file, making it inaccessible
+        $abstractOriginalName = $this->abstractFile->getClientOriginalName();
+        $abstractMimeType = $this->abstractFile->getMimeType();
+        $abstractFileSize = $this->abstractFile->getSize();
         $abstractPath = $this->abstractFile->store('papers/' . $paper->id, 'public');
         PaperFile::create([
             'paper_id' => $paper->id,
             'type' => 'abstract',
             'file_path' => $abstractPath,
-            'original_name' => $this->abstractFile->getClientOriginalName(),
-            'mime_type' => $this->abstractFile->getMimeType(),
-            'file_size' => $this->abstractFile->getSize(),
+            'original_name' => $abstractOriginalName,
+            'mime_type' => $abstractMimeType,
+            'file_size' => $abstractFileSize,
         ]);
 
         // Upload full paper if provided (opsional)
         if ($this->paperFile) {
+            $paperOriginalName = $this->paperFile->getClientOriginalName();
+            $paperMimeType = $this->paperFile->getMimeType();
+            $paperFileSize = $this->paperFile->getSize();
             $path = $this->paperFile->store('papers/' . $paper->id, 'public');
             PaperFile::create([
                 'paper_id' => $paper->id,
                 'type' => 'full_paper',
                 'file_path' => $path,
-                'original_name' => $this->paperFile->getClientOriginalName(),
-                'mime_type' => $this->paperFile->getMimeType(),
-                'file_size' => $this->paperFile->getSize(),
+                'original_name' => $paperOriginalName,
+                'mime_type' => $paperMimeType,
+                'file_size' => $paperFileSize,
             ]);
         }
 
         // Upload turnitin if provided (opsional)
         if ($this->turnitinFile) {
+            $turnitinOriginalName = $this->turnitinFile->getClientOriginalName();
+            $turnitinMimeType = $this->turnitinFile->getMimeType();
+            $turnitinFileSize = $this->turnitinFile->getSize();
             $turnitinPath = $this->turnitinFile->store('papers/' . $paper->id . '/turnitin', 'public');
             PaperFile::create([
                 'paper_id' => $paper->id,
                 'type' => 'turnitin',
                 'file_path' => $turnitinPath,
-                'original_name' => $this->turnitinFile->getClientOriginalName(),
-                'mime_type' => $this->turnitinFile->getMimeType(),
-                'file_size' => $this->turnitinFile->getSize(),
+                'original_name' => $turnitinOriginalName,
+                'mime_type' => $turnitinMimeType,
+                'file_size' => $turnitinFileSize,
             ]);
         }
 
