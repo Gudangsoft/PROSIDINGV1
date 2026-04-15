@@ -384,6 +384,11 @@ class PaperDetail extends Component
 
             $loaLink = '';
             
+            // Set accepted_at BEFORE LOA generation so the paper is counted correctly
+            $this->paper->update([
+                'accepted_at' => now(),
+            ]);
+
             // Generate LOA automatically atau use manual link
             if ($this->autoGenerateLoa) {
                 $generator = new \App\Services\DocumentGenerator();
@@ -397,7 +402,6 @@ class PaperDetail extends Component
             // Update paper status
             $this->paper->update([
                 'status' => 'payment_pending',
-                'accepted_at' => now(),
                 'loa_link' => $loaLink,
             ]);
 

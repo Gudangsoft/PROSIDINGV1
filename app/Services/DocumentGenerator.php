@@ -128,18 +128,26 @@ class DocumentGenerator
         $conference = $paper->conference;
         $year = now()->year;
         
-        // Count existing LOAs for this conference and year
-        $count = Paper::where('conference_id', $conference->id)
-            ->whereNotNull('loa_number')
-            ->whereYear('accepted_at', $year)
-            ->count() + 1;
-        
         $acronym = $conference->acronym ?: 'CONF';
         // Sanitize: collapse spaces, remove characters that break URLs/filenames
         $acronym = preg_replace('/\s+/', '-', trim($acronym));
         $acronym = preg_replace('/[^A-Za-z0-9\-]/', '', $acronym);
+        $acronymUpper = strtoupper($acronym);
         
-        return sprintf("LOA/%03d/%s/%d", $count, strtoupper($acronym), $year);
+        // Count existing LOAs for this conference and year, then loop until unique
+        $count = Paper::where('conference_id', $conference->id)
+            ->whereNotNull('loa_number')
+            ->count() + 1;
+        
+        do {
+            $loaNumber = sprintf("LOA/%03d/%s/%d", $count, $acronymUpper, $year);
+            $exists = Paper::where('loa_number', $loaNumber)->exists();
+            if ($exists) {
+                $count++;
+            }
+        } while ($exists);
+        
+        return $loaNumber;
     }
     
     /**
