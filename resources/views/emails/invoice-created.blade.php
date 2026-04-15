@@ -55,7 +55,7 @@
                     <td style="font-size:14px;color:#64748b;">No. Invoice</td>
                     <td style="font-size:14px;font-weight:700;font-family:monospace;color:#1e293b;">{{ $invoiceNumber }}</td>
                   </tr>
-                  <tr>\n                    <td style="font-size:14px;color:#64748b;padding-top:10px;">Jumlah Tagihan</td>\n                    <td style="font-size:20px;font-weight:800;color:#4f46e5;padding-top:10px;">{{ $amount }}</td>\n                  </tr>
+                  <tr>\n                    <td style="font-size:14px;color:#64748b;padding-top:10px;">Jumlah Tagihan</td>\n                    <td style="font-size:20px;font-weight:800;color:#4f46e5;padding-top:10px;">{{ $formattedAmount ?? 'Rp. ' . number_format($amount, 0, ',', '.') }}</td>\n                  </tr>
                 </table>
               </td>
             </tr>

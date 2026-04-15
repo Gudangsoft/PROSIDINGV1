@@ -76,6 +76,8 @@ class InvoiceCreatedMail extends Mailable
         }
 
         return $this->subject('Tagihan Pembayaran - ' . config('app.name'))
-                    ->view('emails.invoice-created');
+                    ->view('emails.invoice-created', [
+                        'formattedAmount' => $formattedAmount,
+                    ]);
     }
 }

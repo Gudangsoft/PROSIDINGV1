@@ -207,8 +207,7 @@ class PaperDetail extends Component
 
     public function acceptAndSkipReview()
     {
-        $this->acceptSource = 'skip';
-        $this->showAcceptModal = true;
+        $this->openAcceptModal('skip');
     }
 
     public function openDeclineModal()
@@ -313,8 +312,7 @@ class PaperDetail extends Component
 
     public function acceptSubmission()
     {
-        $this->acceptSource = 'review';
-        $this->showAcceptModal = true;
+        $this->openAcceptModal('review');
     }
 
     public function openAcceptModal(string $source = 'review')
@@ -407,14 +405,40 @@ class PaperDetail extends Component
 
             // Create invoice automatically
             if (!$this->paper->payment) {
-                Payment::create([
+                $paymentData = [
+                    'type' => Payment::TYPE_PAPER,
                     'paper_id' => $this->paper->id,
                     'user_id' => $this->paper->user_id,
                     'invoice_number' => Payment::generateInvoiceNumber(),
                     'amount' => $this->acceptInvoiceAmount,
                     'description' => $this->acceptInvoiceDescription,
                     'status' => 'pending',
-                ]);
+                ];
+
+                // Store selected registration package if available
+                if ($this->acceptPackageId) {
+                    $paymentData['registration_package_id'] = $this->acceptPackageId;
+                }
+
+                $payment = Payment::create($paymentData);
+
+                // Send invoice email to author
+                try {
+                    $currency = $payment->registrationPackage?->currency ?? 'IDR';
+                    \Illuminate\Support\Facades\Mail::to($this->paper->user->email)->send(
+                        new \App\Mail\InvoiceCreatedMail(
+                            $this->paper->user->name,
+                            $this->paper->title,
+                            $payment->invoice_number,
+                            $payment->amount,
+                            route('author.paper.payment', $this->paper),
+                            $this->paper->conference_id,
+                            $currency
+                        )
+                    );
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send invoice email from confirmAccept: ' . $e->getMessage());
+                }
             }
 
             // Send notification to author with LOA
@@ -584,6 +608,7 @@ class PaperDetail extends Component
         }
 
         $payment = Payment::create([
+            'type' => Payment::TYPE_PAPER,
             'paper_id' => $this->paper->id,
             'user_id' => $this->paper->user_id,
             'invoice_number' => Payment::generateInvoiceNumber(),
