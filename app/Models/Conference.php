@@ -24,6 +24,13 @@ class Conference extends Model
         'read_more_url',
         'chairman_name', 'chairman_title', 'secretary_name', 'secretary_title',
         'chairman_signature', 'secretary_signature',
+        // LOA Template fields
+        'loa_header_logo', 'loa_header_title', 'loa_header_subtitle',
+        'loa_header_address', 'loa_header_phone', 'loa_header_fax', 'loa_header_email',
+        'loa_body_intro', 'loa_body_acceptance', 'loa_important_dates',
+        'loa_body_submission_info', 'loa_payment_info', 'loa_contact_info', 'loa_closing_text',
+        'loa_signatory_name', 'loa_signatory_title', 'loa_signature_image',
+        'loa_footer_text',
     ];
 
     protected $casts = [
@@ -34,6 +41,7 @@ class Conference extends Model
         'payment_methods' => 'array',
         'visible_sections' => 'array',
         'hidden_speaker_types' => 'array',
+        'loa_important_dates' => 'array',
     ];
 
     /**

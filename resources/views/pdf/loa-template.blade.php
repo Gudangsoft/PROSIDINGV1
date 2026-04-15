@@ -6,115 +6,153 @@
     <title>Letter of Acceptance - {{ $loaNumber }}</title>
     <style>
         @page {
-            margin: 2cm 2.5cm;
+            margin: 1.5cm 2cm;
         }
         
         body {
             font-family: 'Times New Roman', Times, serif;
-            font-size: 12pt;
-            line-height: 1.6;
+            font-size: 11pt;
+            line-height: 1.5;
             color: #000;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px double #333;
-            padding-bottom: 20px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .header-logos {
+            margin-bottom: 5px;
         }
         
         .header img.logo {
-            height: 80px;
-            margin-bottom: 10px;
+            height: 70px;
+            margin-bottom: 5px;
         }
         
-        .header h1 {
-            font-size: 18pt;
+        .header .title {
+            font-size: 13pt;
             font-weight: bold;
-            margin: 10px 0 5px 0;
-            color: #1a5490;
+            margin: 5px 0 3px 0;
+            color: #1a3c7a;
+            text-transform: uppercase;
         }
         
-        .header p {
-            margin: 3px 0;
-            font-size: 11pt;
+        .header .subtitle {
+            font-size: 10pt;
+            font-style: italic;
+            margin: 2px 0;
+            color: #333;
         }
-        
-        .meta-info {
-            margin: 25px 0;
+
+        .header .address {
+            font-size: 8pt;
+            color: #555;
+            margin: 3px 0 0 0;
+            font-style: italic;
         }
-        
-        .meta-info table {
-            width: 100%;
-        }
-        
-        .meta-info td {
-            padding: 3px 0;
-        }
-        
-        .meta-info td:first-child {
-            width: 150px;
-            font-weight: bold;
-        }
-        
-        .recipient {
-            margin: 20px 0;
+
+        .header .contact-row {
+            font-size: 8pt;
+            color: #555;
+            margin: 2px 0;
         }
         
         .title-doc {
             text-align: center;
-            font-size: 16pt;
+            font-size: 14pt;
             font-weight: bold;
-            margin: 30px 0;
+            margin: 20px 0 15px 0;
             text-decoration: underline;
-            color: #1a5490;
         }
         
         .content {
             text-align: justify;
-            margin: 20px 0;
+            margin: 10px 0;
+        }
+
+        .content p {
+            margin: 6px 0;
+        }
+
+        .paper-info {
+            text-align: center;
+            margin: 15px 20px;
+            padding: 8px;
+            border-bottom: 1px dotted #666;
         }
         
         .paper-title {
-            text-align: center;
             font-style: italic;
             font-weight: bold;
-            margin: 20px 40px;
-            font-size: 13pt;
+            font-size: 11pt;
+        }
+
+        .paper-meta {
+            text-align: center;
+            font-size: 10pt;
+            margin: 5px 0;
+        }
+
+        .important-dates {
+            margin: 12px 0;
+        }
+
+        .important-dates table {
+            width: 100%;
+        }
+
+        .important-dates td {
+            padding: 2px 0;
+            font-size: 10pt;
+        }
+
+        .important-dates td:first-child {
+            padding-left: 10px;
+        }
+
+        .important-dates td:last-child {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .payment-info {
+            margin: 10px 0;
+        }
+
+        .contact-info {
+            margin: 10px 0;
         }
         
         .signature-section {
-            margin-top: 50px;
-        }
-        
-        .signature-box {
-            float: right;
-            width: 45%;
-            text-align: center;
+            margin-top: 30px;
+            text-align: right;
+            padding-right: 30px;
         }
         
         .signature-image {
             height: 60px;
-            margin: 10px 0;
+            margin: 5px 0;
         }
         
         .qr-section {
-            clear: both;
             text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
+            margin-top: 30px;
+            padding-top: 10px;
             border-top: 1px solid #ddd;
         }
         
         .qr-section img {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
         }
         
         .qr-text {
-            font-size: 9pt;
-            color: #666;
-            margin-top: 5px;
+            font-size: 8pt;
+            color: #888;
+            margin-top: 3px;
         }
         
         .footer {
@@ -122,134 +160,216 @@
             bottom: 0;
             left: 0;
             right: 0;
-            text-align: center;
+            text-align: right;
             font-size: 9pt;
-            color: #888;
+            color: #666;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
-    {{-- Header with Logo and Conference Info --}}
+    {{-- ═══ HEADER ═══ --}}
     <div class="header">
-        @if($conference->logo)
-            <img src="{{ public_path('storage/' . $conference->logo) }}" class="logo" alt="Logo">
+        {{-- Logo --}}
+        @php
+            $headerLogo = $conference->loa_header_logo ?? $conference->logo ?? null;
+        @endphp
+        @if($headerLogo)
+            <div class="header-logos">
+                <img src="{{ public_path('storage/' . $headerLogo) }}" class="logo" alt="Logo">
+            </div>
         @endif
-        <h1>{{ $conference->name }}</h1>
-        <p>{{ $conference->theme }}</p>
-        <p>
-            @if($conference->start_date && $conference->end_date)
-                {{ $conference->start_date->format('d') }} - {{ $conference->end_date->format('d F Y') }}
-            @endif
-        </p>
-        <p>{{ $conference->venue }} @if($conference->city), {{ $conference->city }}@endif</p>
+
+        {{-- Title --}}
+        @if($conference->loa_header_title)
+            <div class="title">{{ $conference->loa_header_title }}</div>
+        @else
+            <div class="title">{{ $conference->name }}</div>
+        @endif
+
+        {{-- Subtitle --}}
+        @if($conference->loa_header_subtitle)
+            @foreach(explode("\n", $conference->loa_header_subtitle) as $line)
+                <div class="subtitle">{{ trim($line) }}</div>
+            @endforeach
+        @elseif($conference->theme)
+            <div class="subtitle">{{ $conference->theme }}</div>
+        @endif
+
+        {{-- Address --}}
+        @if($conference->loa_header_address)
+            <div class="address">{{ $conference->loa_header_address }}</div>
+        @elseif($conference->venue || $conference->city)
+            <div class="address">{{ $conference->venue }}@if($conference->city), {{ $conference->city }}@endif</div>
+        @endif
+
+        {{-- Contact Row --}}
+        @if($conference->loa_header_phone || $conference->loa_header_fax || $conference->loa_header_email)
+        <div class="contact-row">
+            @if($conference->loa_header_phone)Phone : {{ $conference->loa_header_phone }}@endif
+            @if($conference->loa_header_fax) &nbsp;&nbsp; Fax : {{ $conference->loa_header_fax }}@endif
+            @if($conference->loa_header_email) &nbsp;&nbsp; Email : {{ $conference->loa_header_email }}@endif
+        </div>
+        @endif
     </div>
     
-    {{-- Document Metadata --}}
-    <div class="meta-info">
-        <table>
-            <tr>
-                <td>Nomor</td>
-                <td>: <strong>{{ $loaNumber }}</strong></td>
-            </tr>
-            <tr>
-                <td>Tanggal</td>
-                <td>: {{ $generatedDate->format('d F Y') }}</td>
-            </tr>
-        </table>
-    </div>
-    
-    {{-- Recipient --}}
-    <div class="recipient">
-        <p>Kepada Yth,<br>
-        <strong>{{ $author->name }}</strong><br>
-        @if($author->institution){{ $author->institution }}<br>@endif
-        @if($author->email){{ $author->email }}@endif
-        </p>
-    </div>
-    
-    {{-- Document Title --}}
+    {{-- ═══ DOCUMENT TITLE ═══ --}}
     <div class="title-doc">
-        LETTER OF ACCEPTANCE
+        Letter of Acceptance (LoA)
     </div>
     
-    {{-- Content --}}
+    {{-- ═══ BODY CONTENT ═══ --}}
     <div class="content">
-        <p>Dengan hormat,</p>
-        
-        <p>Panitia {{ $conference->name }} dengan senang hati menyampaikan bahwa naskah yang Anda ajukan dengan data sebagai berikut:</p>
-        
-        <table style="margin: 15px 0; width: 100%;">
-            <tr>
-                <td style="width: 120px; vertical-align: top;"><strong>Judul</strong></td>
-                <td style="vertical-align: top;">:</td>
-                <td style="vertical-align: top;">{{ $paper->title }}</td>
-            </tr>
+        {{-- Intro Text --}}
+        @if($conference->loa_body_intro)
+            @foreach(explode("\n", $conference->loa_body_intro) as $line)
+                <p>{{ str_replace(['{author_name}', '{paper_id}'], [$author->name, $paper->id], trim($line)) }}</p>
+            @endforeach
+        @else
+            <p>Dear Author(s),</p>
+            <p>We are pleased to inform you that your paper entitled</p>
+        @endif
+
+        {{-- Paper Title --}}
+        <div class="paper-info">
+            <div class="paper-title">{{ str_replace('{paper_title}', $paper->title, $paper->title) }}</div>
+        </div>
+
+        {{-- Paper Meta --}}
+        <div class="paper-meta">
+            Paper ID: {{ $paper->id }}
             @if($paper->authors_meta && is_array($paper->authors_meta))
-            <tr>
-                <td style="vertical-align: top;"><strong>Penulis</strong></td>
-                <td style="vertical-align: top;">:</td>
-                <td style="vertical-align: top;">
-                    @foreach($paper->authors_meta as $index => $authorMeta)
-                        {{ $authorMeta['name'] ?? '' }}@if(isset($authorMeta['institution'])) ({{ $authorMeta['institution'] }})@endif@if(!$loop->last), @endif
-                    @endforeach
-                </td>
-            </tr>
+                &nbsp;&nbsp;&nbsp; Author(s): 
+                @foreach($paper->authors_meta as $index => $authorMeta)
+                    {{ $authorMeta['name'] ?? '' }}@if(!$loop->last), @endif
+                @endforeach
+            @else
+                &nbsp;&nbsp;&nbsp; Author(s): {{ $author->name }}
             @endif
-            @if($paper->topic)
-            <tr>
-                <td style="vertical-align: top;"><strong>Topik</strong></td>
-                <td style="vertical-align: top;">:</td>
-                <td style="vertical-align: top;">{{ $paper->topic }}</td>
-            </tr>
+        </div>
+
+        {{-- Acceptance Text --}}
+        @if($conference->loa_body_acceptance)
+            <p>{{ str_replace(
+                ['{conference_name}', '{conference_date}'],
+                [$conference->name, $conference->start_date ? $conference->start_date->format('F d, Y') : ''],
+                $conference->loa_body_acceptance
+            ) }}</p>
+        @else
+            <p>has been <strong>accepted for oral presentation</strong> at the <strong>{{ $conference->name }}</strong>
+            @if($conference->start_date)
+                , which scheduled to be held on {{ $conference->start_date->format('F d, Y') }}.
             @endif
-            <tr>
-                <td style="vertical-align: top;"><strong>Tanggal Submit</strong></td>
-                <td style="vertical-align: top;">:</td>
-                <td style="vertical-align: top;">{{ $paper->submitted_at ? $paper->submitted_at->format('d F Y') : '-' }}</td>
-            </tr>
-        </table>
-        
-        <p>telah melalui <strong>proses review</strong> oleh tim reviewer dan dinyatakan <strong style="color: #1a5490;">DITERIMA (ACCEPTED)</strong> untuk dipresentasikan pada {{ $conference->name }}.</p>
-        
-        <p>Untuk kelancaran proses selanjutnya, kami mohon Anda untuk:</p>
-        <ol>
-            <li>Melakukan pembayaran biaya publikasi sesuai invoice yang telah dikirimkan</li>
-            <li>Mengunggah bukti pembayaran melalui sistem</li>
-            <li>Menyiapkan dan mengunggah luaran yang diperlukan (poster, PPT, full paper final, dll) sesuai panduan</li>
-        </ol>
-        
-        <p>Kami ucapkan selamat dan terima kasih atas partisipasi Anda dalam {{ $conference->name }}. Kontribusi Anda sangat berharga bagi kemajuan ilmu pengetahuan.</p>
-        
-        <p>Hormat kami,</p>
+            </p>
+        @endif
+
+        {{-- Important Dates --}}
+        @php
+            $importantDates = $conference->loa_important_dates ?? [];
+        @endphp
+        @if(count($importantDates) > 0)
+        <div class="important-dates">
+            <p><strong>Important Dates:</strong></p>
+            <table>
+                @foreach($importantDates as $dateItem)
+                    @if(!empty($dateItem['label']) || !empty($dateItem['date']))
+                    <tr>
+                        <td>* {{ $dateItem['label'] ?? '' }}</td>
+                        <td>: {{ $dateItem['date'] ?? '' }}</td>
+                    </tr>
+                    @endif
+                @endforeach
+            </table>
+        </div>
+        @endif
+
+        {{-- Submission Info --}}
+        @if($conference->loa_body_submission_info)
+            @foreach(explode("\n", $conference->loa_body_submission_info) as $line)
+                <p>{{ trim($line) }}</p>
+            @endforeach
+        @endif
+
+        {{-- Payment Info --}}
+        @if($conference->loa_payment_info)
+        <div class="payment-info">
+            @foreach(explode("\n", $conference->loa_payment_info) as $line)
+                @php $trimmed = trim($line); @endphp
+                @if(preg_match('/^(.+?)\s*:\s*(.+)$/', $trimmed, $m) && strlen($m[1]) < 30)
+                    <p><strong>{{ $m[1] }}</strong> : {{ $m[2] }}</p>
+                @else
+                    <p>{{ $trimmed }}</p>
+                @endif
+            @endforeach
+        </div>
+        @endif
+
+        {{-- Contact Info --}}
+        @if($conference->loa_contact_info)
+        <div class="contact-info">
+            @foreach(explode("\n", $conference->loa_contact_info) as $line)
+                <p>{{ trim($line) }}</p>
+            @endforeach
+        </div>
+        @endif
+
+        {{-- Closing Text --}}
+        @if($conference->loa_closing_text)
+            <p>{{ $conference->loa_closing_text }}</p>
+        @else
+            <p>We look forward to your valuable contribution and participation in the conference.</p>
+        @endif
     </div>
     
-    {{-- Signature Section --}}
+    {{-- ═══ SIGNATURE ═══ --}}
     <div class="signature-section">
-        <div class="signature-box">
-            <p style="margin-bottom: 5px;">Ketua Panitia Pelaksana</p>
-            <p style="margin-bottom: 5px;">{{ $conference->name }}</p>
-            
-            @if(file_exists(public_path('storage/signatures/chairman.png')))
-                <img src="{{ public_path('storage/signatures/chairman.png') }}" class="signature-image" alt="Signature">
-            @else
-                <div style="height: 60px;"></div>
-            @endif
-            
-            <p style="margin-top: 5px; font-weight: bold; text-decoration: underline;">
+        <p>{{ $conference->city ?? 'Semarang' }}, {{ $generatedDate->format('d F Y') ?? '.....................' }}</p>
+        <p>Sincerely,</p>
+        
+        {{-- Signature Image / Stamp --}}
+        @php
+            $sigImage = $conference->loa_signature_image ?? null;
+        @endphp
+        @if($sigImage && file_exists(public_path('storage/' . $sigImage)))
+            <img src="{{ public_path('storage/' . $sigImage) }}" class="signature-image" alt="Signature">
+        @elseif(file_exists(public_path('storage/signatures/chairman.png')))
+            <img src="{{ public_path('storage/signatures/chairman.png') }}" class="signature-image" alt="Signature">
+        @else
+            <div style="height: 60px;"></div>
+        @endif
+        
+        @if($conference->loa_signatory_name)
+            <p style="font-weight: bold; text-decoration: underline; margin-top: 3px;">
+                {{ $conference->loa_signatory_name }}
+            </p>
+        @else
+            <p style="font-weight: bold; text-decoration: underline; margin-top: 3px;">
                 {{ $conference->organizer ?? 'Ketua Panitia' }}
             </p>
-        </div>
+        @endif
+
+        @if($conference->loa_signatory_title)
+            <p style="font-size: 10pt;">{{ $conference->loa_signatory_title }}</p>
+        @else
+            <p style="font-size: 10pt;">{{ $conference->name }}</p>
+        @endif
     </div>
     
-    {{-- QR Code Section --}}
+    {{-- ═══ QR CODE ═══ --}}
     <div class="qr-section">
         <img src="{{ $qrCode }}" alt="QR Code Verification">
         <p class="qr-text">Scan QR Code untuk verifikasi keaslian dokumen<br>{{ $loaNumber }}</p>
     </div>
     
-    {{-- Footer --}}
+    {{-- ═══ FOOTER ═══ --}}
+    @if($conference->loa_footer_text)
+    <div class="footer">
+        <p>{{ $conference->loa_footer_text }}</p>
+    </div>
+    @else
     <div class="footer">
         <p>Dokumen ini dibuat secara otomatis oleh sistem dan sah tanpa tanda tangan basah</p>
     </div>
+    @endif
 </body>
 </html>

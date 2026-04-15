@@ -32,6 +32,7 @@ use App\Livewire\Admin\PageList;
 use App\Livewire\Admin\PageForm;
 use App\Livewire\Admin\EmailTemplateManager;
 use App\Livewire\Admin\TutorialManager;
+use App\Livewire\Admin\LoaTemplateManager;
 use App\Http\Controllers\Admin\PaymentExportController;
 use App\Http\Controllers\Admin\DatabaseExportController;
 use App\Livewire\Admin\DatabaseManager;
@@ -213,6 +214,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/news', NewsList::class)->name('admin.news');
         Route::get('/news/create', NewsForm::class)->name('admin.news.create');
         Route::get('/news/{news}/edit', NewsForm::class)->name('admin.news.edit');
+
+        // Template LOA
+        Route::get('/loa-template', LoaTemplateManager::class)->name('admin.loa-template');
 
         // Sertifikat
         Route::get('/certificates', \App\Livewire\Admin\CertificateManager::class)->name('admin.certificates');
