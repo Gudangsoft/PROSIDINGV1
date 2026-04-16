@@ -6,10 +6,12 @@
     <title>Letter of Acceptance - {{ $loaNumber }}</title>
     <style>
         @page {
-            margin: 1.5cm 2cm;
+            margin: 0;
         }
         
         body {
+            margin: 0;
+            padding: 0;
             font-family: 'Times New Roman', Times, serif;
             font-size: 11pt;
             line-height: 1.5;
@@ -18,15 +20,19 @@
         
         .header {
             text-align: center;
+            padding: 1.5cm 2cm 0 2cm;
             margin-bottom: 15px;
             border-bottom: 2px solid #333;
-            padding-bottom: 10px;
         }
 
         .header.full-banner {
-            margin: -1.5cm -2cm 20px -2cm;
             padding: 0;
+            margin-bottom: 20px;
             border: none;
+        }
+
+        .main-content {
+            padding: 0 2cm 1.5cm 2cm;
         }
 
         .header-logos {
@@ -38,7 +44,7 @@
             height: auto;
             max-width: 100%;
             display: block;
-            margin: 0 auto 5px auto;
+            margin: 0;
         }
         
         .header .title {
@@ -189,43 +195,46 @@
             </div>
         @endif
 
-        {{-- Title --}}
-        @if($conference->loa_header_title)
-            <div class="title">{{ $conference->loa_header_title }}</div>
-        @else
-            <div class="title">{{ $conference->name }}</div>
-        @endif
+        @if(!$conference->loa_header_logo)
+            {{-- Title --}}
+            @if($conference->loa_header_title)
+                <div class="title">{{ $conference->loa_header_title }}</div>
+            @else
+                <div class="title">{{ $conference->name }}</div>
+            @endif
 
-        {{-- Subtitle --}}
-        @if($conference->loa_header_subtitle)
-            @foreach(explode("\n", $conference->loa_header_subtitle) as $line)
-                <div class="subtitle">{{ trim($line) }}</div>
-            @endforeach
-        @elseif($conference->theme)
-            <div class="subtitle">{{ $conference->theme }}</div>
-        @endif
+            {{-- Subtitle --}}
+            @if($conference->loa_header_subtitle)
+                @foreach(explode("\n", $conference->loa_header_subtitle) as $line)
+                    <div class="subtitle">{{ trim($line) }}</div>
+                @endforeach
+            @elseif($conference->theme)
+                <div class="subtitle">{{ $conference->theme }}</div>
+            @endif
 
-        {{-- Address --}}
-        @if($conference->loa_header_address)
-            <div class="address">{{ $conference->loa_header_address }}</div>
-        @elseif($conference->venue || $conference->city)
-            <div class="address">{{ $conference->venue }}@if($conference->city), {{ $conference->city }}@endif</div>
-        @endif
+            {{-- Address --}}
+            @if($conference->loa_header_address)
+                <div class="address">{{ $conference->loa_header_address }}</div>
+            @elseif($conference->venue || $conference->city)
+                <div class="address">{{ $conference->venue }}@if($conference->city), {{ $conference->city }}@endif</div>
+            @endif
 
-        {{-- Contact Row --}}
-        @if($conference->loa_header_phone || $conference->loa_header_fax || $conference->loa_header_email)
-        <div class="contact-row">
-            @if($conference->loa_header_phone)Phone : {{ $conference->loa_header_phone }}@endif
-            @if($conference->loa_header_fax) &nbsp;&nbsp; Fax : {{ $conference->loa_header_fax }}@endif
-            @if($conference->loa_header_email) &nbsp;&nbsp; Email : {{ $conference->loa_header_email }}@endif
-        </div>
+            {{-- Contact Row --}}
+            @if($conference->loa_header_phone || $conference->loa_header_fax || $conference->loa_header_email)
+            <div class="contact-row">
+                @if($conference->loa_header_phone)Phone : {{ $conference->loa_header_phone }}@endif
+                @if($conference->loa_header_fax) &nbsp;&nbsp; Fax : {{ $conference->loa_header_fax }}@endif
+                @if($conference->loa_header_email) &nbsp;&nbsp; Email : {{ $conference->loa_header_email }}@endif
+            </div>
+            @endif
         @endif
     </div>
     
-    {{-- ═══ DOCUMENT TITLE ═══ --}}
-    <div class="title-doc">
-        Letter of Acceptance (LoA)
-    </div>
+    <div class="main-content">
+        {{-- ═══ DOCUMENT TITLE ═══ --}}
+        <div class="title-doc">
+            Letter of Acceptance (LoA)
+        </div>
     
     {{-- ═══ BODY CONTENT ═══ --}}
     <div class="content">
@@ -368,7 +377,7 @@
     <div class="qr-section">
         <img src="{{ $qrCode }}" alt="QR Code Verification">
         <p class="qr-text">Scan QR Code untuk verifikasi keaslian dokumen<br>{{ $loaNumber }}</p>
-    </div>
+    </div><!-- /.main-content -->
     
     {{-- ═══ FOOTER ═══ --}}
     @if($conference->loa_footer_text)

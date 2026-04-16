@@ -400,6 +400,7 @@
                         <img src="{{ asset('storage/' . $conference->logo) }}" alt="Logo" class="h-16 mx-auto mb-3 object-contain">
                     @endif
 
+                    @if(!$conference->loa_header_logo)
                     <div class="{{ $conference->loa_header_logo ? 'px-8' : '' }}">
                         @if($loa_header_title)
                             <p class="text-sm font-bold text-blue-800 uppercase">{{ $loa_header_title }}</p>
@@ -418,6 +419,7 @@
                             @if($loa_header_email)<span>Email: {{ $loa_header_email }}</span>@endif
                         </div>
                     </div>
+                    @endif
                 </div>
 
                 {{-- Body Preview --}}
