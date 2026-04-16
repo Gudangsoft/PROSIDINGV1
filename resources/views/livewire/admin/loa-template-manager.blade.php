@@ -393,28 +393,30 @@
             <div class="w-full max-w-[700px] bg-white border border-gray-300 shadow-lg rounded-lg overflow-hidden" style="font-family: 'Times New Roman', Times, serif;">
 
                 {{-- Header Preview --}}
-                <div class="text-center px-8 pt-8 pb-4 border-b-2 border-gray-700">
+                <div class="text-center {{ $conference->loa_header_logo ? 'mb-4' : 'px-8 pt-8 pb-4 border-b-2 border-gray-700' }}">
                     @if($conference->loa_header_logo)
-                        <img src="{{ asset('storage/' . $conference->loa_header_logo) }}" alt="Logo" class="h-16 mx-auto mb-3 object-contain">
+                        <img src="{{ asset('storage/' . $conference->loa_header_logo) }}" alt="Logo" class="w-full h-auto mx-auto mb-3">
                     @elseif($conference->logo)
                         <img src="{{ asset('storage/' . $conference->logo) }}" alt="Logo" class="h-16 mx-auto mb-3 object-contain">
                     @endif
 
-                    @if($loa_header_title)
-                        <p class="text-sm font-bold text-blue-800 uppercase">{{ $loa_header_title }}</p>
-                    @endif
-                    @if($loa_header_subtitle)
-                        @foreach(explode("\n", $loa_header_subtitle) as $line)
-                            <p class="text-xs text-gray-600 italic">{{ $line }}</p>
-                        @endforeach
-                    @endif
-                    @if($loa_header_address)
-                        <p class="text-[10px] text-gray-500 mt-1">{{ $loa_header_address }}</p>
-                    @endif
-                    <div class="flex items-center justify-center gap-4 mt-1 text-[10px] text-gray-500">
-                        @if($loa_header_phone)<span>Phone: {{ $loa_header_phone }}</span>@endif
-                        @if($loa_header_fax)<span>Fax: {{ $loa_header_fax }}</span>@endif
-                        @if($loa_header_email)<span>Email: {{ $loa_header_email }}</span>@endif
+                    <div class="{{ $conference->loa_header_logo ? 'px-8' : '' }}">
+                        @if($loa_header_title)
+                            <p class="text-sm font-bold text-blue-800 uppercase">{{ $loa_header_title }}</p>
+                        @endif
+                        @if($loa_header_subtitle)
+                            @foreach(explode("\n", $loa_header_subtitle) as $line)
+                                <p class="text-xs text-gray-600 italic">{{ $line }}</p>
+                            @endforeach
+                        @endif
+                        @if($loa_header_address)
+                            <p class="text-[10px] text-gray-500 mt-1">{{ $loa_header_address }}</p>
+                        @endif
+                        <div class="flex items-center justify-center gap-4 mt-1 text-[10px] text-gray-500">
+                            @if($loa_header_phone)<span>Phone: {{ $loa_header_phone }}</span>@endif
+                            @if($loa_header_fax)<span>Fax: {{ $loa_header_fax }}</span>@endif
+                            @if($loa_header_email)<span>Email: {{ $loa_header_email }}</span>@endif
+                        </div>
                     </div>
                 </div>
 

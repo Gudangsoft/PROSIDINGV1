@@ -28,8 +28,11 @@
         }
         
         .header img.logo {
-            height: 70px;
-            margin-bottom: 5px;
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            display: block;
+            margin: 0 auto 5px auto;
         }
         
         .header .title {
@@ -169,7 +172,7 @@
 </head>
 <body>
     {{-- ═══ HEADER ═══ --}}
-    <div class="header">
+    <div class="header" @if($headerLogo) style="padding: 0; border: none; margin-bottom: 20px;" @endif>
         {{-- Logo --}}
         @php
             $headerLogo = $conference->loa_header_logo ?? $conference->logo ?? null;
