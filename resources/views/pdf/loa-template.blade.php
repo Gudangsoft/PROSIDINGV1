@@ -23,6 +23,12 @@
             padding-bottom: 10px;
         }
 
+        .header.full-banner {
+            margin: -1.5cm -2cm 20px -2cm;
+            padding: 0;
+            border: none;
+        }
+
         .header-logos {
             margin-bottom: 5px;
         }
@@ -172,11 +178,11 @@
 </head>
 <body>
     {{-- ═══ HEADER ═══ --}}
-    <div class="header" @if($headerLogo) style="padding: 0; border: none; margin-bottom: 20px;" @endif>
+    @php
+        $headerLogo = $conference->loa_header_logo ?? $conference->logo ?? null;
+    @endphp
+    <div class="header {{ $headerLogo ? 'full-banner' : '' }}">
         {{-- Logo --}}
-        @php
-            $headerLogo = $conference->loa_header_logo ?? $conference->logo ?? null;
-        @endphp
         @if($headerLogo)
             <div class="header-logos">
                 <img src="{{ public_path('storage/' . $headerLogo) }}" class="logo" alt="Logo">

@@ -114,9 +114,22 @@
             border-bottom: 0.5mm solid #c9a227;
             padding-bottom: 3mm;
         }
+        .header.full-banner {
+            flex-direction: column;
+            padding: 0;
+            border: none;
+            gap: 0;
+            margin-bottom: 5px;
+        }
         .header img.logo {
             height: 14mm;
             object-fit: contain;
+        }
+        .header.full-banner img.logo {
+            height: auto;
+            width: 100%;
+            max-height: 30mm;
+            margin-bottom: 0;
         }
         .header-text {
             text-align: center;
@@ -362,10 +375,15 @@
     <div class="content-area">
 
         {{-- Header --}}
-        <div class="header">
-            @if($conference && $conference->logo)
-                <img class="logo" src="{{ public_path('storage/' . $conference->logo) }}" alt="Logo">
+        @php
+            $headerLogo = $conference->loa_header_logo ?? $conference->logo ?? null;
+            $isBanner = $conference && $conference->loa_header_logo;
+        @endphp
+        <div class="header {{ $isBanner ? 'full-banner' : '' }}">
+            @if($headerLogo)
+                <img class="logo" src="{{ public_path('storage/' . $headerLogo) }}" alt="Logo">
             @endif
+            @if(!$isBanner)
             <div class="header-text">
                 <div class="org-name">
                     @if($conference){{ $conference->name }}@else{{ config('app.name') }}@endif
@@ -384,6 +402,7 @@
                     </div>
                 @endif
             </div>
+            @endif
         </div>
 
         {{-- Certificate title --}}
