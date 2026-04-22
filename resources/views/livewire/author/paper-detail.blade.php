@@ -95,6 +95,110 @@
             </div>
             @endif
 
+            {{-- Discussions (semua stage) --}}
+            @php
+                $allDiscussions = $paper->discussions ?? collect();
+                $stageLabels = [
+                    'submission'  => 'Pre-Review Discussions',
+                    'review'      => 'Review Discussions',
+                    'copyediting' => 'Copyediting Discussions',
+                    'production'  => 'Production Discussions',
+                ];
+            @endphp
+            @if($allDiscussions->count())
+            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h3 class="font-semibold text-gray-800">Diskusi Paper</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Diskusi antara editor dan author terkait paper ini.</p>
+                </div>
+                <div class="divide-y divide-gray-100">
+                    @foreach($allDiscussions as $disc)
+                    <div>
+                        {{-- Discussion Header --}}
+                        <div wire:click="openDiscussion({{ $disc->id }})"
+                             class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                            <div class="flex items-start gap-3 min-w-0">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-700 flex-shrink-0 mt-0.5">
+                                    {{ strtoupper(substr($disc->user->name, 0, 1)) }}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-semibold text-gray-800 text-sm">{{ $disc->subject }}</span>
+                                        @if($disc->is_closed)
+                                            <span class="bg-red-100 text-red-700 px-1.5 py-0.5 rounded text-[10px] font-medium">Ditutup</span>
+                                        @endif
+                                        <span class="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-[10px]">
+                                            {{ $stageLabels[$disc->stage] ?? ucfirst($disc->stage) }}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
+                                        <span>{{ $disc->user->name }}</span>
+                                        <span>•</span>
+                                        <span>{{ $disc->messages->count() - 1 }} balasan</span>
+                                        <span>•</span>
+                                        <span>{{ $disc->latestMessage?->created_at?->diffForHumans() ?? '-' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform {{ $activeDiscussionId === $disc->id ? 'rotate-180' : '' }}"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+
+                        {{-- Discussion Messages (expanded) --}}
+                        @if($activeDiscussionId === $disc->id)
+                        <div class="bg-gray-50 border-t border-gray-100 px-6 py-4">
+                            {{-- Messages --}}
+                            <div class="space-y-4 max-h-72 overflow-y-auto mb-4">
+                                @foreach($disc->messages as $msg)
+                                @php
+                                    $isMe = $msg->user_id === Auth::id();
+                                @endphp
+                                <div class="flex gap-3 {{ $isMe ? 'flex-row-reverse' : '' }}">
+                                    <div class="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0
+                                        {{ $isMe ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' }}">
+                                        {{ strtoupper(substr($msg->user->name, 0, 1)) }}
+                                    </div>
+                                    <div class="{{ $isMe ? 'items-end' : 'items-start' }} flex flex-col max-w-[80%]">
+                                        <div class="flex items-center gap-2 mb-1 {{ $isMe ? 'flex-row-reverse' : '' }}">
+                                            <span class="text-xs font-semibold text-gray-700">{{ $isMe ? 'Anda' : $msg->user->name }}</span>
+                                            <span class="text-[10px] text-gray-400">{{ $msg->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        <div class="px-3 py-2 rounded-lg text-sm text-gray-700 whitespace-pre-wrap
+                                            {{ $isMe ? 'bg-blue-100 text-blue-900' : 'bg-white border border-gray-200' }}">
+                                            {{ $msg->message }}
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+
+                            {{-- Reply Form --}}
+                            @if(!$disc->is_closed)
+                            <div class="flex gap-2 border-t border-gray-200 pt-3">
+                                <input wire:model="replyMessage"
+                                       wire:keydown.enter="sendReply"
+                                       type="text"
+                                       placeholder="Tulis balasan..."
+                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <button wire:click="sendReply" type="button"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition flex-shrink-0">
+                                    <span wire:loading.remove wire:target="sendReply">Kirim</span>
+                                    <span wire:loading wire:target="sendReply">...</span>
+                                </button>
+                            </div>
+                            @else
+                            <p class="text-xs text-gray-400 italic border-t border-gray-200 pt-3 text-center">Diskusi ini telah ditutup oleh editor.</p>
+                            @endif
+                        </div>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             {{-- LOA & Payment Info --}}
             @if($paper->loa_url)
             <div class="bg-green-50 border border-green-200 rounded-xl p-6">
