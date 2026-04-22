@@ -46,8 +46,26 @@ class Payment extends Model
     public static function generateInvoiceNumber(): string
     {
         $prefix = 'INV-' . date('Ymd');
-        $last = self::where('invoice_number', 'like', $prefix . '%')->count();
-        return $prefix . '-' . str_pad($last + 1, 4, '0', STR_PAD_LEFT);
+        $lastPayment = self::where('invoice_number', 'like', $prefix . '%')
+                           ->orderBy('id', 'desc')
+                           ->first();
+                           
+        if ($lastPayment) {
+            $lastNumber = (int) substr($lastPayment->invoice_number, strrpos($lastPayment->invoice_number, '-') + 1);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+        
+        $invoiceNumber = $prefix . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        
+        // Loop just to be absolutely sure in case of edge cases
+        while (self::where('invoice_number', $invoiceNumber)->exists()) {
+            $newNumber++;
+            $invoiceNumber = $prefix . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        }
+        
+        return $invoiceNumber;
     }
 
     public function getFormattedAmountAttribute(): string
