@@ -39,6 +39,15 @@ class FortifyServiceProvider extends ServiceProvider
 
         // Custom authentication: allow login, redirect after based on payment status
         Fortify::authenticateUsing(function (Request $request) {
+            $inputCaptcha = $request->input('captcha_result');
+            $sessionCaptcha = $request->session()->get('captcha_answer');
+
+            if ($sessionCaptcha === null || (int)$inputCaptcha !== (int)$sessionCaptcha) {
+                throw ValidationException::withMessages([
+                    'captcha_result' => __('Hasil perhitungan matematika salah.'),
+                ]);
+            }
+
             $user = User::where('email', $request->email)->first();
 
             if ($user && Hash::check($request->password, $user->password)) {

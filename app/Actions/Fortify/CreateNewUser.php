@@ -65,6 +65,12 @@ class CreateNewUser implements CreatesNewUsers
             $rules['proof_of_payment'] = ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'];
         }
 
+        $rules['captcha_result'] = ['required', 'numeric', function ($attribute, $value, $fail) {
+            if ((int)$value !== (int)session()->get('register_captcha_answer')) {
+                $fail('Hasil perhitungan matematika salah.');
+            }
+        }];
+
         Validator::make($input, $rules)->validate();
 
         $data = [

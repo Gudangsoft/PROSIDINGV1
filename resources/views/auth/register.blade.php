@@ -474,6 +474,33 @@
                 </div>
             </div>
 
+            {{-- ── CAPTCHA Keamanan ────────────────────────────────────────────── --}}
+            @php
+                $num1 = rand(1, 9);
+                $num2 = rand(1, 9);
+                session()->put('register_captcha_answer', $num1 + $num2);
+            @endphp
+            <div class="px-8 pb-6 mb-6 mt-6 border-b border-gray-100">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Security Verification <span class="text-red-500">*</span></h3>
+                </div>
+                <label for="captcha_result" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Berapa hasil dari {{ $num1 }} + {{ $num2 }}?
+                </label>
+                <div class="relative max-w-sm">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3l-3-3m-6 6h.01M9 17h.01M9 14h.01h0m6-6h-6m6 0v2l-3 3"/></svg>
+                    </span>
+                    <input id="captcha_result" type="number" name="captcha_result" required
+                        class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition @error('captcha_result') border-red-400 bg-red-50 @enderror"
+                        placeholder="Masukkan hasil">
+                </div>
+                @error('captcha_result')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+
             {{-- ── Submit Button ─────────────────────────────────────────────── --}}
             <div class="px-8 pb-8">
                 <button type="submit"

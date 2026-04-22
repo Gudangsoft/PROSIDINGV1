@@ -35,6 +35,21 @@
             @enderror
         </div>
 
+        <div class="mb-5">
+            @php
+                $num1 = rand(1, 9);
+                $num2 = rand(1, 9);
+                session()->put('captcha_answer', $num1 + $num2);
+            @endphp
+            <label for="captcha_result" class="block text-base font-medium text-gray-700 mb-2">Berapa hasil dari {{ $num1 }} + {{ $num2 }}? <span class="text-red-500">*</span></label>
+            <input id="captcha_result" type="number" name="captcha_result" required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition @error('captcha_result') border-red-500 @enderror"
+                placeholder="Masukkan hasil perhitungan">
+            @error('captcha_result')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
         <div class="flex items-center justify-between mb-6">
             <label class="flex items-center cursor-pointer">
                 <input type="checkbox" name="remember" class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
