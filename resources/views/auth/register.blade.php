@@ -44,8 +44,32 @@
 
     {{-- Form Card --}}
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data"
+            x-ref="registerFormEl"
+            @submit.prevent="validateAndSubmit($refs.registerFormEl)">
             @csrf
+
+            {{-- ── Error Summary Panel ──────────────────────────────────── --}}
+            <div x-show="showErrors" x-transition x-ref="errorPanel"
+                class="mx-8 mt-6 bg-red-50 border border-red-300 rounded-xl overflow-hidden" style="display:none">
+                <div class="bg-red-500 px-5 py-3 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <p class="font-bold text-white text-sm">Harap lengkapi field berikut sebelum mendaftar:</p>
+                </div>
+                <ul class="px-5 py-4 space-y-2">
+                    <template x-for="(err, idx) in errors" :key="idx">
+                        <li class="flex items-start gap-2 text-red-700 text-sm">
+                            <svg class="w-4 h-4 shrink-0 mt-0.5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            <span x-text="err" class="font-medium"></span>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+
             @if($preselectedPackage)
             <input type="hidden" name="registration_package_id" value="{{ $preselectedPackage->id }}">
             @endif
@@ -303,7 +327,7 @@
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                             </span>
-                            <input id="research_interest" type="text" name="research_interest" value="{{ old('research_interest') }}"
+                            <input id="research_interest" type="text" name="research_interest" value="{{ old('research_interest') }}" required
                                 placeholder="e.g. Pharmaceutical Technology, Pharmacology, etc."
                                 class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition @error('research_interest') border-red-400 bg-red-50 @enderror">
                         </div>
@@ -525,7 +549,11 @@ function registerForm(defaultRole, packageAmount, isFree) {
         packageAmount: packageAmount || null,
         isFree: isFree || false,
         paymentPreview: null,
-        
+
+        // Validation state
+        errors: [],
+        showErrors: false,
+
         // Signature canvas properties
         signatureData: '',
         isDrawingSignature: false,
@@ -544,6 +572,119 @@ function registerForm(defaultRole, packageAmount, isFree) {
                     this.signatureCtx.lineJoin = 'round';
                 }
             });
+        },
+
+        // ── Validasi sebelum submit ──────────────────────────────────────
+        validateAndSubmit(form) {
+            this.errors = [];
+
+            // 1. Kategori pendaftaran (role)
+            const roleInputs = document.querySelectorAll('[name="role"]');
+            const roleChecked = document.querySelector('[name="role"]:checked');
+            if (roleInputs.length > 0 && !roleChecked) {
+                this.errors.push('Kategori Pendaftaran (Author / Participant) belum dipilih');
+            }
+
+            // 2. Jenis Peserta (participant_type_id) — hanya jika section tampil
+            const ptInputs = document.querySelectorAll('[name="participant_type_id"]');
+            if (ptInputs.length > 0) {
+                const ptChecked = document.querySelector('[name="participant_type_id"]:checked');
+                if (!ptChecked) {
+                    this.errors.push('Jenis Peserta (To Register as) belum dipilih');
+                }
+            }
+
+            // 3. Full Name
+            const nameEl = document.getElementById('name');
+            if (!nameEl || !nameEl.value.trim()) {
+                this.errors.push('Full Name belum diisi');
+            }
+
+            // 4. Gender
+            const genderEl = document.getElementById('gender');
+            if (!genderEl || !genderEl.value) {
+                this.errors.push('Gender belum dipilih');
+            }
+
+            // 5. Institution
+            const institutionEl = document.getElementById('institution');
+            if (!institutionEl || !institutionEl.value.trim()) {
+                this.errors.push('Institution / University belum diisi');
+            }
+
+            // 6. Country
+            const countryEl = document.getElementById('country');
+            if (!countryEl || !countryEl.value) {
+                this.errors.push('Country belum dipilih');
+            }
+
+            // 7. Email
+            const emailEl = document.getElementById('email');
+            if (!emailEl || !emailEl.value.trim()) {
+                this.errors.push('Email belum diisi');
+            } else {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(emailEl.value.trim())) {
+                    this.errors.push('Format Email tidak valid');
+                }
+            }
+
+            // 8. Phone
+            const phoneEl = document.getElementById('phone');
+            const phoneVal = phoneEl ? phoneEl.value.trim() : '';
+            if (!phoneEl || !phoneVal || phoneVal === '+62' || phoneVal === '') {
+                this.errors.push('Phone / WhatsApp Number belum diisi');
+            }
+
+            // 9. Research Interest
+            const riEl = document.getElementById('research_interest');
+            if (!riEl || !riEl.value.trim()) {
+                this.errors.push('Research Interest belum diisi');
+            }
+
+            // 10. Password
+            const pwdEl  = document.getElementById('password');
+            const pwdCEl = document.getElementById('password_confirmation');
+            if (!pwdEl || !pwdEl.value) {
+                this.errors.push('Password belum diisi');
+            } else if (pwdEl.value.length < 8) {
+                this.errors.push('Password minimal 8 karakter');
+            } else if (!pwdCEl || !pwdCEl.value) {
+                this.errors.push('Konfirmasi Password belum diisi');
+            } else if (pwdEl.value !== pwdCEl.value) {
+                this.errors.push('Password dan Konfirmasi Password tidak cocok');
+            }
+
+            // 11. Bukti Pembayaran — hanya jika field ada dan terlihat di DOM
+            const proofEl = document.getElementById('proof_of_payment');
+            if (proofEl) {
+                const proofSection = proofEl.closest('div[class*="grid"]') || proofEl.parentElement;
+                const isHidden = proofEl.offsetParent === null;
+                if (!isHidden && proofEl.files && proofEl.files.length === 0) {
+                    this.errors.push('Bukti Pembayaran (Payment Proof) belum diunggah');
+                }
+            }
+
+            // 12. Captcha
+            const captchaEl = document.getElementById('captcha_result');
+            if (!captchaEl || !captchaEl.value.trim()) {
+                this.errors.push('Security Verification (hasil perhitungan) belum diisi');
+            }
+
+            // Jika ada error, tampilkan panel dan scroll ke atas
+            if (this.errors.length > 0) {
+                this.showErrors = true;
+                this.$nextTick(() => {
+                    if (this.$refs.errorPanel) {
+                        this.$refs.errorPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+                return;
+            }
+
+            // Tidak ada error — sembunyikan panel dan submit form
+            this.showErrors = false;
+            form.submit();
         },
 
         getSignatureCoordinates(event) {

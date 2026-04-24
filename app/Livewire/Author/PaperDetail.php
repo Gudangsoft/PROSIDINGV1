@@ -7,6 +7,7 @@ use App\Models\PaperFile;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 class PaperDetail extends Component
@@ -40,39 +41,72 @@ class PaperDetail extends Component
 
     public function submitRevision()
     {
-        $this->validate([
-            'revisionFile' => 'required|file|mimes:pdf,doc,docx|max:10240',
-        ]);
+        // Pastikan file sudah di-upload sebelum validasi
+        if (! $this->revisionFile) {
+            $this->addError('revisionFile', 'File revisi wajib dipilih.');
+            return;
+        }
 
-        $path = $this->revisionFile->store('papers/' . $this->paper->id . '/revisions', 'public');
-        PaperFile::create([
-            'paper_id' => $this->paper->id,
-            'type' => 'revision',
-            'file_path' => $path,
-            'original_name' => $this->revisionFile->getClientOriginalName(),
-            'mime_type' => $this->revisionFile->getMimeType(),
-            'file_size' => $this->revisionFile->getSize(),
-            'notes' => $this->revisionNotes,
-        ]);
+        // Cek apakah file temporary Livewire masih dapat diakses
+        try {
+            $tmpPath = $this->revisionFile->getRealPath();
+            if (! $tmpPath || ! file_exists($tmpPath)) {
+                $this->revisionFile = null;
+                $this->addError('revisionFile', 'File tidak ditemukan atau telah kadaluarsa. Silakan pilih ulang file revisi Anda.');
+                return;
+            }
+        } catch (\Exception $e) {
+            $this->revisionFile = null;
+            $this->addError('revisionFile', 'File tidak dapat diakses. Silakan pilih ulang file revisi Anda.');
+            return;
+        }
 
-        $this->paper->update(['status' => 'revised']);
-        
-        // Send notification to admins/editors
-        $adminIds = \App\Models\User::whereIn('role', ['admin', 'editor'])->pluck('id');
-        \App\Models\Notification::createForUsers(
-            $adminIds,
-            'info',
-            'Revisi Paper Diterima',
-            'Author telah mengupload revisi untuk paper "' . \Illuminate\Support\Str::limit($this->paper->title, 50) . '"',
-            route('admin.paper.detail', $this->paper),
-            'Lihat Paper'
-        );
-        
-        $this->revisionFile = null;
-        $this->revisionNotes = '';
-        $this->paper->refresh();
+        try {
+            $this->validate([
+                'revisionFile' => 'required|file|mimes:pdf,doc,docx|max:10240',
+            ]);
 
-        session()->flash('success', 'Revisi berhasil diunggah!');
+            $path = $this->revisionFile->store('papers/' . $this->paper->id . '/revisions', 'public');
+            PaperFile::create([
+                'paper_id'      => $this->paper->id,
+                'type'          => 'revision',
+                'file_path'     => $path,
+                'original_name' => $this->revisionFile->getClientOriginalName(),
+                'mime_type'     => $this->revisionFile->getMimeType(),
+                'file_size'     => $this->revisionFile->getSize(),
+                'notes'         => $this->revisionNotes,
+            ]);
+
+            $this->paper->update(['status' => 'revised']);
+
+            // Send notification to admins/editors
+            $adminIds = \App\Models\User::whereIn('role', ['admin', 'editor'])->pluck('id');
+            \App\Models\Notification::createForUsers(
+                $adminIds,
+                'info',
+                'Revisi Paper Diterima',
+                'Author telah mengupload revisi untuk paper "' . \Illuminate\Support\Str::limit($this->paper->title, 50) . '"',
+                route('admin.paper.detail', $this->paper),
+                'Lihat Paper'
+            );
+
+            $this->revisionFile = null;
+            $this->revisionNotes = '';
+            $this->paper->refresh();
+
+            session()->flash('success', 'Revisi berhasil diunggah!');
+
+        } catch (\League\Flysystem\UnableToRetrieveMetadata $e) {
+            // File temporary Livewire sudah expired / tidak dapat dibaca
+            Log::warning('submitRevision - file tmp expired: ' . $e->getMessage());
+            $this->revisionFile = null;
+            $this->addError('revisionFile', 'File tidak dapat diproses karena sudah kadaluarsa. Silakan pilih ulang file revisi Anda dan kirim kembali.');
+
+        } catch (\Exception $e) {
+            Log::error('submitRevision error: ' . $e->getMessage());
+            $this->revisionFile = null;
+            $this->addError('revisionFile', 'Terjadi kesalahan saat mengunggah file. Silakan coba lagi.');
+        }
     }
 
     public function submitVideoUrl()
