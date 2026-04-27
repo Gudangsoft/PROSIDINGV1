@@ -885,6 +885,27 @@ class PaperDetail extends Component
         session()->flash('success', $discussion->is_closed ? 'Diskusi ditutup.' : 'Diskusi dibuka kembali.');
     }
 
+    public function deleteFile(int $fileId)
+    {
+        try {
+            $file = \App\Models\PaperFile::findOrFail($fileId);
+            
+            // Delete from storage
+            if ($file->file_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($file->file_path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($file->file_path);
+            }
+            
+            $fileName = $file->original_name;
+            $file->delete();
+            
+            $this->paper->refresh();
+            session()->flash('success', "File '{$fileName}' berhasil dihapus.");
+        } catch (\Exception $e) {
+            \Log::error('Error deleting file: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menghapus file: ' . $e->getMessage());
+        }
+    }
+
     // ─── Helpers ───
     public function getWorkflowStageProperty(): string
     {

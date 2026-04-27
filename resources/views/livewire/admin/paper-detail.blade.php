@@ -115,8 +115,15 @@
                                             <p class="text-xs text-gray-400">{{ ucfirst(str_replace('_', ' ', $file->type)) }} &bull; {{ $file->created_at->format('M d, Y') }}</p>
                                         </div>
                                     </div>
-                                    <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank"
-                                        class="text-blue-600 text-xs hover:underline">Download</a>
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank"
+                                            class="text-blue-600 text-xs hover:underline">Download</a>
+                                        <button wire:click="deleteFile({{ $file->id }})" 
+                                            wire:confirm="Apakah Anda yakin ingin menghapus file ini? File akan dihapus permanen dari server."
+                                            type="button" class="text-red-500 hover:text-red-700 text-xs">
+                                            Hapus
+                                        </button>
+                                    </div>
                                 </div>
                                 @endforeach
                             @else
@@ -260,14 +267,22 @@
                                                 @endif
                                             </div>
                                         </div>
-                                        <a href="{{ asset('storage/' . $rfile->file_path) }}" 
-                                           target="_blank" 
-                                           class="ml-3 flex-shrink-0 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700 transition-colors flex items-center gap-1.5 shadow-sm">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                            </svg>
-                                            Download
-                                        </a>
+                                        <div class="ml-3 flex flex-col items-end gap-2">
+                                            <a href="{{ asset('storage/' . $rfile->file_path) }}" 
+                                               target="_blank" 
+                                               class="flex-shrink-0 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700 transition-colors flex items-center gap-1.5 shadow-sm">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                </svg>
+                                                Download
+                                            </a>
+                                            <button wire:click="deleteFile({{ $rfile->id }})" 
+                                                wire:confirm="Hapus file revisi ini? Tindakan ini tidak dapat dibatalkan."
+                                                type="button" class="text-[10px] text-red-500 hover:text-red-700 font-medium flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                Hapus File
+                                            </button>
+                                        </div>
                                     </div>
                                     @endforeach
                                 </div>
