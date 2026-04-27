@@ -17,10 +17,18 @@
             <div class="bg-white rounded-xl shadow-sm border p-6 sticky top-4">
                 <h3 class="font-semibold text-gray-800 mb-3">File Paper</h3>
                 @foreach($review->paper->files->sortByDesc('created_at') as $file)
-                <div class="p-3 bg-gray-50 rounded-lg mb-2">
-                    <p class="text-sm font-medium text-gray-800 truncate">{{ $file->original_name }}</p>
-                    <p class="text-xs text-gray-400">{{ ucfirst(str_replace('_',' ',$file->type)) }}</p>
-                    <a href="{{ asset('storage/'.$file->file_path) }}" target="_blank" class="text-blue-600 text-xs font-medium">Download</a>
+                <div class="p-3 {{ $file->type === 'revision' ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50' }} rounded-lg mb-2">
+                    <div class="flex items-center gap-2 mb-1">
+                        @if($file->type === 'revision')
+                            <span class="px-1.5 py-0.5 bg-amber-500 text-white text-[9px] font-bold rounded uppercase">Revision</span>
+                        @endif
+                        <p class="text-sm font-medium text-gray-800 truncate">{{ $file->original_name }}</p>
+                    </div>
+                    <p class="text-[10px] text-gray-400">{{ $file->created_at->format('d M Y') }}</p>
+                    <a href="{{ asset('storage/'.$file->file_path) }}" target="_blank" class="text-blue-600 text-xs font-medium hover:underline flex items-center gap-1 mt-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Download
+                    </a>
                 </div>
                 @endforeach
 
