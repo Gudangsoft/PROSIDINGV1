@@ -170,6 +170,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/papers', AuthorPaperList::class)->name('author.papers');
         Route::get('/papers/submit', SubmitPaper::class)->name('author.submit');
         Route::get('/papers/{paper}', AuthorPaperDetail::class)->name('author.paper.detail');
+        Route::post('/papers/{paper}/revision', [\App\Http\Controllers\Author\RevisionController::class, 'upload'])->name('author.paper.revision');
         Route::get('/papers/{paper}/payment', PaymentUpload::class)->name('author.paper.payment');
         Route::get('/papers/{paper}/deliverables', DeliverableUpload::class)->name('author.paper.deliverables');
         Route::get('/loa', LoaList::class)->name('author.loa');
