@@ -211,6 +211,98 @@
                     </div>
 
                     {{-- Reviewers Section --}}
+                    
+                    {{-- ── Revision Files from Author ── --}}
+                    @php
+                        $revisionFiles = $paper->files->where('type', 'revision')->sortByDesc('created_at');
+                    @endphp
+                    @if($revisionFiles->count() || in_array($paper->status, ['revision_required', 'revised']))
+                    <div class="border {{ $paper->status === 'revised' ? 'border-amber-400' : 'border-gray-200' }} rounded mb-5 overflow-hidden">
+                        <div class="flex items-center justify-between px-4 py-3 border-b {{ $paper->status === 'revised' ? 'border-amber-300 bg-amber-50' : 'border-gray-100 bg-gray-50' }}">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 {{ $paper->status === 'revised' ? 'text-amber-600' : 'text-gray-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <h3 class="text-sm font-bold {{ $paper->status === 'revised' ? 'text-amber-800' : 'text-gray-800' }}">
+                                    Revision Files from Author
+                                </h3>
+                                @if($paper->status === 'revised')
+                                    <span class="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-full animate-pulse">NEW REVISION</span>
+                                @endif
+                            </div>
+                            <span class="text-xs {{ $paper->status === 'revised' ? 'text-amber-600' : 'text-gray-400' }}">
+                                {{ $revisionFiles->count() }} file(s)
+                            </span>
+                        </div>
+                        <div class="p-4 bg-white">
+                            @if($revisionFiles->count())
+                                <div class="space-y-3 mb-4">
+                                    @foreach($revisionFiles as $rfile)
+                                    <div class="flex items-start justify-between p-3 bg-gray-50 border border-gray-100 rounded-lg hover:border-amber-200 transition-colors">
+                                        <div class="flex items-start gap-3 min-w-0">
+                                            <div class="w-10 h-10 bg-red-100 rounded flex items-center justify-center flex-shrink-0">
+                                                <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                                                    <path d="M14 2v6h6" fill="none" stroke="white" stroke-width="1"/>
+                                                </svg>
+                                            </div>
+                                            <div class="min-w-0">
+                                                <p class="text-sm font-medium text-gray-800 truncate">{{ $rfile->original_name }}</p>
+                                                <p class="text-[11px] text-gray-500 mt-0.5">
+                                                    {{ $rfile->file_size_human }} &bull;
+                                                    {{ $rfile->created_at->format('d M Y, H:i') }}
+                                                </p>
+                                                @if($rfile->notes)
+                                                    <div class="mt-2 text-xs text-gray-700 bg-white border border-gray-100 p-2 rounded shadow-sm italic">
+                                                        <span class="text-[10px] font-bold text-gray-400 block mb-1 uppercase tracking-wider">Author Notes:</span>
+                                                        "{{ $rfile->notes }}"
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <a href="{{ asset('storage/' . $rfile->file_path) }}" 
+                                           target="_blank" 
+                                           class="ml-3 flex-shrink-0 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700 transition-colors flex items-center gap-1.5 shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            Download
+                                        </a>
+                                    </div>
+                                    @endforeach
+                                </div>
+
+                                {{-- Action Buttons --}}
+                                @if($paper->status === 'revised')
+                                <div class="border-t border-gray-100 pt-4 mt-4">
+                                    <div class="flex flex-col sm:flex-row gap-2">
+                                        <button wire:click="acceptSubmission" type="button" 
+                                            class="flex-1 py-2.5 bg-green-600 text-white rounded text-xs font-bold hover:bg-green-700 transition-colors cursor-pointer flex items-center justify-center gap-2">
+                                            <span wire:loading.remove wire:target="acceptSubmission">✓ Accept Revision</span>
+                                            <span wire:loading wire:target="acceptSubmission">Processing...</span>
+                                        </button>
+                                        <button wire:click="requestRevision" type="button" 
+                                            wire:confirm="Minta revisi lagi? Author akan diberitahu."
+                                            class="flex-1 py-2.5 bg-amber-500 text-white rounded text-xs font-bold hover:bg-amber-600 transition-colors cursor-pointer flex items-center justify-center gap-2">
+                                            <span wire:loading.remove wire:target="requestRevision">↺ Request More Revision</span>
+                                            <span wire:loading wire:target="requestRevision">Processing...</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                @endif
+                            @else
+                                <div class="text-center py-6 border-2 border-dashed border-gray-100 rounded-lg">
+                                    <svg class="w-10 h-10 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    <p class="text-xs text-gray-400 italic">No revision files uploaded yet.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Reviewers Section --}}
                     <div class="border border-gray-200 rounded mb-5">
                         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
                             <h3 class="text-sm font-bold text-gray-800">Reviewers</h3>
