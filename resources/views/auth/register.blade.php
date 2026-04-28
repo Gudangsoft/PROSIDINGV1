@@ -145,6 +145,12 @@
                 $availableParticipantTypes = $activeConference
                     ? $activeConference->participantTypes()->active()->orderBy('sort_order')->get()
                     : collect();
+                $allPackages = $activeConference
+                    ? \App\Models\RegistrationPackage::where('is_active', true)
+                        ->where('conference_id', $activeConference->id)
+                        ->orderBy('sort_order')
+                        ->get()
+                    : collect();
             @endphp
 
             {{-- ── SEKSI 1B: Jenis Peserta (hanya tampil jika tidak dikunci dari paket) ── --}}
@@ -164,7 +170,7 @@
                     <label class="relative flex items-start gap-3 border-2 px-4 py-3 cursor-pointer rounded-xl transition-all hover:shadow-md"
                         :class="selectedType == '{{ $pType->id }}' ? 'border-purple-500 bg-purple-50 shadow-sm' : 'border-gray-200 hover:border-purple-300'">
                         <input type="radio" name="participant_type_id" value="{{ $pType->id }}"
-                            x-model="selectedType"
+                            x-model="selectedType" @change="selectedPackageId = ''"
                             class="sr-only"
                             {{ old('participant_type_id') == $pType->id ? 'checked' : '' }}>
                         <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition"
@@ -189,6 +195,31 @@
                     @endforeach
                 </div>
                 @error('participant_type_id')<p class="text-red-500 text-xs mt-2">{{ $message }}</p>@enderror
+            </div>
+            @endif
+
+            {{-- ── SEKSI 1C: Paket Registrasi (Wajib untuk Partisipan) ── --}}
+            @if(!$preselectedPackage)
+            <div x-show="role === 'participant'" x-transition class="px-8 py-6 border-b border-gray-100 bg-teal-50/30">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Paket Registrasi <span class="text-red-500">*</span></h3>
+                </div>
+                <div class="relative">
+                    <select name="registration_package_id" x-model="selectedPackageId" @change="updatePackageDetails"
+                        class="w-full px-4 py-3 border border-teal-300 rounded-xl text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition bg-white @error('registration_package_id') border-red-400 bg-red-50 @enderror">
+                        <option value="">-- Pilih Paket Registrasi --</option>
+                        <template x-for="pkg in filteredPackages" :key="pkg.id">
+                            <option :value="pkg.id" x-text="pkg.name + ' — ' + (pkg.is_free ? 'GRATIS' : pkg.currency + ' ' + Number(pkg.price).toLocaleString('id-ID'))"></option>
+                        </template>
+                    </select>
+                </div>
+                <p class="text-xs text-teal-600 mt-2">Pilih paket registrasi yang sesuai dengan jenis peserta Anda.</p>
+                @error('registration_package_id')<p class="text-red-500 text-xs mt-2">{{ $message }}</p>@enderror
             </div>
             @endif
 
@@ -546,9 +577,28 @@
 function registerForm(defaultRole, packageAmount, isFree) {
     return {
         role: defaultRole || '{{ old('role', 'author') }}',
+        selectedType: '{{ old('participant_type_id') }}',
+        selectedPackageId: '{{ old('registration_package_id') }}',
         packageAmount: packageAmount || null,
         isFree: isFree || false,
         paymentPreview: null,
+        packages: @json($allPackages ?? []),
+
+        get filteredPackages() {
+            if (!this.selectedType) return this.packages.filter(p => !p.participant_type_id);
+            return this.packages.filter(p => !p.participant_type_id || String(p.participant_type_id) === String(this.selectedType));
+        },
+
+        updatePackageDetails() {
+            const pkg = this.packages.find(p => String(p.id) === String(this.selectedPackageId));
+            if (pkg) {
+                this.isFree = pkg.is_free;
+                this.packageAmount = pkg.price;
+            } else {
+                this.isFree = false;
+                this.packageAmount = null;
+            }
+        },
 
         // Validation state
         errors: [],
@@ -587,10 +637,19 @@ function registerForm(defaultRole, packageAmount, isFree) {
 
             // 2. Jenis Peserta (participant_type_id) — hanya jika section tampil
             const ptInputs = document.querySelectorAll('[name="participant_type_id"]');
-            if (ptInputs.length > 0) {
+            if (ptInputs.length > 0 && this.role === 'participant') {
                 const ptChecked = document.querySelector('[name="participant_type_id"]:checked');
-                if (!ptChecked) {
+                if (!ptChecked && !document.querySelector('input[name="participant_type_id"][type="hidden"]')) {
                     this.errors.push('Jenis Peserta (To Register as) belum dipilih');
+                }
+            }
+
+            // 2B. Paket Registrasi (registration_package_id) — wajib jika partisipan
+            if (this.role === 'participant') {
+                const pkgSelect = document.querySelector('select[name="registration_package_id"]');
+                const pkgHidden = document.querySelector('input[name="registration_package_id"][type="hidden"]');
+                if (!pkgHidden && pkgSelect && !pkgSelect.value) {
+                    this.errors.push('Paket Registrasi belum dipilih');
                 }
             }
 

@@ -240,18 +240,24 @@
 
         /* ── Footer: signatures + cert number + QR ── */
         .cert-footer {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
             width: 100%;
             border-top: 0.5mm solid #c9a227;
             padding-top: 3mm;
+            margin-top: 5mm;
+        }
+        table.footer-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table.footer-table td {
+            vertical-align: bottom;
+            text-align: center;
         }
 
-        /* Cert number (left) */
+        /* Cert number (center under QR) */
         .cert-number-block {
-            text-align: left;
-            min-width: 55mm;
+            text-align: center;
+            margin-top: 2mm;
         }
         .cert-number-block .label {
             font-size: 6.5pt;
@@ -266,16 +272,10 @@
             font-family: 'Courier New', monospace;
         }
 
-        /* Signatures (center) */
-        .signatures {
-            display: flex;
-            gap: 20mm;
-            justify-content: center;
-            flex: 1;
-        }
+        /* Signatures */
         .sig-box {
             text-align: center;
-            width: 45mm;
+            width: 100%;
         }
         .sig-box .sig-title {
             font-size: 8pt;
@@ -453,51 +453,56 @@
 
         {{-- Footer --}}
         <div class="cert-footer">
+            <table class="footer-table">
+                <tr>
+                    {{-- Left Signature --}}
+                    <td style="width: 33%;">
+                        <div class="sig-box">
+                            <div class="sig-title">Chairperson</div>
+                            @if($conference && $conference->chairman_signature && file_exists(public_path('storage/' . $conference->chairman_signature)))
+                                <img src="{{ public_path('storage/' . $conference->chairman_signature) }}" class="sig-img" alt="Signature">
+                            @elseif(file_exists(public_path('storage/signatures/chairman.png')))
+                                <img src="{{ public_path('storage/signatures/chairman.png') }}" class="sig-img" alt="Signature">
+                            @else
+                                <div class="sig-spacer"></div>
+                            @endif
+                            <div class="sig-line"></div>
+                            <div class="sig-name">{{ $conference->chairman_name ?? $conference->organizer ?? 'Chairperson' }}</div>
+                            <div class="sig-role">{{ $conference->chairman_title ?? 'Conference Chair' }}</div>
+                        </div>
+                    </td>
 
-            {{-- Cert number (left) --}}
-            <div class="cert-number-block">
-                <div class="label">Certificate No.</div>
-                <div class="number">{{ $certNumber }}</div>
-                <div class="label" style="margin-top:1mm;">Issued: {{ $generatedDate->format('d F Y') }}</div>
-            </div>
+                    {{-- Center QR Code & Cert Number --}}
+                    <td style="width: 33%;">
+                        <div class="qr-block">
+                            <img src="{{ $qrCode }}" alt="QR Verify">
+                            <div class="qr-label">Scan to verify</div>
+                        </div>
+                        <div class="cert-number-block">
+                            <div class="label">Certificate No.</div>
+                            <div class="number">{{ $certNumber }}</div>
+                            <div class="label" style="margin-top:1mm;">Issued: {{ $generatedDate->format('d F Y') }}</div>
+                        </div>
+                    </td>
 
-            {{-- Signatures (center) --}}
-            <div class="signatures">
-                <div class="sig-box">
-                    <div class="sig-title">Chairperson</div>
-                    @if($conference && $conference->chairman_signature && file_exists(public_path('storage/' . $conference->chairman_signature)))
-                        <img src="{{ public_path('storage/' . $conference->chairman_signature) }}" class="sig-img" alt="Signature">
-                    @elseif(file_exists(public_path('storage/signatures/chairman.png')))
-                        <img src="{{ public_path('storage/signatures/chairman.png') }}" class="sig-img" alt="Signature">
-                    @else
-                        <div class="sig-spacer"></div>
-                    @endif
-                    <div class="sig-line"></div>
-                    <div class="sig-name">{{ $conference->chairman_name ?? $conference->organizer ?? 'Chairperson' }}</div>
-                    <div class="sig-role">{{ $conference->chairman_title ?? 'Conference Chair' }}</div>
-                </div>
-
-                <div class="sig-box">
-                    <div class="sig-title">Secretary</div>
-                    @if($conference && $conference->secretary_signature && file_exists(public_path('storage/' . $conference->secretary_signature)))
-                        <img src="{{ public_path('storage/' . $conference->secretary_signature) }}" class="sig-img" alt="Signature">
-                    @elseif(file_exists(public_path('storage/signatures/secretary.png')))
-                        <img src="{{ public_path('storage/signatures/secretary.png') }}" class="sig-img" alt="Signature">
-                    @else
-                        <div class="sig-spacer"></div>
-                    @endif
-                    <div class="sig-line"></div>
-                    <div class="sig-name">{{ $conference->secretary_name ?? 'Conference Secretary' }}</div>
-                    <div class="sig-role">{{ $conference->secretary_title ?? ($conference ? $conference->name : 'Conference') }}</div>
-                </div>
-            </div>
-
-            {{-- QR Code (right) --}}
-            <div class="qr-block">
-                <img src="{{ $qrCode }}" alt="QR Verify">
-                <div class="qr-label">Scan to verify</div>
-            </div>
-
+                    {{-- Right Signature --}}
+                    <td style="width: 33%;">
+                        <div class="sig-box">
+                            <div class="sig-title">Secretary</div>
+                            @if($conference && $conference->secretary_signature && file_exists(public_path('storage/' . $conference->secretary_signature)))
+                                <img src="{{ public_path('storage/' . $conference->secretary_signature) }}" class="sig-img" alt="Signature">
+                            @elseif(file_exists(public_path('storage/signatures/secretary.png')))
+                                <img src="{{ public_path('storage/signatures/secretary.png') }}" class="sig-img" alt="Signature">
+                            @else
+                                <div class="sig-spacer"></div>
+                            @endif
+                            <div class="sig-line"></div>
+                            <div class="sig-name">{{ $conference->secretary_name ?? 'Conference Secretary' }}</div>
+                            <div class="sig-role">{{ $conference->secretary_title ?? ($conference ? $conference->name : 'Conference') }}</div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div><!-- /.content-area -->
 </div><!-- /.page -->
