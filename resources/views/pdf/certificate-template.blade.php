@@ -387,7 +387,7 @@
     <div class="side-text-right">{{ $conference->acronym ?? config('app.name') }} &bull; {{ now()->year }}</div>
 
     {{-- ── Main content ── --}}
-    <div class="content-area" @if($isBanner) style="top: 45mm;" @endif>
+    <div class="content-area" @if($isBanner) style="top: 60mm;" @endif>
 
         {{-- Header (Standard Logo & Text) --}}
         @if(!$isBanner)
