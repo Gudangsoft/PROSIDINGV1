@@ -114,22 +114,23 @@
             border-bottom: 0.5mm solid #c9a227;
             padding-bottom: 3mm;
         }
-        .header.full-banner {
-            flex-direction: column;
-            padding: 0;
-            border: none;
-            gap: 0;
-            margin-bottom: 5px;
-        }
         .header img.logo {
             height: 14mm;
             object-fit: contain;
         }
-        .header.full-banner img.logo {
-            height: auto;
+        .full-width-banner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 297mm;
+            z-index: 10;
+        }
+        .full-width-banner img {
             width: 100%;
-            max-height: 30mm;
-            margin-bottom: 0;
+            height: auto;
+            max-height: 45mm;
+            object-fit: cover;
+            display: block;
         }
         .header-text {
             text-align: center;
@@ -349,21 +350,35 @@
 <body>
 <div class="page">
 
+    @php
+        $headerLogo = $conference->loa_header_logo ?? $conference->logo ?? null;
+        $isBanner = $conference && $conference->loa_header_logo;
+    @endphp
+
+    {{-- Full Width Banner --}}
+    @if($isBanner && $headerLogo)
+        <div class="full-width-banner">
+            <img src="{{ public_path('storage/' . $headerLogo) }}" alt="Banner">
+        </div>
+    @endif
+
     {{-- Background panels --}}
     <div class="bg-left"></div>
     <div class="bg-right"></div>
-    <div class="bg-top"></div>
+    @if(!$isBanner) <div class="bg-top"></div> @endif
     <div class="bg-bottom"></div>
 
     {{-- Gold lines --}}
     <div class="gold-line-v-left"></div>
     <div class="gold-line-v-right"></div>
-    <div class="gold-line-h-top"></div>
+    @if(!$isBanner) <div class="gold-line-h-top"></div> @endif
     <div class="gold-line-h-bottom"></div>
 
     {{-- Corner diamonds --}}
+    @if(!$isBanner)
     <div class="corner corner-tl"></div>
     <div class="corner corner-tr"></div>
+    @endif
     <div class="corner corner-bl"></div>
     <div class="corner corner-br"></div>
 
@@ -372,18 +387,14 @@
     <div class="side-text-right">{{ $conference->acronym ?? config('app.name') }} &bull; {{ now()->year }}</div>
 
     {{-- ── Main content ── --}}
-    <div class="content-area">
+    <div class="content-area" @if($isBanner) style="top: 45mm;" @endif>
 
-        {{-- Header --}}
-        @php
-            $headerLogo = $conference->loa_header_logo ?? $conference->logo ?? null;
-            $isBanner = $conference && $conference->loa_header_logo;
-        @endphp
-        <div class="header {{ $isBanner ? 'full-banner' : '' }}">
+        {{-- Header (Standard Logo & Text) --}}
+        @if(!$isBanner)
+        <div class="header">
             @if($headerLogo)
                 <img class="logo" src="{{ public_path('storage/' . $headerLogo) }}" alt="Logo">
             @endif
-            @if(!$isBanner)
             <div class="header-text">
                 <div class="org-name">
                     @if($conference){{ $conference->name }}@else{{ config('app.name') }}@endif
@@ -402,8 +413,8 @@
                     </div>
                 @endif
             </div>
-            @endif
         </div>
+        @endif
 
         {{-- Certificate title --}}
         <div class="cert-label">

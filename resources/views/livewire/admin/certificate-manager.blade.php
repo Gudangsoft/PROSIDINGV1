@@ -267,12 +267,18 @@
                 </svg>
                 <span class="text-xs text-amber-700">Preview menggunakan data dummy. Klik "Buka Preview PDF" untuk melihat tampilan lengkap.</span>
             </div>
-            <iframe
-                src="{{ route('admin.certificate.preview', ['conference' => $conference->id, 'type' => $previewType]) }}"
+            <object
+                data="{{ route('admin.certificate.preview', ['conference' => $conference->id, 'type' => $previewType]) }}#view=FitH"
+                type="application/pdf"
                 class="w-full"
-                style="height: 560px;"
-                loading="lazy">
-            </iframe>
+                style="height: 560px;">
+                <div class="p-8 text-center bg-gray-50">
+                    <p class="text-gray-500 mb-2">Browser Anda tidak mendukung preview PDF langsung.</p>
+                    <a href="{{ route('admin.certificate.preview', ['conference' => $conference->id, 'type' => $previewType]) }}"
+                       target="_blank"
+                       class="text-blue-600 hover:underline font-medium">Klik di sini untuk melihat PDF</a>
+                </div>
+            </object>
         </div>
 
         {{-- Info cards --}}
