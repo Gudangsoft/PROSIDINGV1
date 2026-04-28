@@ -44,6 +44,21 @@ class PaymentProof extends Component
             
             // Load payment methods from conference
             $this->paymentMethods = $conference->payment_methods ?? [];
+            
+            // Fallback to legacy payment fields if paymentMethods is empty but legacy fields exist
+            if (empty($this->paymentMethods) && !empty($conference->payment_bank_name) && !empty($conference->payment_bank_account)) {
+                $this->paymentMethods = [
+                    [
+                        'type' => 'Bank Transfer',
+                        'name' => $conference->payment_bank_name,
+                        'account_number' => $conference->payment_bank_account,
+                        'account_holder' => $conference->payment_account_holder,
+                        'instructions' => $conference->payment_instructions,
+                        'amount' => null,
+                        'is_active' => true,
+                    ]
+                ];
+            }
         }
 
         // If payment exists, pre-select the package
