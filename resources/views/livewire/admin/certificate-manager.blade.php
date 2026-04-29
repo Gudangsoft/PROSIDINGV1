@@ -320,19 +320,39 @@
                 <h3 class="font-semibold text-lg">Generate Sertifikat Massal</h3>
                 <p class="text-blue-100 text-sm mt-0.5">Buat sertifikat otomatis untuk semua presenter yang sudah diverifikasi pembayarannya.</p>
             </div>
-            <button wire:click="batchGenerate"
-                    wire:confirm="Generate sertifikat untuk semua presenter yang memenuhi syarat?"
-                    wire:loading.attr="disabled"
-                    class="flex items-center gap-2 px-5 py-2.5 bg-white text-blue-700 rounded-lg text-sm font-semibold hover:bg-blue-50 transition shrink-0 ml-4 disabled:opacity-60">
-                <span wire:loading.remove wire:target="batchGenerate">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                </span>
-                <span wire:loading wire:target="batchGenerate">
-                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" class="opacity-75"/></svg>
-                </span>
-                <span wire:loading.remove wire:target="batchGenerate">Generate Sekarang</span>
-                <span wire:loading wire:target="batchGenerate">Memproses...</span>
-            </button>
+            <div class="flex items-center gap-3 shrink-0 ml-4">
+                {{-- Tarik Semua --}}
+                @if($certificates->count() > 0)
+                <button wire:click="revokeAllCertificates"
+                        wire:confirm="⚠️ Tarik SEMUA {{ $certificates->count() }} sertifikat? File akan dihapus permanen dan peserta tidak dapat mengaksesnya lagi. Lanjutkan?"
+                        wire:loading.attr="disabled"
+                        class="flex items-center gap-2 px-4 py-2.5 bg-red-500 bg-opacity-90 text-white border border-red-300 border-opacity-40 rounded-lg text-sm font-semibold hover:bg-red-600 transition disabled:opacity-60">
+                    <span wire:loading.remove wire:target="revokeAllCertificates">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </span>
+                    <span wire:loading wire:target="revokeAllCertificates">
+                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" class="opacity-75"/></svg>
+                    </span>
+                    <span wire:loading.remove wire:target="revokeAllCertificates">Tarik Semua</span>
+                    <span wire:loading wire:target="revokeAllCertificates">Menarik...</span>
+                </button>
+                @endif
+
+                {{-- Generate Sekarang --}}
+                <button wire:click="batchGenerate"
+                        wire:confirm="Generate sertifikat untuk semua presenter yang memenuhi syarat?"
+                        wire:loading.attr="disabled"
+                        class="flex items-center gap-2 px-5 py-2.5 bg-white text-blue-700 rounded-lg text-sm font-semibold hover:bg-blue-50 transition disabled:opacity-60">
+                    <span wire:loading.remove wire:target="batchGenerate">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    </span>
+                    <span wire:loading wire:target="batchGenerate">
+                        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" class="opacity-75"/></svg>
+                    </span>
+                    <span wire:loading.remove wire:target="batchGenerate">Generate Sekarang</span>
+                    <span wire:loading wire:target="batchGenerate">Memproses...</span>
+                </button>
+            </div>
         </div>
 
         @if(!empty($batchStats))
@@ -391,13 +411,33 @@
                                 {{ $cert->sent_at?->format('d/m/Y') ?? '—' }}
                             </td>
                             <td class="px-4 py-3 text-right">
-                                <a href="{{ Storage::url($cert->file_path) }}" target="_blank"
-                                   class="inline-flex items-center gap-1 text-xs px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition font-medium">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                    </svg>
-                                    Download
-                                </a>
+                                <div class="flex items-center justify-end gap-2">
+                                    {{-- Download --}}
+                                    <a href="{{ Storage::url($cert->file_path) }}" target="_blank"
+                                       class="inline-flex items-center gap-1 text-xs px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition font-medium">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                        </svg>
+                                        Download
+                                    </a>
+
+                                    {{-- Tarik Ulang --}}
+                                    <button wire:click="revokeCertificate({{ $cert->id }})"
+                                            wire:confirm="Tarik sertifikat milik {{ $cert->user->name ?? 'peserta ini' }}? File akan dihapus permanen."
+                                            wire:loading.attr="disabled"
+                                            class="inline-flex items-center gap-1 text-xs px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium border border-red-100"
+                                            title="Tarik ulang sertifikat">
+                                        <span wire:loading.remove wire:target="revokeCertificate({{ $cert->id }})">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </span>
+                                        <span wire:loading wire:target="revokeCertificate({{ $cert->id }})">
+                                            <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" class="opacity-75"/></svg>
+                                        </span>
+                                        Tarik
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         @endforeach

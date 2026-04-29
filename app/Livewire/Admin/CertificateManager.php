@@ -168,6 +168,58 @@ class CertificateManager extends Component
         $this->batchLoading = false;
     }
 
+    /**
+     * Tarik (hapus) satu sertifikat berdasarkan ID Deliverable.
+     */
+    public function revokeCertificate(int $deliverableId): void
+    {
+        $cert = Deliverable::find($deliverableId);
+
+        if (! $cert || $cert->type !== 'certificate') {
+            $this->errorMessage = 'Sertifikat tidak ditemukan.';
+            return;
+        }
+
+        // Hapus file fisik jika ada
+        if ($cert->file_path && Storage::disk('public')->exists($cert->file_path)) {
+            Storage::disk('public')->delete($cert->file_path);
+        }
+
+        $cert->delete();
+
+        $this->successMessage = 'Sertifikat berhasil ditarik.';
+        $this->errorMessage   = '';
+    }
+
+    /**
+     * Tarik semua sertifikat untuk konferensi yang dipilih.
+     */
+    public function revokeAllCertificates(): void
+    {
+        if (! $this->conference) {
+            $this->errorMessage = 'Pilih konferensi terlebih dahulu.';
+            return;
+        }
+
+        $certs = Deliverable::where('type', 'certificate')
+            ->where('direction', 'admin_send')
+            ->whereHas('paper', fn ($q) => $q->where('conference_id', $this->conference->id))
+            ->get();
+
+        $count = 0;
+        foreach ($certs as $cert) {
+            if ($cert->file_path && Storage::disk('public')->exists($cert->file_path)) {
+                Storage::disk('public')->delete($cert->file_path);
+            }
+            $cert->delete();
+            $count++;
+        }
+
+        $this->batchStats     = [];
+        $this->successMessage = "{$count} sertifikat berhasil ditarik.";
+        $this->errorMessage   = '';
+    }
+
     public function getCertificatesProperty()
     {
         if (! $this->conference) {
