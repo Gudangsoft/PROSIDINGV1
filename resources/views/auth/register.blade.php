@@ -170,7 +170,7 @@
                     <label class="relative flex items-start gap-3 border-2 px-4 py-3 cursor-pointer rounded-xl transition-all hover:shadow-md"
                         :class="selectedType == '{{ $pType->id }}' ? 'border-purple-500 bg-purple-50 shadow-sm' : 'border-gray-200 hover:border-purple-300'">
                         <input type="radio" name="participant_type_id" value="{{ $pType->id }}"
-                            x-model="selectedType" @change="selectedPackageId = ''"
+                            x-model="selectedType" @change="autoSelectPackage()"
                             class="sr-only"
                             {{ old('participant_type_id') == $pType->id ? 'checked' : '' }}>
                         <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition"
@@ -201,24 +201,72 @@
             {{-- ── SEKSI 1C: Paket Registrasi (Wajib untuk Partisipan) ── --}}
             @if(!$preselectedPackage)
             <div x-show="role === 'participant'" x-transition class="px-8 py-6 border-b border-gray-100 bg-teal-50/30">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                <input type="hidden" name="registration_package_id" :value="selectedPackageId">
+
+                {{-- Jika hanya 1 paket: tampilkan sebagai info terpilih otomatis --}}
+                <template x-if="filteredPackages.length === 1">
+                    <div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-gray-800">Paket Registrasi</h3>
+                        </div>
+                        <div class="flex items-center gap-3 px-4 py-3 bg-teal-50 border-2 border-teal-400 rounded-xl">
+                            <div class="w-2.5 h-2.5 rounded-full bg-teal-500 shrink-0"></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-semibold text-sm text-gray-800" x-text="filteredPackages[0].name"></p>
+                                <p class="text-xs text-teal-600 mt-0.5" x-text="filteredPackages[0].is_free ? 'GRATIS' : filteredPackages[0].currency + ' ' + Number(filteredPackages[0].price).toLocaleString('id-ID')"></p>
+                            </div>
+                            <span class="text-xs font-medium text-teal-700 bg-teal-100 px-2 py-1 rounded-full shrink-0">Terpilih Otomatis</span>
+                        </div>
                     </div>
-                    <h3 class="font-semibold text-gray-800">Paket Registrasi <span class="text-red-500">*</span></h3>
-                </div>
-                <div class="relative">
-                    <select name="registration_package_id" x-model="selectedPackageId" @change="updatePackageDetails"
-                        class="w-full px-4 py-3 border border-teal-300 rounded-xl text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition bg-white @error('registration_package_id') border-red-400 bg-red-50 @enderror">
-                        <option value="">-- Pilih Paket Registrasi --</option>
-                        <template x-for="pkg in filteredPackages" :key="pkg.id">
-                            <option :value="pkg.id" x-text="pkg.name + ' — ' + (pkg.is_free ? 'GRATIS' : pkg.currency + ' ' + Number(pkg.price).toLocaleString('id-ID'))"></option>
-                        </template>
-                    </select>
-                </div>
-                <p class="text-xs text-teal-600 mt-2">Pilih paket registrasi yang sesuai dengan jenis peserta Anda.</p>
+                </template>
+
+                {{-- Jika lebih dari 1 paket: tampilkan sebagai kartu pilihan --}}
+                <template x-if="filteredPackages.length > 1">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-gray-800">Paket Registrasi <span class="text-red-500">*</span></h3>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <template x-for="pkg in filteredPackages" :key="pkg.id">
+                                <label class="relative flex items-start gap-3 border-2 px-4 py-3 cursor-pointer rounded-xl transition-all hover:shadow-md"
+                                    :class="String(selectedPackageId) === String(pkg.id) ? 'border-teal-500 bg-teal-50 shadow-sm' : 'border-gray-200 hover:border-teal-300'">
+                                    <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition"
+                                        :class="String(selectedPackageId) === String(pkg.id) ? 'bg-teal-500' : 'bg-gray-100'">
+                                        <svg class="w-4 h-4 transition" :class="String(selectedPackageId) === String(pkg.id) ? 'text-white' : 'text-gray-400'"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-sm text-gray-800" x-text="pkg.name"></p>
+                                        <p class="text-xs mt-0.5"
+                                            :class="String(selectedPackageId) === String(pkg.id) ? 'text-teal-600' : 'text-gray-500'"
+                                            x-text="pkg.is_free ? 'GRATIS' : pkg.currency + ' ' + Number(pkg.price).toLocaleString('id-ID')"></p>
+                                    </div>
+                                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition"
+                                        :class="String(selectedPackageId) === String(pkg.id) ? 'border-teal-500' : 'border-gray-300'">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-teal-500 transition"
+                                            x-show="String(selectedPackageId) === String(pkg.id)"></div>
+                                    </div>
+                                    <input type="radio" class="sr-only"
+                                        :value="pkg.id"
+                                        @click="selectedPackageId = pkg.id; updatePackageDetails()">
+                                </label>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
                 @error('registration_package_id')<p class="text-red-500 text-xs mt-2">{{ $message }}</p>@enderror
             </div>
             @endif
@@ -587,6 +635,19 @@ function registerForm(defaultRole, packageAmount, isFree) {
         get filteredPackages() {
             if (!this.selectedType) return this.packages.filter(p => !p.participant_type_id);
             return this.packages.filter(p => !p.participant_type_id || String(p.participant_type_id) === String(this.selectedType));
+        },
+
+        autoSelectPackage() {
+            const filtered = this.filteredPackages;
+            if (filtered.length === 1) {
+                this.selectedPackageId = filtered[0].id;
+                this.isFree = filtered[0].is_free;
+                this.packageAmount = filtered[0].price;
+            } else {
+                this.selectedPackageId = '';
+                this.isFree = false;
+                this.packageAmount = null;
+            }
         },
 
         updatePackageDetails() {
