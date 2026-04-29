@@ -256,14 +256,7 @@
         {{-- Paper Meta --}}
         <div class="paper-meta">
             Paper ID: {{ $paper->id }}
-            @if($paper->authors_meta && is_array($paper->authors_meta))
-                &nbsp;&nbsp;&nbsp; Author(s): 
-                @foreach($paper->authors_meta as $index => $authorMeta)
-                    {{ $authorMeta['name'] ?? '' }}@if(!$loop->last), @endif
-                @endforeach
-            @else
-                &nbsp;&nbsp;&nbsp; Author(s): {{ $author->name }}
-            @endif
+            &nbsp;&nbsp;&nbsp; Author(s): {{ $author->name }}@if($paper->authors_meta && is_array($paper->authors_meta) && count($paper->authors_meta) > 0), @foreach($paper->authors_meta as $authorMeta){{ $authorMeta['name'] ?? '' }}@if(!$loop->last), @endif@endforeach@endif
         </div>
 
         {{-- Acceptance Text --}}
