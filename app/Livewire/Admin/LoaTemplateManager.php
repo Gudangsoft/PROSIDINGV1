@@ -3,6 +3,8 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Conference;
+use App\Models\Paper;
+use App\Services\DocumentGenerator;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -45,6 +47,10 @@ class LoaTemplateManager extends Component
     public string $activeTab = 'header';
     public string $successMessage = '';
     public string $errorMessage = '';
+    public bool $regenerating = false;
+    public int $regeneratedCount = 0;
+    public int $regenerateTotal = 0;
+    public int $regenerateFailed = 0;
 
     public function mount(): void
     {
@@ -271,6 +277,62 @@ class LoaTemplateManager extends Component
     private function getDefaultClosing(): string
     {
         return "We look forward to your valuable contribution and participation in the conference.";
+    }
+
+    public function regenerateAllLoa(): void
+    {
+        if (!$this->conference) {
+            $this->errorMessage = 'Pilih konferensi terlebih dahulu.';
+            return;
+        }
+
+        $acceptedStatuses = [
+            'accepted', 'payment_pending', 'payment_uploaded',
+            'payment_verified', 'deliverables_pending', 'completed',
+        ];
+
+        $papers = Paper::where('conference_id', $this->conference->id)
+            ->whereIn('status', $acceptedStatuses)
+            ->whereNotNull('loa_link')
+            ->where(function ($q) {
+                $q->where('loa_link', 'not like', 'http://%')
+                  ->where('loa_link', 'not like', 'https://%');
+            })
+            ->with('user')
+            ->get();
+
+        $this->regenerateTotal = $papers->count();
+        $this->regeneratedCount = 0;
+        $this->regenerateFailed = 0;
+        $this->successMessage = '';
+        $this->errorMessage = '';
+
+        if ($this->regenerateTotal === 0) {
+            $this->errorMessage = 'Tidak ada LOA yang dapat di-regenerate. Pastikan ada paper accepted dengan LOA yang sudah digenerate sebelumnya.';
+            return;
+        }
+
+        $generator = new DocumentGenerator();
+
+        foreach ($papers as $paper) {
+            try {
+                if ($paper->loa_link && Storage::disk('public')->exists($paper->loa_link)) {
+                    Storage::disk('public')->delete($paper->loa_link);
+                }
+
+                $newPath = $generator->generateLOA($paper);
+                $paper->update(['loa_link' => $newPath]);
+                $this->regeneratedCount++;
+            } catch (\Throwable $e) {
+                $this->regenerateFailed++;
+            }
+        }
+
+        if ($this->regenerateFailed === 0) {
+            $this->successMessage = "Berhasil regenerate {$this->regeneratedCount} LOA.";
+        } else {
+            $this->successMessage = "Selesai: {$this->regeneratedCount} berhasil, {$this->regenerateFailed} gagal dari total {$this->regenerateTotal} LOA.";
+        }
     }
 
     public function render()

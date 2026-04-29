@@ -256,7 +256,18 @@
         {{-- Paper Meta --}}
         <div class="paper-meta">
             Paper ID: {{ $paper->id }}
-            &nbsp;&nbsp;&nbsp; Author(s): {{ $author->name }}@if($paper->authors_meta && is_array($paper->authors_meta) && count($paper->authors_meta) > 0), @foreach($paper->authors_meta as $authorMeta){{ $authorMeta['name'] ?? '' }}@if(!$loop->last), @endif@endforeach@endif
+            &nbsp;&nbsp;&nbsp; Author(s):
+            @php
+                $allAuthors = [$author->name];
+                if ($paper->authors_meta && is_array($paper->authors_meta)) {
+                    foreach ($paper->authors_meta as $meta) {
+                        if (!empty($meta['name'])) {
+                            $allAuthors[] = $meta['name'];
+                        }
+                    }
+                }
+            @endphp
+            {{ implode(', ', $allAuthors) }}
         </div>
 
         {{-- Acceptance Text --}}
