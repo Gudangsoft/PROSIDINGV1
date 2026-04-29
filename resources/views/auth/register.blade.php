@@ -165,7 +165,7 @@
                     <h3 class="font-semibold text-gray-800">Jenis Peserta <span class="text-red-500">*</span></h3>
                 </div>
                 {{-- Selectable: user picks the participant type --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-data="{ selectedType: '{{ old('participant_type_id') }}' }">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     @foreach($availableParticipantTypes as $pType)
                     <label class="relative flex items-start gap-3 border-2 px-4 py-3 cursor-pointer rounded-xl transition-all hover:shadow-md"
                         :class="selectedType == '{{ $pType->id }}' ? 'border-purple-500 bg-purple-50 shadow-sm' : 'border-gray-200 hover:border-purple-300'">
