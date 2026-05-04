@@ -439,43 +439,60 @@
     <div class="space-y-5">
 
         {{-- Batch Generate Card --}}
-        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white p-5 flex items-center justify-between">
-            <div>
-                <h3 class="font-semibold text-lg">Generate Sertifikat Massal</h3>
-                <p class="text-blue-100 text-sm mt-0.5">Buat sertifikat otomatis untuk semua presenter yang sudah diverifikasi pembayarannya.</p>
-            </div>
-            <div class="flex items-center gap-3 shrink-0 ml-4">
-                {{-- Tarik Semua --}}
-                @if($certificates->count() > 0)
-                <button wire:click="revokeAllCertificates"
-                        wire:confirm="⚠️ Tarik SEMUA {{ $certificates->count() }} sertifikat? File akan dihapus permanen dan peserta tidak dapat mengaksesnya lagi. Lanjutkan?"
-                        wire:loading.attr="disabled"
-                        class="flex items-center gap-2 px-4 py-2.5 bg-red-500 bg-opacity-90 text-white border border-red-300 border-opacity-40 rounded-lg text-sm font-semibold hover:bg-red-600 transition disabled:opacity-60">
-                    <span wire:loading.remove wire:target="revokeAllCertificates">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                    </span>
-                    <span wire:loading wire:target="revokeAllCertificates">
-                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" class="opacity-75"/></svg>
-                    </span>
-                    <span wire:loading.remove wire:target="revokeAllCertificates">Tarik Semua</span>
-                    <span wire:loading wire:target="revokeAllCertificates">Menarik...</span>
-                </button>
-                @endif
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white p-5">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h3 class="font-semibold text-lg">Generate Sertifikat Massal</h3>
+                    <p class="text-blue-100 text-sm mt-0.5">Pemakalah: semua presenter terverifikasi (1 sertifikat per user). Peserta: hanya non-pemakalah.</p>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    {{-- Tarik Semua --}}
+                    @if($certificates->count() > 0)
+                    <button wire:click="revokeAllCertificates"
+                            wire:confirm="⚠️ Tarik SEMUA {{ $certificates->count() }} sertifikat? File akan dihapus permanen dan peserta tidak dapat mengaksesnya lagi. Lanjutkan?"
+                            wire:loading.attr="disabled"
+                            class="flex items-center gap-2 px-4 py-2.5 bg-red-500 bg-opacity-90 text-white border border-red-300 border-opacity-40 rounded-lg text-sm font-semibold hover:bg-red-600 transition disabled:opacity-60">
+                        <span wire:loading.remove wire:target="revokeAllCertificates">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </span>
+                        <span wire:loading wire:target="revokeAllCertificates">
+                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" class="opacity-75"/></svg>
+                        </span>
+                        <span wire:loading.remove wire:target="revokeAllCertificates">Tarik Semua</span>
+                        <span wire:loading wire:target="revokeAllCertificates">Menarik...</span>
+                    </button>
+                    @endif
 
-                {{-- Generate Sekarang --}}
-                <button wire:click="batchGenerate"
-                        wire:confirm="Generate sertifikat untuk semua presenter yang memenuhi syarat?"
-                        wire:loading.attr="disabled"
-                        class="flex items-center gap-2 px-5 py-2.5 bg-white text-blue-700 rounded-lg text-sm font-semibold hover:bg-blue-50 transition disabled:opacity-60">
-                    <span wire:loading.remove wire:target="batchGenerate">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                    </span>
-                    <span wire:loading wire:target="batchGenerate">
-                        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" class="opacity-75"/></svg>
-                    </span>
-                    <span wire:loading.remove wire:target="batchGenerate">Generate Sekarang</span>
-                    <span wire:loading wire:target="batchGenerate">Memproses...</span>
-                </button>
+                    {{-- Generate Pemakalah --}}
+                    <button wire:click="batchGenerate"
+                            wire:confirm="Generate sertifikat pemakalah? Setiap pemakalah hanya mendapat 1 sertifikat."
+                            wire:loading.attr="disabled"
+                            class="flex items-center gap-2 px-5 py-2.5 bg-white text-blue-700 rounded-lg text-sm font-semibold hover:bg-blue-50 transition disabled:opacity-60">
+                        <span wire:loading.remove wire:target="batchGenerate">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        </span>
+                        <span wire:loading wire:target="batchGenerate">
+                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" class="opacity-75"/></svg>
+                        </span>
+                        <span wire:loading.remove wire:target="batchGenerate">Pemakalah</span>
+                        <span wire:loading wire:target="batchGenerate">Memproses...</span>
+                    </button>
+
+                    {{-- Generate Peserta (non-pemakalah only) --}}
+                    <button wire:click="batchGenerateParticipants"
+                            wire:confirm="Generate sertifikat peserta? Pemakalah akan otomatis dilewati."
+                            wire:loading.attr="disabled"
+                            class="flex items-center gap-2 px-5 py-2.5 bg-indigo-100 text-indigo-900 rounded-lg text-sm font-semibold hover:bg-indigo-200 transition disabled:opacity-60">
+                        <span wire:loading.remove wire:target="batchGenerateParticipants">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </span>
+                        <span wire:loading wire:target="batchGenerateParticipants">
+                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/><path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" class="opacity-75"/></svg>
+                        </span>
+                        <span wire:loading.remove wire:target="batchGenerateParticipants">Peserta</span>
+                        <span wire:loading wire:target="batchGenerateParticipants">Memproses...</span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -484,7 +501,15 @@
             <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <div>
                 <span class="font-medium text-green-800">Batch selesai!</span>
-                <span class="text-green-700"> Berhasil: {{ $batchStats['authors'] ?? 0 }} sertifikat, Gagal: {{ $batchStats['failed'] ?? 0 }}.</span>
+                @if(isset($batchStats['authors']))
+                <span class="text-green-700"> Pemakalah: {{ $batchStats['authors'] }} sertifikat.</span>
+                @endif
+                @if(isset($batchStats['participants']))
+                <span class="text-green-700"> Peserta: {{ $batchStats['participants'] }} sertifikat.</span>
+                @endif
+                @if(($batchStats['failed'] ?? 0) > 0)
+                <span class="text-red-600"> Gagal: {{ $batchStats['failed'] }}.</span>
+                @endif
             </div>
         </div>
         @endif

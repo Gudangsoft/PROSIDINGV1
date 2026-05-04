@@ -197,49 +197,103 @@ class DocumentGenerator
     }
     
     /**
-     * Batch generate certificates for all accepted papers
-     *
-     * @param Conference $conference
-     * @return array Stats about generation
+     * Batch generate author certificates.
+     * One certificate per user (deduped): uses the latest eligible paper if user has multiple.
+     * Users who already have an author certificate for this conference are skipped.
      */
     public function batchGenerateCertificates(Conference $conference): array
     {
-        $stats = [
-            'authors' => 0,
-            'failed' => 0,
-        ];
-        
-        // Get all accepted papers without certificates
+        $stats = ['authors' => 0, 'failed' => 0];
+
+        // Collect user_ids that already have an author Certificate for this conference
+        $alreadyCertified = \App\Models\Certificate::where('conference_id', $conference->id)
+            ->where('type', 'author')
+            ->pluck('user_id')
+            ->toArray();
+
+        // Get eligible papers, excluding users who already have author certificates.
+        // Group by user so each user only receives ONE certificate even if they have
+        // multiple papers. The most recent eligible paper is picked per user.
         $papers = Paper::where('conference_id', $conference->id)
             ->whereIn('status', ['payment_verified', 'deliverables_pending', 'completed'])
             ->whereDoesntHave('deliverables', function ($query) {
-                $query->where('type', 'certificate');
+                $query->where('type', 'certificate')->where('direction', 'admin_send');
             })
+            ->whereNotIn('user_id', $alreadyCertified)
             ->with('user')
-            ->get();
-        
+            ->latest()
+            ->get()
+            ->unique('user_id'); // one paper per user
+
         foreach ($papers as $paper) {
             try {
                 $path = $this->generateCertificate($paper->user, 'author', $paper);
-                
-                // Create deliverable record
+
                 $paper->deliverables()->create([
-                    'user_id' => $paper->user_id,
-                    'type' => 'certificate',
-                    'direction' => 'admin_send',
-                    'file_path' => $path,
+                    'user_id'       => $paper->user_id,
+                    'type'          => 'certificate',
+                    'direction'     => 'admin_send',
+                    'file_path'     => $path,
                     'original_name' => basename($path),
-                    'notes' => 'Certificate auto-generated',
-                    'sent_at' => now(),
+                    'notes'         => 'Certificate auto-generated',
+                    'sent_at'       => now(),
                 ]);
-                
+
                 $stats['authors']++;
             } catch (\Exception $e) {
                 \Log::error("Failed to generate certificate for paper {$paper->id}: " . $e->getMessage());
                 $stats['failed']++;
             }
         }
-        
+
+        return $stats;
+    }
+
+    /**
+     * Batch generate participant certificates.
+     * Only for users with a verified participant payment who do NOT have any paper
+     * in this conference (authors already get a more appropriate author certificate).
+     */
+    public function batchGenerateParticipantCertificates(Conference $conference): array
+    {
+        $stats = ['participants' => 0, 'failed' => 0];
+
+        // User IDs of anyone who has a paper in this conference (authors) — excluded
+        $authorUserIds = Paper::where('conference_id', $conference->id)
+            ->whereIn('status', ['payment_verified', 'deliverables_pending', 'completed', 'accepted', 'in_review', 'revised', 'revision_required', 'submitted'])
+            ->pluck('user_id')
+            ->unique()
+            ->toArray();
+
+        // User IDs who already have a participant Certificate for this conference
+        $alreadyCertified = \App\Models\Certificate::where('conference_id', $conference->id)
+            ->where('type', 'participant')
+            ->pluck('user_id')
+            ->toArray();
+
+        // Participant payments that are verified for this conference
+        $payments = \App\Models\Payment::where('type', 'participant')
+            ->where('status', 'verified')
+            ->whereHas('registrationPackage', fn ($q) => $q->where('conference_id', $conference->id))
+            ->whereNotIn('user_id', $authorUserIds)
+            ->whereNotIn('user_id', $alreadyCertified)
+            ->with('user')
+            ->get()
+            ->unique('user_id');
+
+        foreach ($payments as $payment) {
+            if (! $payment->user) {
+                continue;
+            }
+            try {
+                $this->generateCertificate($payment->user, 'participant');
+                $stats['participants']++;
+            } catch (\Exception $e) {
+                \Log::error("Failed to generate participant certificate for user {$payment->user_id}: " . $e->getMessage());
+                $stats['failed']++;
+            }
+        }
+
         return $stats;
     }
 }

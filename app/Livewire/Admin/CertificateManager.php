@@ -195,7 +195,29 @@ class CertificateManager extends Component
             $generator = new DocumentGenerator();
             $stats     = $generator->batchGenerateCertificates($this->conference);
             $this->batchStats   = $stats;
-            $this->successMessage = "Batch selesai: {$stats['authors']} sertifikat dibuat, {$stats['failed']} gagal.";
+            $this->successMessage = "Batch selesai: {$stats['authors']} sertifikat pemakalah dibuat, {$stats['failed']} gagal.";
+        } catch (\Exception $e) {
+            $this->errorMessage = 'Gagal: ' . $e->getMessage();
+        }
+
+        $this->batchLoading = false;
+    }
+
+    public function batchGenerateParticipants(): void
+    {
+        if (! $this->conference) {
+            $this->errorMessage = 'Pilih konferensi terlebih dahulu.';
+            return;
+        }
+
+        $this->batchLoading = true;
+        $this->batchStats   = [];
+
+        try {
+            $generator = new DocumentGenerator();
+            $stats     = $generator->batchGenerateParticipantCertificates($this->conference);
+            $this->batchStats   = $stats;
+            $this->successMessage = "Batch selesai: {$stats['participants']} sertifikat peserta dibuat, {$stats['failed']} gagal. (Pemakalah otomatis dilewati)";
         } catch (\Exception $e) {
             $this->errorMessage = 'Gagal: ' . $e->getMessage();
         }
