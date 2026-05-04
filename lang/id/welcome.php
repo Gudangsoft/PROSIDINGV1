@@ -50,7 +50,7 @@ return [
     // Committees
     'committees' => [
         'badge' => 'Panitia',
-        'title' => 'Komite Penyelenggara',
+        'title' => 'Conference Committee',
     ],
 
     // News

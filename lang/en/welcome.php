@@ -50,7 +50,7 @@ return [
     // Committees
     'committees' => [
         'badge' => 'Committee',
-        'title' => 'Organizing Committee',
+        'title' => 'Conference Committee',
     ],
 
     // News

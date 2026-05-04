@@ -14,7 +14,7 @@ class Committee extends Model
 
     const TYPE_LABELS = [
         'steering' => 'Steering Committee',
-        'organizing' => 'Organizing Committee',
+        'organizing' => 'Conference Committee',
         'scientific' => 'Scientific Committee',
         'advisory' => 'Advisory Board',
         'reviewer_committee' => 'Reviewer Committee',
