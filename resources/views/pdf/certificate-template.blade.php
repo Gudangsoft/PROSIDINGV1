@@ -463,17 +463,25 @@
         </div>
 
         {{-- Footer --}}
+        @php
+            $showChairman       = $conference->show_chairman ?? true;
+            $showSecretary      = $conference->show_secretary ?? true;
+            $showInstChairman   = $conference->show_institute_chairman ?? false;
+            $sigCount = ($showChairman ? 1 : 0) + ($showSecretary ? 1 : 0) + ($showInstChairman ? 1 : 0);
+            // total cols = sigs + 1 QR col
+            $totalCols = $sigCount + 1;
+            $colPct = floor(100 / $totalCols) . '%';
+        @endphp
         <div class="cert-footer">
             <table class="footer-table">
                 <tr>
-                    {{-- Left Signature --}}
-                    <td style="width: 33%;">
+                    {{-- Chairman Signature --}}
+                    @if($showChairman)
+                    <td style="width: {{ $colPct }};">
                         <div class="sig-box">
                             <div class="sig-title">Chairperson</div>
                             @if($conference && $conference->chairman_signature && file_exists(public_path('storage/' . $conference->chairman_signature)))
                                 <img src="{{ public_path('storage/' . $conference->chairman_signature) }}" class="sig-img" alt="Signature">
-                            @elseif(file_exists(public_path('storage/signatures/chairman.png')))
-                                <img src="{{ public_path('storage/signatures/chairman.png') }}" class="sig-img" alt="Signature">
                             @else
                                 <div class="sig-spacer"></div>
                             @endif
@@ -482,9 +490,27 @@
                             <div class="sig-role">{{ $conference->chairman_title ?? 'Conference Chair' }}</div>
                         </div>
                     </td>
+                    @endif
+
+                    {{-- Institute Chairman Signature --}}
+                    @if($showInstChairman)
+                    <td style="width: {{ $colPct }};">
+                        <div class="sig-box">
+                            <div class="sig-title">Head of Institution</div>
+                            @if($conference && $conference->institute_chairman_signature && file_exists(public_path('storage/' . $conference->institute_chairman_signature)))
+                                <img src="{{ public_path('storage/' . $conference->institute_chairman_signature) }}" class="sig-img" alt="Signature">
+                            @else
+                                <div class="sig-spacer"></div>
+                            @endif
+                            <div class="sig-line"></div>
+                            <div class="sig-name">{{ $conference->institute_chairman_name ?? 'Head of Institution' }}</div>
+                            <div class="sig-role">{{ $conference->institute_chairman_title ?? '' }}</div>
+                        </div>
+                    </td>
+                    @endif
 
                     {{-- Center QR Code & Cert Number --}}
-                    <td style="width: 33%;">
+                    <td style="width: {{ $colPct }};">
                         <div class="qr-block">
                             <img src="{{ $qrCode }}" alt="QR Verify">
                             <div class="qr-label">Scan to verify</div>
@@ -496,14 +522,13 @@
                         </div>
                     </td>
 
-                    {{-- Right Signature --}}
-                    <td style="width: 33%;">
+                    {{-- Secretary Signature --}}
+                    @if($showSecretary)
+                    <td style="width: {{ $colPct }};">
                         <div class="sig-box">
                             <div class="sig-title">Secretary</div>
                             @if($conference && $conference->secretary_signature && file_exists(public_path('storage/' . $conference->secretary_signature)))
                                 <img src="{{ public_path('storage/' . $conference->secretary_signature) }}" class="sig-img" alt="Signature">
-                            @elseif(file_exists(public_path('storage/signatures/secretary.png')))
-                                <img src="{{ public_path('storage/signatures/secretary.png') }}" class="sig-img" alt="Signature">
                             @else
                                 <div class="sig-spacer"></div>
                             @endif
@@ -512,6 +537,7 @@
                             <div class="sig-role">{{ $conference->secretary_title ?? ($conference ? $conference->name : 'Conference') }}</div>
                         </div>
                     </td>
+                    @endif
                 </tr>
             </table>
         </div>

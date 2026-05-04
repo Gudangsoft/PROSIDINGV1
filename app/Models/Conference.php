@@ -24,6 +24,8 @@ class Conference extends Model
         'read_more_url',
         'chairman_name', 'chairman_title', 'secretary_name', 'secretary_title',
         'chairman_signature', 'secretary_signature',
+        'institute_chairman_name', 'institute_chairman_title', 'institute_chairman_signature',
+        'show_chairman', 'show_secretary', 'show_institute_chairman',
         // LOA Template fields
         'loa_header_logo', 'loa_header_title', 'loa_header_subtitle',
         'loa_header_address', 'loa_header_phone', 'loa_header_fax', 'loa_header_email',
@@ -42,6 +44,9 @@ class Conference extends Model
         'visible_sections' => 'array',
         'hidden_speaker_types' => 'array',
         'loa_important_dates' => 'array',
+        'show_chairman' => 'boolean',
+        'show_secretary' => 'boolean',
+        'show_institute_chairman' => 'boolean',
     ];
 
     /**

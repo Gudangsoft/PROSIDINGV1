@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 namespace App\Livewire\Admin;
 
@@ -25,9 +25,19 @@ class CertificateManager extends Component
     public string $secretary_name = '';
     public string $secretary_title = '';
 
+    // Institute chairman (3rd signatory)
+    public string $institute_chairman_name = '';
+    public string $institute_chairman_title = '';
+
+    // Visibility toggles
+    public bool $show_chairman = true;
+    public bool $show_secretary = true;
+    public bool $show_institute_chairman = false;
+
     // Signature image uploads
     public $chairman_signature_upload = null;
     public $secretary_signature_upload = null;
+    public $institute_chairman_signature_upload = null;
 
     // UI tabs
     public string $activeTab = 'settings';
@@ -73,6 +83,11 @@ class CertificateManager extends Component
         $this->chairman_title = $conf->chairman_title ?? '';
         $this->secretary_name  = $conf->secretary_name ?? '';
         $this->secretary_title = $conf->secretary_title ?? '';
+        $this->institute_chairman_name  = $conf->institute_chairman_name ?? '';
+        $this->institute_chairman_title = $conf->institute_chairman_title ?? '';
+        $this->show_chairman             = $conf->show_chairman ?? true;
+        $this->show_secretary            = $conf->show_secretary ?? true;
+        $this->show_institute_chairman   = $conf->show_institute_chairman ?? false;
     }
 
     public function saveSettings(): void
@@ -82,8 +97,11 @@ class CertificateManager extends Component
             'chairman_title'          => 'nullable|string|max:100',
             'secretary_name'          => 'nullable|string|max:100',
             'secretary_title'         => 'nullable|string|max:100',
-            'chairman_signature_upload'  => 'nullable|image|max:2048',
-            'secretary_signature_upload' => 'nullable|image|max:2048',
+            'institute_chairman_name'  => 'nullable|string|max:100',
+            'institute_chairman_title' => 'nullable|string|max:100',
+            'chairman_signature_upload'             => 'nullable|image|max:2048',
+            'secretary_signature_upload'            => 'nullable|image|max:2048',
+            'institute_chairman_signature_upload'   => 'nullable|image|max:2048',
         ]);
 
         if (! $this->conference) {
@@ -96,6 +114,11 @@ class CertificateManager extends Component
             'chairman_title' => $this->chairman_title,
             'secretary_name'  => $this->secretary_name,
             'secretary_title' => $this->secretary_title,
+            'institute_chairman_name'  => $this->institute_chairman_name,
+            'institute_chairman_title' => $this->institute_chairman_title,
+            'show_chairman'           => $this->show_chairman,
+            'show_secretary'          => $this->show_secretary,
+            'show_institute_chairman' => $this->show_institute_chairman,
         ];
 
         if ($this->chairman_signature_upload) {
@@ -121,6 +144,18 @@ class CertificateManager extends Component
                 'public'
             );
             $this->secretary_signature_upload = null;
+        }
+
+        if ($this->institute_chairman_signature_upload) {
+            if ($this->conference->institute_chairman_signature) {
+                Storage::disk('public')->delete($this->conference->institute_chairman_signature);
+            }
+            $data['institute_chairman_signature'] = $this->institute_chairman_signature_upload->storeAs(
+                'signatures',
+                'institute-chairman-' . $this->conference->id . '.png',
+                'public'
+            );
+            $this->institute_chairman_signature_upload = null;
         }
 
         $this->conference->update($data);

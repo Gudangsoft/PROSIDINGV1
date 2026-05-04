@@ -71,7 +71,7 @@
                 </svg>
                 Penandatangan Sertifikat
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {{-- Chairman --}}
                 <div class="space-y-3">
                     <h4 class="text-sm font-medium text-gray-700 flex items-center gap-1.5">
@@ -80,16 +80,44 @@
                     </h4>
                     <div>
                         <label class="block text-xs text-gray-500 mb-1">Nama Lengkap</label>
-                        <input wire:model="chairman_name" type="text" placeholder="Prof. Dr. ..." 
+                        <input wire:model="chairman_name" type="text" placeholder="Prof. Dr. ..."
                                class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                         @error('chairman_name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label class="block text-xs text-gray-500 mb-1">Jabatan / Gelar</label>
-                        <input wire:model="chairman_title" type="text" placeholder="Conference Chairperson" 
+                        <input wire:model="chairman_title" type="text" placeholder="Conference Chairperson"
                                class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                         @error('chairman_title')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
+                    <label class="flex items-center gap-2 cursor-pointer mt-1">
+                        <input wire:model="show_chairman" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="text-xs text-gray-600">Tampilkan di sertifikat</span>
+                    </label>
+                </div>
+
+                {{-- Institute Chairman --}}
+                <div class="space-y-3">
+                    <h4 class="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                        Ketua Institusi / Head of Institution
+                    </h4>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Nama Lengkap</label>
+                        <input wire:model="institute_chairman_name" type="text" placeholder="Prof. Dr. ..."
+                               class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500">
+                        @error('institute_chairman_name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Jabatan / Gelar</label>
+                        <input wire:model="institute_chairman_title" type="text" placeholder="Rektor / Dekan / ..."
+                               class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500">
+                        @error('institute_chairman_title')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+                    <label class="flex items-center gap-2 cursor-pointer mt-1">
+                        <input wire:model="show_institute_chairman" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                        <span class="text-xs text-gray-600">Tampilkan di sertifikat</span>
+                    </label>
                 </div>
 
                 {{-- Secretary --}}
@@ -100,16 +128,20 @@
                     </h4>
                     <div>
                         <label class="block text-xs text-gray-500 mb-1">Nama Lengkap</label>
-                        <input wire:model="secretary_name" type="text" placeholder="Dr. ..." 
+                        <input wire:model="secretary_name" type="text" placeholder="Dr. ..."
                                class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                         @error('secretary_name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label class="block text-xs text-gray-500 mb-1">Jabatan / Gelar</label>
-                        <input wire:model="secretary_title" type="text" placeholder="Conference Secretary" 
+                        <input wire:model="secretary_title" type="text" placeholder="Conference Secretary"
                                class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                         @error('secretary_title')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
+                    <label class="flex items-center gap-2 cursor-pointer mt-1">
+                        <input wire:model="show_secretary" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="text-xs text-gray-600">Tampilkan di sertifikat</span>
+                    </label>
                 </div>
             </div>
         </div>
@@ -132,11 +164,19 @@
     {{-- ────────────── TAB: SIGNATURES ────────────── --}}
     @if($activeTab === 'signatures')
     <form wire:submit="saveSettings">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
             {{-- Chairman Signature --}}
-            <div class="bg-white rounded-xl border shadow-sm p-6">
-                <h3 class="font-semibold text-gray-800 mb-4">Tanda Tangan Ketua</h3>
+            <div class="bg-white rounded-xl border shadow-sm p-6 flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-gray-800">Tanda Tangan Ketua</h3>
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input wire:model="show_chairman" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="text-xs {{ $show_chairman ? 'text-blue-700 font-medium' : 'text-gray-400' }}">
+                            {{ $show_chairman ? 'Tampil di sertifikat' : 'Disembunyikan' }}
+                        </span>
+                    </label>
+                </div>
 
                 @if($conference->chairman_signature)
                 <div class="mb-4 p-3 bg-gray-50 rounded-lg text-center border">
@@ -178,9 +218,69 @@
                 </p>
             </div>
 
+            {{-- Institute Chairman Signature --}}
+            <div class="bg-white rounded-xl border shadow-sm p-6 flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-gray-800">Tanda Tangan Ketua Institusi</h3>
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input wire:model="show_institute_chairman" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                        <span class="text-xs {{ $show_institute_chairman ? 'text-emerald-700 font-medium' : 'text-gray-400' }}">
+                            {{ $show_institute_chairman ? 'Tampil di sertifikat' : 'Disembunyikan' }}
+                        </span>
+                    </label>
+                </div>
+
+                @if($conference->institute_chairman_signature)
+                <div class="mb-4 p-3 bg-gray-50 rounded-lg text-center border">
+                    <p class="text-xs text-gray-400 mb-2">Tanda tangan saat ini:</p>
+                    <img src="{{ Storage::url($conference->institute_chairman_signature) }}" alt="Institute Chairman Signature"
+                         class="max-h-20 mx-auto object-contain">
+                    <button type="button" wire:click="deleteSignature('institute_chairman')"
+                            wire:confirm="Hapus tanda tangan ketua institusi?"
+                            class="mt-2 text-xs text-red-600 hover:text-red-800 hover:underline">
+                        Hapus tanda tangan
+                    </button>
+                </div>
+                @else
+                <div class="mb-4 p-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 text-center">
+                    <svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                    <p class="text-xs text-gray-400">Belum ada tanda tangan</p>
+                </div>
+                @endif
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Upload Tanda Tangan Baru</label>
+                    <input wire:model="institute_chairman_signature_upload" type="file" accept="image/*"
+                           class="block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                    <p class="text-xs text-gray-400 mt-1">Format: PNG / JPG / transparent PNG. Maks 2MB.</p>
+                    @error('institute_chairman_signature_upload')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                @if($institute_chairman_signature_upload)
+                <div class="mt-3 p-3 bg-emerald-50 rounded-lg text-center border border-emerald-100">
+                    <p class="text-xs text-emerald-600 mb-2">Preview:</p>
+                    <img src="{{ $institute_chairman_signature_upload->temporaryUrl() }}" class="max-h-20 mx-auto object-contain">
+                </div>
+                @endif
+
+                <p class="text-xs text-gray-500 mt-3 bg-amber-50 border border-amber-100 rounded p-2">
+                    💡 <strong>Tips:</strong> Gunakan gambar PNG dengan latar belakang transparan untuk tampilan terbaik di sertifikat.
+                </p>
+            </div>
+
             {{-- Secretary Signature --}}
-            <div class="bg-white rounded-xl border shadow-sm p-6">
-                <h3 class="font-semibold text-gray-800 mb-4">Tanda Tangan Sekretaris</h3>
+            <div class="bg-white rounded-xl border shadow-sm p-6 flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-gray-800">Tanda Tangan Sekretaris</h3>
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input wire:model="show_secretary" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="text-xs {{ $show_secretary ? 'text-indigo-700 font-medium' : 'text-gray-400' }}">
+                            {{ $show_secretary ? 'Tampil di sertifikat' : 'Disembunyikan' }}
+                        </span>
+                    </label>
+                </div>
 
                 @if($conference->secretary_signature)
                 <div class="mb-4 p-3 bg-gray-50 rounded-lg text-center border">
@@ -282,23 +382,47 @@
         </div>
 
         {{-- Info cards --}}
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
             <div class="bg-gray-50 rounded-lg p-3 border text-sm">
-                <div class="font-medium text-gray-700">Ketua</div>
+                <div class="flex items-center justify-between">
+                    <div class="font-medium text-gray-700">Ketua</div>
+                    <span class="text-xs px-1.5 py-0.5 rounded {{ ($conference->show_chairman ?? true) ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-400' }}">
+                        {{ ($conference->show_chairman ?? true) ? 'Tampil' : 'Sembunyi' }}
+                    </span>
+                </div>
                 <div class="text-gray-500 mt-0.5">{{ $conference->chairman_name ?: '(belum diisi)' }}</div>
                 <div class="text-gray-400 text-xs">{{ $conference->chairman_title ?: '' }}</div>
             </div>
             <div class="bg-gray-50 rounded-lg p-3 border text-sm">
-                <div class="font-medium text-gray-700">Sekretaris</div>
+                <div class="flex items-center justify-between">
+                    <div class="font-medium text-gray-700">Ketua Institusi</div>
+                    <span class="text-xs px-1.5 py-0.5 rounded {{ ($conference->show_institute_chairman ?? false) ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-400' }}">
+                        {{ ($conference->show_institute_chairman ?? false) ? 'Tampil' : 'Sembunyi' }}
+                    </span>
+                </div>
+                <div class="text-gray-500 mt-0.5">{{ $conference->institute_chairman_name ?: '(belum diisi)' }}</div>
+                <div class="text-gray-400 text-xs">{{ $conference->institute_chairman_title ?: '' }}</div>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-3 border text-sm">
+                <div class="flex items-center justify-between">
+                    <div class="font-medium text-gray-700">Sekretaris</div>
+                    <span class="text-xs px-1.5 py-0.5 rounded {{ ($conference->show_secretary ?? true) ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-200 text-gray-400' }}">
+                        {{ ($conference->show_secretary ?? true) ? 'Tampil' : 'Sembunyi' }}
+                    </span>
+                </div>
                 <div class="text-gray-500 mt-0.5">{{ $conference->secretary_name ?: '(belum diisi)' }}</div>
                 <div class="text-gray-400 text-xs">{{ $conference->secretary_title ?: '' }}</div>
             </div>
             <div class="bg-gray-50 rounded-lg p-3 border text-sm">
-                <div class="font-medium text-gray-700">Tanda Tangan</div>
-                <div class="flex gap-3 mt-1">
+                <div class="font-medium text-gray-700 mb-1">Gambar TTD</div>
+                <div class="flex flex-col gap-1">
                     <span class="flex items-center gap-1 text-xs {{ $conference->chairman_signature ? 'text-green-600' : 'text-gray-400' }}">
                         <span class="w-1.5 h-1.5 rounded-full {{ $conference->chairman_signature ? 'bg-green-500' : 'bg-gray-300' }}"></span>
                         Ketua
+                    </span>
+                    <span class="flex items-center gap-1 text-xs {{ $conference->institute_chairman_signature ? 'text-green-600' : 'text-gray-400' }}">
+                        <span class="w-1.5 h-1.5 rounded-full {{ $conference->institute_chairman_signature ? 'bg-green-500' : 'bg-gray-300' }}"></span>
+                        Ketua Institusi
                     </span>
                     <span class="flex items-center gap-1 text-xs {{ $conference->secretary_signature ? 'text-green-600' : 'text-gray-400' }}">
                         <span class="w-1.5 h-1.5 rounded-full {{ $conference->secretary_signature ? 'bg-green-500' : 'bg-gray-300' }}"></span>
