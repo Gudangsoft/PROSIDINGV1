@@ -285,12 +285,14 @@
             letter-spacing: 1px;
         }
         .sig-box .sig-img {
-            height: 12mm;
-            margin: 1.5mm 0;
+            height: 22mm;
+            max-width: 55mm;
+            margin: 1.5mm auto;
             object-fit: contain;
+            display: block;
         }
         .sig-box .sig-spacer {
-            height: 12mm;
+            height: 22mm;
         }
         .sig-box .sig-line {
             border-top: 0.5mm solid #0f2447;
@@ -320,6 +322,13 @@
             color: #aaa;
             margin-top: 0.5mm;
             letter-spacing: 0.5px;
+        }
+
+        /* Ordinal superscript */
+        sup.ordinal {
+            font-size: 55%;
+            vertical-align: super;
+            line-height: 0;
         }
 
         /* ── Side vertical text ── */
@@ -353,6 +362,13 @@
     @php
         $headerLogo = $conference->loa_header_logo ?? $conference->logo ?? null;
         $isBanner = $conference && $conference->loa_header_logo;
+
+        // Wrap ordinal suffixes (1st, 2nd, 3rd, 4th …) in <sup> tags
+        $ordinal = fn(string $text): string => preg_replace(
+            '/\b(\d+)(st|nd|rd|th)\b/i',
+            '$1<sup class="ordinal">$2</sup>',
+            $text
+        );
     @endphp
 
     {{-- Full Width Banner --}}
@@ -397,7 +413,7 @@
             @endif
             <div class="header-text">
                 <div class="org-name">
-                    @if($conference){{ $conference->name }}@else{{ config('app.name') }}@endif
+                    @if($conference){!! $ordinal($conference->name) !!}@else{{ config('app.name') }}@endif
                 </div>
                 @if($conference && $conference->theme)
                     <div class="conf-theme">{{ $conference->theme }}</div>
@@ -443,21 +459,21 @@
                     for presenting the paper entitled:
                 </div>
                 <div class="paper-title">&ldquo;{{ $paper->title }}&rdquo;</div>
-                <div class="conf-ref">at <strong>{{ $conference ? $conference->name : 'the conference' }}</strong></div>
+                <div class="conf-ref">at <strong>{!! $conference ? $ordinal($conference->name) : 'the conference' !!}</strong></div>
             @elseif($type === 'participant')
                 <div class="description">
                     for active participation in<br>
-                    <strong>{{ $conference ? $conference->name : 'the conference' }}</strong>
+                    <strong>{!! $conference ? $ordinal($conference->name) : 'the conference' !!}</strong>
                 </div>
             @elseif($type === 'reviewer')
                 <div class="description">
                     for valuable contribution as a peer reviewer for<br>
-                    <strong>{{ $conference ? $conference->name : 'the conference' }}</strong>
+                    <strong>{!! $conference ? $ordinal($conference->name) : 'the conference' !!}</strong>
                 </div>
             @elseif($type === 'committee')
                 <div class="description">
                     for dedicated service as a committee member of<br>
-                    <strong>{{ $conference ? $conference->name : 'the conference' }}</strong>
+                    <strong>{!! $conference ? $ordinal($conference->name) : 'the conference' !!}</strong>
                 </div>
             @endif
         </div>
