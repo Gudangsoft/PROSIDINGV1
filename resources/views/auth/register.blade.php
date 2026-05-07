@@ -4,6 +4,12 @@
 
 @section('content')
 @php
+    $activeConf = \App\Models\Conference::where('is_active', true)->first()
+               ?? \App\Models\Conference::latest()->first();
+    $registrationOpen = $activeConf ? ($activeConf->registration_open ?? true) : true;
+    $closedMessage = $activeConf?->registration_closed_message
+        ?: 'Pendaftaran untuk konferensi ini telah ditutup. Terima kasih atas perhatian Anda.';
+
     $preselectedPackage = null;
     $packageQueryId = request()->query('package');
     if ($packageQueryId) {
@@ -12,6 +18,59 @@
     $defaultRole = $preselectedPackage ? 'participant' : old('role', 'author');
     $packageParticipantTypeId = $preselectedPackage?->participant_type_id;
 @endphp
+
+{{-- ── Pendaftaran Ditutup ── --}}
+@if(!$registrationOpen)
+<div class="max-w-2xl mx-auto py-12">
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-red-100">
+        {{-- Header merah --}}
+        <div class="bg-gradient-to-r from-red-500 to-red-600 px-8 py-10 text-center text-white">
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold mb-1">Pendaftaran Ditutup</h1>
+            @if($activeConf)
+            <p class="text-red-100 text-sm">{{ $activeConf->name }}</p>
+            @endif
+        </div>
+
+        {{-- Body --}}
+        <div class="px-8 py-8 text-center">
+            <p class="text-gray-700 text-base leading-relaxed">{{ $closedMessage }}</p>
+
+            @if($activeConf && ($activeConf->start_date || $activeConf->end_date))
+            <div class="mt-5 inline-flex items-center gap-2 text-sm text-gray-500 bg-gray-50 rounded-lg px-4 py-2 border">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                {{ $activeConf->date_range }}
+            </div>
+            @endif
+
+            <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="{{ url('/') }}"
+                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Kembali ke Beranda
+                </a>
+                <a href="{{ route('login') }}"
+                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                    </svg>
+                    Sudah Punya Akun? Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+@else
 
 <div class="max-w-4xl mx-auto" x-data="registerForm('{{ $defaultRole }}', {{ $preselectedPackage ? $preselectedPackage->price : 'null' }}, {{ $preselectedPackage && $preselectedPackage->is_free ? 'true' : 'false' }})">
 
@@ -877,4 +936,5 @@ function registerForm(defaultRole, packageAmount, isFree) {
     }
 }
 </script>
+@endif {{-- end registrationOpen --}}
 @endsection

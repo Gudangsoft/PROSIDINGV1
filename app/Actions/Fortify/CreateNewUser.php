@@ -23,6 +23,18 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
+        // Block registration if the active conference has it closed
+        $activeConf = \App\Models\Conference::where('is_active', true)->first()
+                   ?? \App\Models\Conference::latest()->first();
+        if ($activeConf && !($activeConf->registration_open ?? true)) {
+            $msg = $activeConf->registration_closed_message
+                ?: 'Pendaftaran untuk konferensi ini telah ditutup.';
+            Validator::make([], [])->errors(); // ensure instance exists
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'email' => [$msg],
+            ]);
+        }
+
         $role = $input['role'] ?? 'author';
         $isParticipant = $role === 'participant';
 

@@ -46,6 +46,8 @@ class ConferenceForm extends Component
     public string $loaGenerationMode = 'manual';
     public string $certificateGenerationMode = 'manual';
     public bool $showRegisterButton = true;
+    public bool $registrationOpen = true;
+    public string $registrationClosedMessage = '';
     public $cover_image;
     public $logo;
     public $brochure;
@@ -136,6 +138,8 @@ class ConferenceForm extends Component
                 'loaGenerationMode' => $conference->loa_generation_mode ?? 'manual',
                 'certificateGenerationMode' => $conference->certificate_generation_mode ?? 'manual',
                 'showRegisterButton' => $conference->show_register_button ?? true,
+                'registrationOpen' => $conference->registration_open ?? true,
+                'registrationClosedMessage' => $conference->registration_closed_message ?? '',
                 'existing_cover_image' => $conference->cover_image,
                 'existing_logo' => $conference->logo,
                 'existing_brochure' => $conference->brochure,
@@ -629,6 +633,8 @@ class ConferenceForm extends Component
             'loa_generation_mode' => $this->loaGenerationMode,
             'certificate_generation_mode' => $this->certificateGenerationMode,
             'show_register_button' => $this->showRegisterButton,
+            'registration_open' => $this->registrationOpen,
+            'registration_closed_message' => $this->registrationClosedMessage ?: null,
         ];
 
         // Only include visible_sections if the column exists (production migration safety)

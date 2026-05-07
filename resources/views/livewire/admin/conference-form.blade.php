@@ -500,6 +500,61 @@
     {{-- TAB: Pricing / Registration Packages --}}
     @if($activeTab === 'pricing')
     <div class="space-y-6">
+
+        {{-- ── Status Pendaftaran ── --}}
+        <div class="rounded-xl border-2 shadow-sm p-5
+            {{ $registrationOpen ? 'bg-green-50 border-green-400' : 'bg-red-50 border-red-400' }}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0
+                        {{ $registrationOpen ? 'bg-green-500' : 'bg-red-500' }}">
+                        @if($registrationOpen)
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        @else
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                        </svg>
+                        @endif
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-base">Status Pendaftaran</h3>
+                        <p class="text-sm font-semibold mt-0.5 {{ $registrationOpen ? 'text-green-700' : 'text-red-700' }}">
+                            {{ $registrationOpen ? 'Pendaftaran DIBUKA' : 'Pendaftaran DITUTUP' }}
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Toggle switch --}}
+                <label class="relative inline-flex items-center cursor-pointer shrink-0" title="{{ $registrationOpen ? 'Klik untuk menutup pendaftaran' : 'Klik untuk membuka pendaftaran' }}">
+                    <input type="checkbox" wire:model.live="registrationOpen" class="sr-only peer">
+                    <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer
+                        peer-checked:after:translate-x-7 peer-checked:bg-green-500
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:bg-white after:rounded-full after:h-6 after:w-6
+                        after:transition-all after:shadow"></div>
+                    <span class="ml-3 text-sm font-medium {{ $registrationOpen ? 'text-green-700' : 'text-red-600' }}">
+                        {{ $registrationOpen ? 'Buka' : 'Tutup' }}
+                    </span>
+                </label>
+            </div>
+
+            {{-- Pesan tutup (hanya muncul saat ditutup) --}}
+            @if(!$registrationOpen)
+            <div class="mt-4 pt-4 border-t border-red-200">
+                <label class="block text-xs font-semibold text-gray-700 mb-1.5">
+                    Pesan untuk calon pendaftar (opsional)
+                </label>
+                <input wire:model.defer="registrationClosedMessage"
+                       type="text"
+                       placeholder="Cth: Pendaftaran telah ditutup. Terima kasih atas partisipasi Anda."
+                       class="w-full px-3 py-2 border border-red-300 rounded-lg text-sm focus:ring-2 focus:ring-red-400 bg-white">
+                <p class="text-xs text-gray-400 mt-1">Pesan ini ditampilkan di halaman /register jika pendaftaran ditutup.</p>
+            </div>
+            @endif
+        </div>
+
         {{-- Informasi Pembayaran --}}
         <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4">
             <div class="flex items-center gap-2 mb-1">
