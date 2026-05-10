@@ -267,8 +267,10 @@ class DocumentGenerator
 
     /**
      * Batch generate participant certificates.
-     * For all users with a verified participant payment — including authors
-     * who also registered as participants.
+     * Covers two groups:
+     *   1. Users with a verified participant payment (pure participants).
+     *   2. Authors whose paper payment is verified — they attend as presenters
+     *      and also deserve a participant certificate.
      */
     public function batchGenerateParticipantCertificates(Conference $conference): array
     {
@@ -280,8 +282,8 @@ class DocumentGenerator
             ->pluck('user_id')
             ->toArray();
 
-        // Participant payments that are verified for this conference
-        $payments = \App\Models\Payment::where('type', 'participant')
+        // Group 1: pure participants with a verified participant payment
+        $fromPayments = \App\Models\Payment::where('type', 'participant')
             ->where('status', 'verified')
             ->whereHas('registrationPackage', fn ($q) => $q->where('conference_id', $conference->id))
             ->whereNotIn('user_id', $alreadyCertified)
@@ -289,15 +291,33 @@ class DocumentGenerator
             ->get()
             ->unique('user_id');
 
-        foreach ($payments as $payment) {
-            if (! $payment->user) {
-                continue;
+        // Group 2: authors whose paper is in a verified/completed status
+        $fromPapers = Paper::where('conference_id', $conference->id)
+            ->whereIn('status', ['payment_verified', 'deliverables_pending', 'completed'])
+            ->whereNotIn('user_id', $alreadyCertified)
+            ->with('user')
+            ->get()
+            ->unique('user_id');
+
+        // Merge both groups, keyed by user_id so there are no duplicates
+        $usersById = collect();
+        foreach ($fromPayments as $payment) {
+            if ($payment->user) {
+                $usersById->put($payment->user_id, $payment->user);
             }
+        }
+        foreach ($fromPapers as $paper) {
+            if ($paper->user && ! $usersById->has($paper->user_id)) {
+                $usersById->put($paper->user_id, $paper->user);
+            }
+        }
+
+        foreach ($usersById as $user) {
             try {
-                $this->generateCertificate($payment->user, 'participant');
+                $this->generateCertificate($user, 'participant');
                 $stats['participants']++;
             } catch (\Exception $e) {
-                \Log::error("Failed to generate participant certificate for user {$payment->user_id}: " . $e->getMessage());
+                \Log::error("Failed to generate participant certificate for user {$user->id}: " . $e->getMessage());
                 $stats['failed']++;
             }
         }
