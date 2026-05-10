@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\Certificate;
 use App\Models\Conference;
 use App\Models\Deliverable;
 use App\Models\Paper;
@@ -224,51 +223,6 @@ class CertificateManager extends Component
         }
 
         $this->batchLoading = false;
-    }
-
-    /**
-     * Delete participant certificates from the certificates table for any user
-     * who also has an author certificate in the same conference.
-     * Use this to clean up existing duplicate records created before the dedup fix.
-     */
-    public function cleanupDuplicateCertificates(): void
-    {
-        if (! $this->conference) {
-            $this->errorMessage = 'Pilih konferensi terlebih dahulu.';
-            return;
-        }
-
-        $conferenceId = $this->conference->id;
-
-        // User IDs that have an author cert for this conference
-        $authorUserIds = Certificate::where('conference_id', $conferenceId)
-            ->where('type', 'author')
-            ->pluck('user_id')
-            ->unique()
-            ->toArray();
-
-        if (empty($authorUserIds)) {
-            $this->successMessage = 'Tidak ada duplikat yang perlu dibersihkan.';
-            return;
-        }
-
-        // Participant certs for those same users in this conference
-        $duplicates = Certificate::where('conference_id', $conferenceId)
-            ->where('type', 'participant')
-            ->whereIn('user_id', $authorUserIds)
-            ->get();
-
-        $count = 0;
-        foreach ($duplicates as $cert) {
-            if ($cert->file_path && Storage::disk('public')->exists($cert->file_path)) {
-                Storage::disk('public')->delete($cert->file_path);
-            }
-            $cert->delete();
-            $count++;
-        }
-
-        $this->successMessage = "{$count} sertifikat peserta duplikat (untuk pemakalah) berhasil dihapus.";
-        $this->errorMessage   = '';
     }
 
     /**

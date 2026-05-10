@@ -19,22 +19,6 @@ class CertificateList extends Component
                     ->with(['conference', 'paper'])
                     ->latest('generated_at')
                     ->get();
-
-                // If user has an author cert for a conference, hide the participant cert
-                // for that same conference (author cert supersedes participant cert).
-                $authorConferenceIds = $certificates
-                    ->where('type', 'author')
-                    ->pluck('conference_id')
-                    ->filter()
-                    ->unique()
-                    ->toArray();
-
-                if (! empty($authorConferenceIds)) {
-                    $certificates = $certificates->reject(function ($cert) use ($authorConferenceIds) {
-                        return $cert->type === 'participant'
-                            && in_array($cert->conference_id, $authorConferenceIds);
-                    })->values();
-                }
             }
         } catch (\Throwable $e) {
             // table not yet migrated

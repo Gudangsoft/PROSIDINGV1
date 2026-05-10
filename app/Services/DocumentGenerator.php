@@ -267,19 +267,12 @@ class DocumentGenerator
 
     /**
      * Batch generate participant certificates.
-     * Only for users with a verified participant payment who do NOT have any paper
-     * in this conference (authors already get a more appropriate author certificate).
+     * For all users with a verified participant payment — including authors
+     * who also registered as participants.
      */
     public function batchGenerateParticipantCertificates(Conference $conference): array
     {
         $stats = ['participants' => 0, 'failed' => 0];
-
-        // User IDs of anyone who has a paper in this conference (authors) — excluded
-        $authorUserIds = Paper::where('conference_id', $conference->id)
-            ->whereIn('status', ['payment_verified', 'deliverables_pending', 'completed', 'accepted', 'in_review', 'revised', 'revision_required', 'submitted'])
-            ->pluck('user_id')
-            ->unique()
-            ->toArray();
 
         // User IDs who already have a participant Certificate for this conference
         $alreadyCertified = \App\Models\Certificate::where('conference_id', $conference->id)
@@ -291,7 +284,6 @@ class DocumentGenerator
         $payments = \App\Models\Payment::where('type', 'participant')
             ->where('status', 'verified')
             ->whereHas('registrationPackage', fn ($q) => $q->where('conference_id', $conference->id))
-            ->whereNotIn('user_id', $authorUserIds)
             ->whereNotIn('user_id', $alreadyCertified)
             ->with('user')
             ->get()
