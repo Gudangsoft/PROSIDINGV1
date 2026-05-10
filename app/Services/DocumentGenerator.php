@@ -99,8 +99,24 @@ class DocumentGenerator
         
         Storage::disk('public')->put($path, $pdf->output());
 
-        // 7. Store certificate record in DB for verification
+        // 7. Store certificate record in DB for verification.
+        //    Delete any existing certificate of the same type for this user+conference
+        //    first, so we never accumulate duplicates.
         try {
+            if ($conference) {
+                $existing = Certificate::where('user_id', $user->id)
+                    ->where('conference_id', $conference->id)
+                    ->where('type', $type)
+                    ->get();
+
+                foreach ($existing as $old) {
+                    if ($old->file_path && Storage::disk('public')->exists($old->file_path)) {
+                        Storage::disk('public')->delete($old->file_path);
+                    }
+                    $old->delete();
+                }
+            }
+
             Certificate::create([
                 'cert_number'   => $certNumber,
                 'type'          => $type,
