@@ -16,248 +16,133 @@ class DocumentGenerator
 {
     /**
      * Generate LOA (Letter of Acceptance) PDF for a paper
-     *
-     * @param Paper $paper
-     * @return string Path to generated PDF
      */
     public function generateLOA(Paper $paper): string
     {
-        // 1. Generate unique LOA number
         $loaNumber = $this->generateLOANumber($paper);
-        
-        // 2. Generate QR Code for verification
         $qrCodeDataUri = $this->generateQRCode(route('verify-loa', ['code' => $loaNumber]));
-        
-        // 3. Load conference with related data
         $conference = $paper->conference()->with(['importantDates', 'keynoteSpeakers'])->first();
-        
-        // 4. Prepare data for PDF
+
         $data = [
-            'paper' => $paper,
-            'author' => $paper->user,
-            'conference' => $conference,
-            'loaNumber' => $loaNumber,
-            'qrCode' => $qrCodeDataUri,
+            'paper'         => $paper,
+            'author'        => $paper->user,
+            'conference'    => $conference,
+            'loaNumber'     => $loaNumber,
+            'qrCode'        => $qrCodeDataUri,
             'generatedDate' => now(),
         ];
-        
-        // 5. Generate PDF from view
-        $pdf = Pdf::loadView('pdf.loa-template', $data)
-            ->setPaper('a4', 'portrait');
-        
-        // 6. Save to storage
+
+        $pdf = Pdf::loadView('pdf.loa-template', $data)->setPaper('a4', 'portrait');
+
         $filename = "LOA-{$paper->id}-" . now()->format('Ymd-His') . ".pdf";
-        $path = "loa/" . now()->year . "/{$filename}";
-        
+        $path     = "loa/" . now()->year . "/{$filename}";
         Storage::disk('public')->put($path, $pdf->output());
-        
-        // 7. Store LOA number in paper metadata (for verification)
-        $paper->update([
-            'loa_number' => $loaNumber,
-        ]);
-        
+
+        $paper->update(['loa_number' => $loaNumber]);
+
         return $path;
     }
-    
+
     /**
-     * Generate Certificate PDF for a user
+     * Generate a Certificate PDF and store it.
      *
-     * @param User $user
-     * @param string $type (author, participant, reviewer, committee)
-     * @param Paper|null $paper (for author type)
-     * @return string Path to generated PDF
+     * Guarantees exactly ONE certificate record per (user, type, conference).
+     * Safe order: delete old → generate PDF → save file → create record.
+     * If PDF generation or file-save fails an exception propagates to the caller
+     * and nothing is deleted, so existing data stays intact.
      */
-    public function generateCertificate(User $user, string $type = 'author', ?Paper $paper = null): string
-    {
-        // 1. Generate unique certificate number
-        $certNumber = $this->generateCertificateNumber($type);
-        
-        // 2. Generate QR Code
+    public function generateCertificate(
+        User $user,
+        string $type = 'author',
+        ?Paper $paper = null
+    ): string {
+        $conference = $paper
+            ? $paper->conference
+            : Conference::where('is_active', true)->first();
+
+        // Remove any stale duplicate records for this user+type+conference.
+        // Done BEFORE generating the PDF so that if generation fails the old
+        // record (if valid) is untouched.
+        if ($conference) {
+            $existing = Certificate::where('user_id', $user->id)
+                ->where('conference_id', $conference->id)
+                ->where('type', $type)
+                ->get();
+
+            foreach ($existing as $old) {
+                if ($old->file_path && Storage::disk('public')->exists($old->file_path)) {
+                    Storage::disk('public')->delete($old->file_path);
+                }
+                $old->delete();
+            }
+        }
+
+        $certNumber    = $this->generateCertificateNumber($type);
         $qrCodeDataUri = $this->generateQRCode(route('verify-certificate', ['code' => $certNumber]));
-        
-        // 3. Get active conference (or specific conference from paper)
-        $conference = $paper ? $paper->conference : Conference::where('is_active', true)->first();
-        
-        // 4. Prepare data
+
         $data = [
-            'user' => $user,
-            'paper' => $paper,
-            'conference' => $conference,
-            'certNumber' => $certNumber,
-            'qrCode' => $qrCodeDataUri,
-            'type' => $type,
+            'user'          => $user,
+            'paper'         => $paper,
+            'conference'    => $conference,
+            'certNumber'    => $certNumber,
+            'qrCode'        => $qrCodeDataUri,
+            'type'          => $type,
             'generatedDate' => now(),
         ];
-        
-        // 5. Generate PDF (landscape for certificate)
-        $pdf = Pdf::loadView('pdf.certificate-template', $data)
-            ->setPaper('a4', 'landscape');
-        
-        // 6. Save to storage
+
+        $pdf = Pdf::loadView('pdf.certificate-template', $data)->setPaper('a4', 'landscape');
+
         $filename = "CERT-{$type}-{$user->id}-" . now()->format('Ymd-His') . ".pdf";
-        $path = "certificates/" . now()->year . "/{$filename}";
-        
+        $path     = "certificates/" . now()->year . "/{$filename}";
         Storage::disk('public')->put($path, $pdf->output());
 
-        // 7. Store certificate record in DB for verification.
-        //    Delete any existing certificate of the same type for this user+conference
-        //    first, so we never accumulate duplicates.
-        try {
-            if ($conference) {
-                $existing = Certificate::where('user_id', $user->id)
-                    ->where('conference_id', $conference->id)
-                    ->where('type', $type)
-                    ->get();
+        Certificate::create([
+            'cert_number'   => $certNumber,
+            'type'          => $type,
+            'user_id'       => $user->id,
+            'paper_id'      => $paper?->id,
+            'conference_id' => $conference?->id,
+            'file_path'     => $path,
+            'generated_at'  => now(),
+        ]);
 
-                foreach ($existing as $old) {
-                    if ($old->file_path && Storage::disk('public')->exists($old->file_path)) {
-                        Storage::disk('public')->delete($old->file_path);
-                    }
-                    $old->delete();
-                }
-            }
-
-            Certificate::create([
-                'cert_number'   => $certNumber,
-                'type'          => $type,
-                'user_id'       => $user->id,
-                'paper_id'      => $paper?->id,
-                'conference_id' => $conference?->id,
-                'file_path'     => $path,
-                'generated_at'  => now(),
-            ]);
-        } catch (\Throwable $e) {
-            \Log::warning('Could not save certificate record: ' . $e->getMessage());
-        }
-        
         return $path;
     }
-    
-    /**
-     * Generate unique LOA number
-     *
-     * @param Paper $paper
-     * @return string
-     */
-    private function generateLOANumber(Paper $paper): string
-    {
-        $conference = $paper->conference;
-        $year = now()->year;
-        
-        $acronym = $conference->acronym ?: 'CONF';
-        // Sanitize: collapse spaces, remove characters that break URLs/filenames
-        $acronym = preg_replace('/\s+/', '-', trim($acronym));
-        $acronym = preg_replace('/[^A-Za-z0-9\-]/', '', $acronym);
-        $acronymUpper = strtoupper($acronym);
-        
-        // Count existing LOAs for this conference and year, then loop until unique
-        $count = Paper::where('conference_id', $conference->id)
-            ->whereNotNull('loa_number')
-            ->count() + 1;
-        
-        do {
-            $loaNumber = sprintf("LOA/%03d/%s/%d", $count, $acronymUpper, $year);
-            $exists = Paper::where('loa_number', $loaNumber)->exists();
-            if ($exists) {
-                $count++;
-            }
-        } while ($exists);
-        
-        return $loaNumber;
-    }
-    
-    /**
-     * Generate unique certificate number
-     *
-     * @param string $type
-     * @return string
-     */
-    private function generateCertificateNumber(string $type): string
-    {
-        $year = now()->year;
-        $typeCode = strtoupper(substr($type, 0, 3)); // AUT, PAR, REV, COM
 
-        // Use DB-based sequential counter
-        $count = 1;
-        try {
-            $count = Certificate::where('type', $type)
-                ->whereYear('generated_at', $year)
-                ->count() + 1;
-        } catch (\Throwable) {
-            // certificates table may not exist yet; fall back to random
-            $count = rand(100, 999);
-        }
-
-        return sprintf("CERT/%s/%03d/%d", $typeCode, $count, $year);
-    }
-    
-    /**
-     * Generate QR Code as base64 data URI
-     *
-     * @param string $url
-     * @return string
-     */
-    private function generateQRCode(string $url): string
-    {
-        $builder = new Builder(
-            writer: new PngWriter(),
-            data: $url,
-            encoding: new Encoding('UTF-8'),
-            size: 120,
-            margin: 5,
-        );
-
-        $result = $builder->build();
-
-        return $result->getDataUri();
-    }
-    
     /**
      * Batch generate author certificates.
-     * One certificate per user (deduped): uses the latest eligible paper if user has multiple.
-     * Users who already have an author certificate for this conference are skipped.
+     *
+     * Rules:
+     * - One certificate per user (even if the user has multiple papers).
+     * - Skips users who already have a valid author certificate (file exists on disk).
+     * - Re-generates for users whose certificate record exists but file is missing.
      */
     public function batchGenerateCertificates(Conference $conference): array
     {
         $stats = ['authors' => 0, 'failed' => 0];
 
-        // Collect user_ids that already have an author Certificate for this conference
-        $alreadyCertified = \App\Models\Certificate::where('conference_id', $conference->id)
+        // Users who already have an author cert WITH a valid file on disk → skip.
+        $alreadyCertified = Certificate::where('conference_id', $conference->id)
             ->where('type', 'author')
+            ->get()
+            ->filter(fn ($c) => $c->file_path && Storage::disk('public')->exists($c->file_path))
             ->pluck('user_id')
             ->toArray();
 
-        // Get eligible papers, excluding users who already have author certificates.
-        // Group by user so each user only receives ONE certificate even if they have
-        // multiple papers. The most recent eligible paper is picked per user.
         $papers = Paper::where('conference_id', $conference->id)
             ->whereIn('status', ['payment_verified', 'deliverables_pending', 'completed'])
-            ->whereDoesntHave('deliverables', function ($query) {
-                $query->where('type', 'certificate')->where('direction', 'admin_send');
-            })
             ->whereNotIn('user_id', $alreadyCertified)
             ->with('user')
             ->latest()
             ->get()
-            ->unique('user_id'); // one paper per user
+            ->unique('user_id');
 
         foreach ($papers as $paper) {
             try {
-                $path = $this->generateCertificate($paper->user, 'author', $paper);
-
-                $paper->deliverables()->create([
-                    'user_id'       => $paper->user_id,
-                    'type'          => 'certificate',
-                    'direction'     => 'admin_send',
-                    'file_path'     => $path,
-                    'original_name' => basename($path),
-                    'notes'         => 'Certificate auto-generated',
-                    'sent_at'       => now(),
-                ]);
-
+                $this->generateCertificate($paper->user, 'author', $paper);
                 $stats['authors']++;
             } catch (\Exception $e) {
-                \Log::error("Failed to generate certificate for paper {$paper->id}: " . $e->getMessage());
+                \Log::error("Failed to generate author certificate for paper {$paper->id}: " . $e->getMessage());
                 $stats['failed']++;
             }
         }
@@ -267,22 +152,35 @@ class DocumentGenerator
 
     /**
      * Batch generate participant certificates.
-     * Covers two groups:
-     *   1. Users with a verified participant payment (pure participants).
-     *   2. Authors whose paper payment is verified — they attend as presenters
-     *      and also deserve a participant certificate.
+     *
+     * Covers:
+     * 1. Authors whose paper is verified/completed (they present at the conference).
+     * 2. Pure participants with a verified participant payment.
+     *
+     * Skips users who already have a valid participant certificate (file exists on disk).
+     * Re-generates if the record exists but the file is missing.
      */
     public function batchGenerateParticipantCertificates(Conference $conference): array
     {
         $stats = ['participants' => 0, 'failed' => 0];
 
-        // User IDs who already have a participant Certificate for this conference
-        $alreadyCertified = \App\Models\Certificate::where('conference_id', $conference->id)
+        // Users who already have a participant cert WITH a valid file on disk → skip.
+        $alreadyCertified = Certificate::where('conference_id', $conference->id)
             ->where('type', 'participant')
+            ->get()
+            ->filter(fn ($c) => $c->file_path && Storage::disk('public')->exists($c->file_path))
             ->pluck('user_id')
             ->toArray();
 
-        // Group 1: pure participants with a verified participant payment
+        // Group 1: verified authors (paper payment confirmed)
+        $fromPapers = Paper::where('conference_id', $conference->id)
+            ->whereIn('status', ['payment_verified', 'deliverables_pending', 'completed'])
+            ->whereNotIn('user_id', $alreadyCertified)
+            ->with('user')
+            ->get()
+            ->unique('user_id');
+
+        // Group 2: pure participants with a verified payment
         $fromPayments = \App\Models\Payment::where('type', 'participant')
             ->where('status', 'verified')
             ->whereHas('registrationPackage', fn ($q) => $q->where('conference_id', $conference->id))
@@ -291,24 +189,16 @@ class DocumentGenerator
             ->get()
             ->unique('user_id');
 
-        // Group 2: authors whose paper is in a verified/completed status
-        $fromPapers = Paper::where('conference_id', $conference->id)
-            ->whereIn('status', ['payment_verified', 'deliverables_pending', 'completed'])
-            ->whereNotIn('user_id', $alreadyCertified)
-            ->with('user')
-            ->get()
-            ->unique('user_id');
-
-        // Merge both groups, keyed by user_id so there are no duplicates
+        // Merge, keyed by user_id to avoid duplicates
         $usersById = collect();
-        foreach ($fromPayments as $payment) {
-            if ($payment->user) {
-                $usersById->put($payment->user_id, $payment->user);
+        foreach ($fromPapers as $paper) {
+            if ($paper->user) {
+                $usersById->put($paper->user_id, $paper->user);
             }
         }
-        foreach ($fromPapers as $paper) {
-            if ($paper->user && ! $usersById->has($paper->user_id)) {
-                $usersById->put($paper->user_id, $paper->user);
+        foreach ($fromPayments as $payment) {
+            if ($payment->user && ! $usersById->has($payment->user_id)) {
+                $usersById->put($payment->user_id, $payment->user);
             }
         }
 
@@ -323,5 +213,55 @@ class DocumentGenerator
         }
 
         return $stats;
+    }
+
+    // ── Private helpers ──────────────────────────────────────────────────────
+
+    private function generateLOANumber(Paper $paper): string
+    {
+        $conference   = $paper->conference;
+        $year         = now()->year;
+        $acronym      = preg_replace('/[^A-Za-z0-9\-]/', '', preg_replace('/\s+/', '-', trim($conference->acronym ?: 'CONF')));
+        $acronymUpper = strtoupper($acronym);
+
+        $count = Paper::where('conference_id', $conference->id)->whereNotNull('loa_number')->count() + 1;
+
+        do {
+            $loaNumber = sprintf("LOA/%03d/%s/%d", $count, $acronymUpper, $year);
+            $exists    = Paper::where('loa_number', $loaNumber)->exists();
+            if ($exists) {
+                $count++;
+            }
+        } while ($exists);
+
+        return $loaNumber;
+    }
+
+    private function generateCertificateNumber(string $type): string
+    {
+        $year     = now()->year;
+        $typeCode = strtoupper(substr($type, 0, 3));
+
+        $count = 1;
+        try {
+            $count = Certificate::where('type', $type)->whereYear('generated_at', $year)->count() + 1;
+        } catch (\Throwable) {
+            $count = rand(100, 999);
+        }
+
+        return sprintf("CERT/%s/%03d/%d", $typeCode, $count, $year);
+    }
+
+    private function generateQRCode(string $url): string
+    {
+        $result = (new Builder(
+            writer: new PngWriter(),
+            data: $url,
+            encoding: new Encoding('UTF-8'),
+            size: 120,
+            margin: 5,
+        ))->build();
+
+        return $result->getDataUri();
     }
 }

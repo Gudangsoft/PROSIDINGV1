@@ -443,7 +443,7 @@
             <div class="flex items-start justify-between gap-4">
                 <div>
                     <h3 class="font-semibold text-lg">Generate Sertifikat Massal</h3>
-                    <p class="text-blue-100 text-sm mt-0.5">Pemakalah: semua presenter terverifikasi (1 sertifikat per user). Peserta: hanya non-pemakalah.</p>
+                    <p class="text-blue-100 text-sm mt-0.5">Pemakalah: semua presenter terverifikasi (1 per user). Peserta: pemakalah + peserta umum terverifikasi.</p>
                 </div>
                 <div class="flex items-center gap-3 shrink-0">
                     {{-- Tarik Semua --}}
@@ -478,9 +478,9 @@
                         <span wire:loading wire:target="batchGenerate">Memproses...</span>
                     </button>
 
-                    {{-- Generate Peserta (non-pemakalah only) --}}
+                    {{-- Generate Peserta --}}
                     <button wire:click="batchGenerateParticipants"
-                            wire:confirm="Generate sertifikat peserta? Pemakalah akan otomatis dilewati."
+                            wire:confirm="Generate sertifikat peserta? Mencakup pemakalah terverifikasi + peserta umum."
                             wire:loading.attr="disabled"
                             class="flex items-center gap-2 px-5 py-2.5 bg-indigo-100 text-indigo-900 rounded-lg text-sm font-semibold hover:bg-indigo-200 transition disabled:opacity-60">
                         <span wire:loading.remove wire:target="batchGenerateParticipants">
@@ -517,7 +517,7 @@
 
         {{-- Filter & Search --}}
         <div class="bg-white rounded-xl border shadow-sm">
-            <div class="px-5 py-4 border-b flex items-center gap-3">
+            <div class="px-5 py-4 border-b flex items-center gap-3 flex-wrap">
                 <div class="relative flex-1 max-w-xs">
                     <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -526,6 +526,14 @@
                            placeholder="Cari nama penerima..."
                            class="pl-9 pr-3 py-2 border rounded-lg text-sm w-full focus:ring-2 focus:ring-blue-500">
                 </div>
+                <select wire:model.live="certTypeFilter"
+                        class="px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                    <option value="">Semua Tipe</option>
+                    <option value="author">Pemakalah</option>
+                    <option value="participant">Peserta</option>
+                    <option value="reviewer">Reviewer</option>
+                    <option value="committee">Panitia</option>
+                </select>
                 <span class="text-sm text-gray-500">{{ $certificates->count() }} sertifikat ditemukan</span>
             </div>
 
@@ -542,7 +550,8 @@
                     <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
                         <tr>
                             <th class="px-4 py-3 text-left font-medium">Penerima</th>
-                            <th class="px-4 py-3 text-left font-medium">Judul Paper</th>
+                            <th class="px-4 py-3 text-left font-medium">Tipe</th>
+                            <th class="px-4 py-3 text-left font-medium">Paper / Nomor</th>
                             <th class="px-4 py-3 text-left font-medium">Dibuat</th>
                             <th class="px-4 py-3 text-right font-medium">Aksi</th>
                         </tr>
@@ -554,11 +563,25 @@
                                 <div class="font-medium text-gray-800">{{ $cert->user->name ?? '—' }}</div>
                                 <div class="text-xs text-gray-400">{{ $cert->user->email ?? '' }}</div>
                             </td>
-                            <td class="px-4 py-3 text-gray-600 max-w-xs truncate">
-                                {{ $cert->paper->title ?? '—' }}
+                            <td class="px-4 py-3">
+                                @php
+                                    $typeColors = [
+                                        'author'      => 'bg-blue-50 text-blue-700',
+                                        'participant' => 'bg-green-50 text-green-700',
+                                        'reviewer'    => 'bg-purple-50 text-purple-700',
+                                        'committee'   => 'bg-orange-50 text-orange-700',
+                                    ];
+                                @endphp
+                                <span class="inline-block px-2 py-0.5 rounded text-xs font-medium {{ $typeColors[$cert->type] ?? 'bg-gray-100 text-gray-600' }}">
+                                    {{ $cert->getTypeLabel() }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-gray-600 max-w-xs">
+                                <div class="truncate">{{ $cert->paper->title ?? '—' }}</div>
+                                <div class="text-xs text-gray-400 font-mono">{{ $cert->cert_number }}</div>
                             </td>
                             <td class="px-4 py-3 text-gray-500">
-                                {{ $cert->sent_at?->format('d/m/Y') ?? '—' }}
+                                {{ $cert->generated_at?->format('d/m/Y') ?? '—' }}
                             </td>
                             <td class="px-4 py-3 text-right">
                                 <div class="flex items-center justify-end gap-2">
