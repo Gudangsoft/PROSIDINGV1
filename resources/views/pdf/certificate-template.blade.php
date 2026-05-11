@@ -438,7 +438,7 @@
             <span class="word-of">of</span>
             <div class="cert-type">
                 @if($type === 'author')Presenter
-                @elseif($type === 'participant')Participation
+                @elseif($type === 'participant')Participant
                 @elseif($type === 'reviewer')Reviewing
                 @elseif($type === 'committee')Committee Member
                 @else{{ ucfirst($type) }}@endif
