@@ -60,7 +60,8 @@ class MaterialList extends Component
                         ->orderBy('sort_order')
                         ->orderBy('type')
                         ->get()
-                        ->groupBy('type');
+                        ->groupBy('type')
+                        ->toBase();
 
                     $conferenceGroups->push([
                         'conference' => $conference,
