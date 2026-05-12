@@ -35,14 +35,81 @@
 
     @foreach($conferenceGroups as $group)
     @php
-        $conference = $group['conference'];
-        $materials  = $group['materials'];
-        $certs      = $materials->get('sertifikat', collect());
-        $otherMats  = $materials->except('sertifikat');
-        $totalOther = $otherMats->flatten()->count();
+        $conference     = $group['conference'];
+        $materials      = $group['materials'];
+        $generatedCerts = $group['generatedCerts'] ?? collect();
+        $certs          = $materials->get('sertifikat', collect());
+        $otherMats      = $materials->except('sertifikat');
+        $totalOther     = $otherMats->flatten()->count();
     @endphp
 
-    {{-- CERTIFICATE SECTION --}}
+    {{-- GENERATED CERTIFICATES (from certificates table) --}}
+    @if($generatedCerts->isNotEmpty())
+    <div class="mb-8">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center shadow-sm">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-lg font-bold text-gray-800">My Certificates</h2>
+                <p class="text-xs text-gray-500">{{ $conference->name }}</p>
+            </div>
+            <span class="ml-auto bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                {{ $generatedCerts->count() }} certificate{{ $generatedCerts->count() > 1 ? 's' : '' }}
+            </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            @foreach($generatedCerts as $cert)
+            <div class="relative overflow-hidden rounded-2xl border-2 border-yellow-300 shadow-md bg-white hover:shadow-lg transition-all duration-300">
+                <div class="h-2 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500"></div>
+                <div class="mx-3 mt-2 mb-3 border border-yellow-200 rounded-xl p-4 bg-gradient-to-br from-yellow-50/60 to-amber-50/40">
+                    <div class="flex items-start gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-bold text-gray-800 text-sm leading-tight">{{ $cert->getTypeLabel() }}</p>
+                            <p class="text-xs text-amber-700 font-medium mt-0.5">{{ $conference->name }}</p>
+                            <p class="text-xs text-gray-400 font-mono mt-1">{{ $cert->cert_number }}</p>
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <svg class="w-3 h-3 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                <span class="text-xs text-green-600 font-medium">Verified Certificate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mt-4">
+                        @if($cert->file_path)
+                        <a href="{{ Storage::url($cert->file_path) }}" download
+                           class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-xl text-sm font-semibold hover:from-yellow-600 hover:to-amber-600 transition shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Download Certificate
+                        </a>
+                        <a href="{{ Storage::url($cert->file_path) }}" target="_blank"
+                           class="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 border-2 border-yellow-300 text-amber-700 rounded-xl text-sm font-semibold hover:bg-yellow-50 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            View
+                        </a>
+                        @else
+                        <span class="text-xs text-amber-600 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            File sedang diproses
+                        </span>
+                        @endif
+                    </div>
+                </div>
+                <div class="h-1 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500"></div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    {{-- CERTIFICATE SECTION (from conference_materials table) --}}
     @if($certs->isNotEmpty())
     <div class="mb-8">
         <div class="flex items-center gap-3 mb-4">
@@ -209,7 +276,7 @@
     </div>
     @endif
 
-    @if($certs->isEmpty() && $totalOther === 0)
+    @if($generatedCerts->isEmpty() && $certs->isEmpty() && $totalOther === 0)
     <div class="bg-white rounded-2xl border p-10 text-center text-gray-400 mb-8">
         <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
         <p class="text-sm font-medium">No content uploaded yet for <span class="text-gray-600">{{ $conference->name }}</span></p>
