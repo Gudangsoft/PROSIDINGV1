@@ -11,9 +11,16 @@ return Application::configure(basePath: dirname(__DIR__))
         using: function () {
             // Central routes first, scoped to each central domain — the SaaS
             // product site itself (config('tenancy.central_domains')).
+            // routes/central.php gets loaded once per configured central
+            // domain, so each route inside it would otherwise be registered
+            // under the exact same name multiple times — harmless at runtime,
+            // but `route:cache`/`optimize` refuses to compile duplicate
+            // route names. Prefixing per domain keeps every registration
+            // unique without needing route() lookups anywhere for these.
             foreach (config('tenancy.central_domains') as $domain) {
                 \Illuminate\Support\Facades\Route::middleware('web')
                     ->domain($domain)
+                    ->name("central.{$domain}.")
                     ->group(base_path('routes/central.php'));
             }
 

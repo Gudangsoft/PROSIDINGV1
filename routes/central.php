@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return 'Prosiding SaaS — central app placeholder. Tenant sites are served on their own domains.';
-})->name('central.home');
+})->name('home');
 
 /*
 |--------------------------------------------------------------------------
@@ -54,4 +54,4 @@ Route::get('/internal/domain-check', function (\Illuminate\Http\Request $request
     }
 
     abort(404);
-})->name('internal.domain-check');
+})->name('domain-check');
