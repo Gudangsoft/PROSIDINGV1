@@ -2,8 +2,11 @@
 
 namespace App\Livewire\Auth;
 
+use App\Helpers\FileUploadValidator;
+use App\Livewire\Concerns\HasHoneypot;
 use App\Models\User;
 use App\Mail\WelcomeMail;
+use App\Rules\NoSpamContent;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
@@ -12,6 +15,7 @@ use Livewire\WithFileUploads;
 class ReviewerRegister extends Component
 {
     use WithFileUploads;
+    use HasHoneypot;
 
     // Personal Information
     public string $name = '';
@@ -49,9 +53,9 @@ class ReviewerRegister extends Component
             'institution' => 'required|string|max:255',
             'country' => 'required|string|max:100',
             'phone' => 'required|string|max:30',
-            'research_interest' => 'required|string|max:500',
-            'other_info' => 'nullable|string|max:1000',
-            'expertise' => 'required|string|max:500',
+            'research_interest' => ['required', 'string', 'max:500', new NoSpamContent()],
+            'other_info' => ['nullable', 'string', 'max:1000', new NoSpamContent()],
+            'expertise' => ['required', 'string', 'max:500', new NoSpamContent()],
             'scopus_id' => 'nullable|string|max:100',
             'google_scholar' => 'nullable|url|max:255',
             'orcid' => 'nullable|string|max:50',
@@ -59,6 +63,7 @@ class ReviewerRegister extends Component
             'review_experience' => 'nullable|string|max:50',
             'password' => 'required|string|min:8|confirmed',
             'cv_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'website' => 'prohibited',
         ];
     }
 
@@ -79,16 +84,39 @@ class ReviewerRegister extends Component
         'password.confirmed' => 'Konfirmasi password tidak cocok.',
         'cv_file.mimes' => 'File CV harus berformat PDF, DOC, atau DOCX.',
         'cv_file.max' => 'Ukuran file CV maksimal 5MB.',
+        'website.prohibited' => 'Terjadi kesalahan validasi. Silakan muat ulang halaman dan coba lagi.',
     ];
 
     public function register()
     {
+        if ($this->isSpamSubmission()) {
+            $this->addError('email', 'Terjadi kesalahan. Silakan muat ulang halaman dan coba lagi.');
+
+            return;
+        }
+
+        $rateLimitKey = 'reviewer-register:' . request()->ip();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($rateLimitKey, 3)) {
+            $this->addError('email', 'Terlalu banyak percobaan registrasi. Silakan coba lagi dalam 1 jam.');
+
+            return;
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($rateLimitKey, 3600);
+
         $this->validate();
 
-        // Handle CV upload
+        // Handle CV upload — validated + malware-scanned before it ever touches storage
         $cvPath = null;
         if ($this->cv_file) {
-            $cvPath = $this->cv_file->store('reviewer-cv', 'public');
+            $scan = FileUploadValidator::validateCv($this->cv_file);
+            if (!$scan['valid']) {
+                $this->addError('cv_file', implode(' ', $scan['errors']));
+
+                return;
+            }
+
+            $filename = FileUploadValidator::generateSecureFilename($this->cv_file, 'cv');
+            $cvPath = $this->cv_file->storeAs('reviewer-cv', $filename, 'public');
         }
 
         // Create user with role 'reviewer' but status pending

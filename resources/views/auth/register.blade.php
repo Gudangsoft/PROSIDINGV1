@@ -108,6 +108,13 @@
             @submit.prevent="validateAndSubmit($refs.registerFormEl)">
             @csrf
 
+            {{-- Honeypot: hidden from real users, bots that auto-fill every field will trip it --}}
+            @php session()->put('register_form_rendered_at', now()->timestamp); @endphp
+            <div style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true">
+                <label for="website">Website</label>
+                <input type="text" id="website" name="website" value="" tabindex="-1" autocomplete="off">
+            </div>
+
             {{-- ── Error Summary Panel ──────────────────────────────────── --}}
             <div x-show="showErrors" x-transition x-ref="errorPanel"
                 class="mx-8 mt-6 bg-red-50 border border-red-300 rounded-xl overflow-hidden" style="display:none">

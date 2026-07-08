@@ -173,7 +173,98 @@ class SubmitPaper extends Component
 
 ---
 
-### 5. **Custom Validation Rules**
+### 5. **Anti-Malware File Scanning**
+Setiap file upload (paper, CV reviewer, bukti pembayaran, deliverable) dipindai untuk konten berbahaya sebelum disimpan.
+
+**Lokasi:** `app/Helpers/MalwareScanner.php` (dipanggil otomatis dari `FileUploadValidator`)
+
+**Yang dideteksi:**
+- ✅ Magic-byte mismatch (file yang disamarkan, mis. `.exe` diganti nama jadi `.pdf`)
+- ✅ Konten aktif berbahaya di PDF (`/JavaScript`, `/OpenAction`, `/Launch`, `/EmbeddedFile`, dll)
+- ✅ Macro VBA di dokumen Office (`vbaProject.bin`)
+- ✅ File executable yang disisipkan di dalam arsip docx/pptx (zip)
+- ✅ Zip bomb (rasio kompresi tidak wajar)
+- ✅ Signature test EICAR (standar industri antivirus)
+- ✅ Header executable Windows (MZ) yang disembunyikan di dalam file lain (polyglot)
+- ✅ Integrasi opsional dengan ClamAV (jika terpasang di server)
+
+**Tidak perlu instalasi tambahan** — semua pemeriksaan di atas berjalan native di PHP. ClamAV bersifat opsional dan *fail-open* (tidak memblokir upload bila binary tidak ditemukan).
+
+**Titik upload yang sudah terlindungi:**
+- Submit paper (abstrak, full paper, turnitin) — `SubmitPaper`
+- Registrasi reviewer (CV) — `ReviewerRegister`
+- Bukti pembayaran (registrasi, participant, author) — `CreateNewUser`, `PaymentProof`, `PaymentUpload`
+- Deliverable (poster, PPT, final paper) — `DeliverableUpload`
+
+**Cara pakai di komponen baru:**
+```php
+use App\Helpers\FileUploadValidator;
+
+$scan = FileUploadValidator::validatePaper($file); // atau validateImage / validatePayment / validateCv / validateDeliverable
+if (!$scan['valid']) {
+    $this->addError('file', implode(' ', $scan['errors']));
+    return;
+}
+```
+
+**Aktifkan ClamAV (opsional, di `.env`):**
+```env
+CLAMAV_ENABLED=true
+CLAMAV_BINARY=clamscan
+CLAMAV_TIMEOUT=15
+```
+
+---
+
+### 6. **Anti-Spam Protection**
+Melindungi form publik (registrasi, registrasi reviewer) dari bot dan konten spam.
+
+**Komponen:**
+- `app/Livewire/Concerns/HasHoneypot.php` — trait honeypot + time-trap untuk komponen Livewire
+- `app/Rules/NoSpamContent.php` — rule validasi untuk field teks bebas (deteksi kata kunci spam, link-stuffing, karakter berulang)
+- Honeypot field pada form registrasi utama (`resources/views/auth/register.blade.php`) dan registrasi reviewer (Livewire)
+- Math CAPTCHA pada form registrasi utama (sudah ada sebelumnya)
+- Rate limiting: 3 percobaan registrasi/jam per IP (limiter `register`, kini benar-benar terpasang di route `register.store` dan di aksi `ReviewerRegister::register()`)
+
+**Cara kerja honeypot + time-trap:**
+1. Field tersembunyi (`website`) — bot yang auto-fill semua field akan mengisinya, user asli tidak pernah melihatnya.
+2. Time-trap — submit yang terjadi kurang dari `SPAM_HONEYPOT_MIN_SECONDS` (default 2 detik) setelah form dirender dianggap bot.
+
+**Cara pakai di komponen Livewire baru:**
+```php
+use App\Livewire\Concerns\HasHoneypot;
+
+class MyPublicForm extends Component
+{
+    use HasHoneypot;
+
+    public function submit()
+    {
+        if ($this->isSpamSubmission()) {
+            $this->addError('email', 'Terjadi kesalahan. Silakan coba lagi.');
+            return;
+        }
+        // ... lanjutkan proses submit
+    }
+}
+```
+Tambahkan input tersembunyi di view:
+```blade
+<div class="absolute -left-[9999px] opacity-0" aria-hidden="true" tabindex="-1">
+    <input type="text" wire:model="website" tabindex="-1" autocomplete="off">
+</div>
+```
+
+**Cara pakai `NoSpamContent` pada field teks:**
+```php
+use App\Rules\NoSpamContent;
+
+'message' => ['required', 'string', 'max:1000', new NoSpamContent()],
+```
+
+---
+
+### 7. **Custom Validation Rules**
 
 #### **NoScriptTags** - Mencegah XSS
 ```php
@@ -298,11 +389,13 @@ Route::post('/submit', [Controller::class, 'submit'])
 - [x] Path traversal protection (SafeFilename)
 - [x] Strong password policy
 - [x] CSRF protection (Laravel default)
+- [x] Malware scanning for uploads (built-in static scanner + optional ClamAV)
+- [x] Anti-spam honeypot + time-trap on public forms
+- [x] Spam-content filtering on free-text fields (NoSpamContent)
 - [ ] Email verification (optional)
 - [ ] Two-factor authentication (Fortify feature)
 - [ ] IP whitelist for admin (optional)
 - [ ] Database backup automation
-- [ ] Malware scanning for uploads (optional)
 
 ---
 
@@ -403,4 +496,4 @@ class SubmitPaper extends Component
 
 ---
 
-**Terakhir diupdate:** 18 Februari 2026
+**Terakhir diupdate:** 8 Juli 2026

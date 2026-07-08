@@ -45,6 +45,12 @@
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
         <form wire:submit="register">
 
+            {{-- Honeypot: hidden from real users, bots that auto-fill every field will trip it --}}
+            <div class="absolute -left-[9999px] opacity-0" aria-hidden="true" tabindex="-1">
+                <label for="website">Website</label>
+                <input type="text" id="website" name="website" wire:model="website" tabindex="-1" autocomplete="off">
+            </div>
+
             {{-- ── SEKSI 1: Data Pribadi ─────────────────────────────────────── --}}
             <div class="px-8 pt-8 pb-6 border-b border-gray-100">
                 <div class="flex items-center gap-3 mb-5">

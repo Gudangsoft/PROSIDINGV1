@@ -71,6 +71,8 @@ class Profile extends Component
             'signatureData' => 'nullable|string',
         ]);
 
+        $emailChanged = $this->email !== $user->email;
+
         $data = [
             'name' => $this->name,
             'email' => $this->email,
@@ -81,6 +83,13 @@ class Profile extends Component
             'research_interest' => $this->research_interest ?: null,
             'other_info' => $this->other_info ?: null,
         ];
+
+        // Changing the email address means the new address hasn't been
+        // proven to belong to this user yet — require re-verification
+        // instead of silently carrying over the old verified_at timestamp.
+        if ($emailChanged) {
+            $data['email_verified_at'] = null;
+        }
 
         // Handle photo upload
         if ($this->photo) {
@@ -117,7 +126,12 @@ class Profile extends Component
 
         $user->update($data);
 
-        session()->flash('profile-success', 'Profil berhasil diperbarui.');
+        if ($emailChanged) {
+            $user->sendEmailVerificationNotification();
+            session()->flash('profile-success', 'Profil berhasil diperbarui. Email baru Anda perlu diverifikasi ulang — cek inbox untuk link verifikasi.');
+        } else {
+            session()->flash('profile-success', 'Profil berhasil diperbarui.');
+        }
     }
 
     public function updatePassword(): void

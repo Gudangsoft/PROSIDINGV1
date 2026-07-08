@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Author;
 
+use App\Helpers\FileUploadValidator;
 use App\Models\Paper;
 use App\Models\PaperFile;
 use App\Models\Topic;
 use App\Models\EmailTemplate;
 use App\Mail\CustomTemplateMail;
+use App\Rules\NoSpamContent;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
@@ -30,15 +32,18 @@ class SubmitPaper extends Component
     public string $contribEmail = '';
     public string $contribInstitution = '';
 
-    protected $rules = [
-        'title' => 'required|min:10|max:500',
-        'abstract' => 'required|min:50',
-        'keywords' => 'required',
-        'selectedTopic' => 'required',
-        'abstractFile' => 'required|file|mimes:pdf,doc,docx|max:10240',
-        'paperFile' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
-        'turnitinFile' => 'nullable|file|mimes:pdf|max:10240',
-    ];
+    protected function rules(): array
+    {
+        return [
+            'title' => ['required', 'min:10', 'max:500', new NoSpamContent()],
+            'abstract' => ['required', 'min:50', new NoSpamContent()],
+            'keywords' => ['required', new NoSpamContent()],
+            'selectedTopic' => 'required',
+            'abstractFile' => 'required|file|mimes:pdf,doc,docx|max:10240',
+            'paperFile' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+            'turnitinFile' => 'nullable|file|mimes:pdf|max:10240',
+        ];
+    }
 
     protected $messages = [
         'title.required' => 'Judul paper wajib diisi.',
@@ -99,6 +104,28 @@ class SubmitPaper extends Component
     public function submit()
     {
         $this->validate();
+
+        // Malware scan every uploaded file before creating any records or
+        // moving files into permanent storage.
+        $scan = FileUploadValidator::validatePaper($this->abstractFile);
+        if (!$scan['valid']) {
+            $this->addError('abstractFile', implode(' ', $scan['errors']));
+            return;
+        }
+        if ($this->paperFile) {
+            $scan = FileUploadValidator::validatePaper($this->paperFile);
+            if (!$scan['valid']) {
+                $this->addError('paperFile', implode(' ', $scan['errors']));
+                return;
+            }
+        }
+        if ($this->turnitinFile) {
+            $scan = FileUploadValidator::validateGeneric($this->turnitinFile, ['application/pdf'], 10240, 'Turnitin file');
+            if (!$scan['valid']) {
+                $this->addError('turnitinFile', implode(' ', $scan['errors']));
+                return;
+            }
+        }
 
         $activeConference = \App\Models\Conference::where('is_active', true)->first();
 

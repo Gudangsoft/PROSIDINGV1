@@ -66,6 +66,15 @@ class PaymentList extends Component
     public function quickVerify(int $paymentId)
     {
         $payment = Payment::findOrFail($paymentId);
+
+        // Uploaded amounts are now always derived server-side from the
+        // package/method price at submission time, but this guards against
+        // older records (created before that fix) or manual DB edits — an
+        // admin verifying a payment should never be silently unaware that
+        // the recorded amount is less than what the package actually costs.
+        $expectedAmount = $payment->registrationPackage?->price;
+        $amountMismatch = $expectedAmount !== null && (float) $payment->amount < (float) $expectedAmount;
+
         $payment->update([
             'status' => 'verified',
             'verified_by' => Auth::id(),
@@ -120,7 +129,11 @@ class PaymentList extends Component
             \Log::error('PaymentVerifiedMail gagal: ' . $e->getMessage());
         }
 
-        session()->flash('success', 'Pembayaran ' . $payment->invoice_number . ' → Lunas! Email notifikasi terkirim.');
+        if ($amountMismatch) {
+            session()->flash('warning', 'Pembayaran ' . $payment->invoice_number . ' → Lunas, TAPI nominal (Rp ' . number_format($payment->amount, 0, ',', '.') . ') lebih kecil dari harga paket (Rp ' . number_format($expectedAmount, 0, ',', '.') . '). Mohon dicek kembali.');
+        } else {
+            session()->flash('success', 'Pembayaran ' . $payment->invoice_number . ' → Lunas! Email notifikasi terkirim.');
+        }
     }
 
     public function openRejectModal(int $paymentId)

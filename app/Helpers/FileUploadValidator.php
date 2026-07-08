@@ -39,11 +39,34 @@ class FileUploadValidator
     ];
 
     /**
+     * Allowed file types for CV/resume uploads (reviewer registration)
+     */
+    public const CV_TYPES = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ];
+
+    /**
+     * Allowed file types for deliverables (poster, ppt, final paper)
+     */
+    public const DELIVERABLE_TYPES = [
+        'application/pdf',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+    ];
+
+    /**
      * Maximum file sizes (in KB)
      */
     public const MAX_PAPER_SIZE = 10240; // 10MB
     public const MAX_IMAGE_SIZE = 5120;  // 5MB
     public const MAX_PAYMENT_SIZE = 2048; // 2MB
+    public const MAX_CV_SIZE = 5120; // 5MB
+    public const MAX_DELIVERABLE_SIZE = 20480; // 20MB
 
     /**
      * Validate paper file upload
@@ -67,6 +90,31 @@ class FileUploadValidator
     public static function validatePayment(UploadedFile $file): array
     {
         return self::validate($file, self::PAYMENT_TYPES, self::MAX_PAYMENT_SIZE, 'Payment');
+    }
+
+    /**
+     * Validate CV/resume file upload
+     */
+    public static function validateCv(UploadedFile $file): array
+    {
+        return self::validate($file, self::CV_TYPES, self::MAX_CV_SIZE, 'CV');
+    }
+
+    /**
+     * Validate deliverable file upload (poster, ppt, final paper)
+     */
+    public static function validateDeliverable(UploadedFile $file): array
+    {
+        return self::validate($file, self::DELIVERABLE_TYPES, self::MAX_DELIVERABLE_SIZE, 'Deliverable');
+    }
+
+    /**
+     * Validate any file against a custom allow-list. Use this for upload
+     * flows that don't map onto one of the presets above.
+     */
+    public static function validateGeneric(UploadedFile $file, array $allowedTypes, int $maxSizeKb, string $label = 'File'): array
+    {
+        return self::validate($file, $allowedTypes, $maxSizeKb, $label);
     }
 
     /**
@@ -102,6 +150,17 @@ class FileUploadValidator
             $errors[] = "Executable files are not allowed";
         }
 
+        // Malware / booby-trapped-content scan (magic bytes, PDF active
+        // content, Office macros, embedded executables, EICAR, optional ClamAV)
+        if (empty($errors)) {
+            $scan = MalwareScanner::scan($file);
+            if (!$scan['clean']) {
+                foreach ($scan['threats'] as $threat) {
+                    $errors[] = "{$fileType} rejected by security scan: {$threat}";
+                }
+            }
+        }
+
         return [
             'valid' => empty($errors),
             'errors' => $errors,
@@ -123,6 +182,8 @@ class FileUploadValidator
             'image/png' => 'png',
             'image/gif' => 'gif',
             'image/webp' => 'webp',
+            'application/vnd.ms-powerpoint' => 'ppt',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation' => 'pptx',
         ];
 
         foreach ($mimeTypes as $mime) {
@@ -148,6 +209,8 @@ class FileUploadValidator
             'png' => ['image/png'],
             'gif' => ['image/gif'],
             'webp' => ['image/webp'],
+            'ppt' => ['application/vnd.ms-powerpoint'],
+            'pptx' => ['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
         ];
 
         $extension = strtolower($extension);

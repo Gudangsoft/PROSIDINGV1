@@ -285,8 +285,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Impersonate User
         Route::post('/impersonate/{user}', function (\App\Models\User $user) {
             if (!auth()->user()->isAdmin()) abort(403);
-            session()->put('impersonating_from', auth()->id());
+            $adminId = auth()->id();
             auth()->login($user);
+            // Rotate the session ID on privilege change so a session fixed/leaked
+            // before impersonation can't be reused to keep riding the new identity.
+            request()->session()->regenerate();
+            session()->put('impersonating_from', $adminId);
             return redirect('/dashboard')->with('info', 'Anda sekarang login sebagai ' . $user->name);
         })->name('admin.impersonate');
     });
@@ -296,6 +300,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $originalId = session()->pull('impersonating_from');
         if ($originalId) {
             auth()->login(\App\Models\User::findOrFail($originalId));
+            request()->session()->regenerate();
             return redirect('/dashboard')->with('info', 'Kembali ke akun admin.');
         }
         return redirect('/dashboard');

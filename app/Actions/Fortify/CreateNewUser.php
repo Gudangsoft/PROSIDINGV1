@@ -2,10 +2,12 @@
 
 namespace App\Actions\Fortify;
 
+use App\Helpers\FileUploadValidator;
 use App\Models\User;
 use App\Models\Payment;
 use App\Models\Notification;
 use App\Mail\WelcomeMail;
+use App\Rules\NoSpamContent;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
@@ -35,6 +37,15 @@ class CreateNewUser implements CreatesNewUsers
             ]);
         }
 
+        // Anti-spam: honeypot field must stay empty, and the form must not be
+        // submitted implausibly fast (bots that auto-fill/auto-submit trip this).
+        $renderedAt = session()->pull('register_form_rendered_at');
+        if (!empty($input['website']) || ($renderedAt && (time() - $renderedAt) < (int) config('security.spam.honeypot_min_seconds', 2))) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'email' => ['Terjadi kesalahan. Silakan muat ulang halaman dan coba lagi.'],
+            ]);
+        }
+
         $role = $input['role'] ?? 'author';
         $isParticipant = $role === 'participant';
 
@@ -53,8 +64,8 @@ class CreateNewUser implements CreatesNewUsers
         ];
 
         // Common optional fields for all roles
-        $rules['research_interest'] = ['required', 'string', 'max:255'];
-        $rules['other_info'] = ['nullable', 'string', 'max:1000'];
+        $rules['research_interest'] = ['required', 'string', 'max:255', new NoSpamContent()];
+        $rules['other_info'] = ['nullable', 'string', 'max:1000', new NoSpamContent()];
         $rules['signature_data'] = ['nullable', 'string']; // Base64 signature from canvas
 
         // Validate participant_type_id if provided (must belong to the active conference)
@@ -84,6 +95,17 @@ class CreateNewUser implements CreatesNewUsers
         }];
 
         Validator::make($input, $rules)->validate();
+
+        // Malware scan for uploaded payment proof — runs after standard
+        // mime/size validation passes, before the file ever touches storage.
+        if ($requireProofAtRegistration && isset($input['proof_of_payment']) && $input['proof_of_payment'] instanceof \Illuminate\Http\UploadedFile) {
+            $scan = FileUploadValidator::validatePayment($input['proof_of_payment']);
+            if (!$scan['valid']) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'proof_of_payment' => $scan['errors'],
+                ]);
+            }
+        }
 
         $data = [
             'name' => $input['name'],
@@ -139,13 +161,17 @@ class CreateNewUser implements CreatesNewUsers
             ]);
         } elseif ($isParticipant && !$isFreePackage && !empty($data['proof_of_payment'])) {
             // Paid package with proof uploaded at registration (require_payment_proof = true)
+            // NOTE: amount is always taken from the package price, never from
+            // $input['payment_amount'] — that field is rendered readonly for
+            // display purposes only, but a crafted request can still submit any
+            // value, so it must never be trusted as the source of truth for money.
             Payment::create([
                 'type' => Payment::TYPE_PARTICIPANT,
                 'user_id' => $user->id,
                 'paper_id' => null,
                 'registration_package_id' => $packageId,
                 'invoice_number' => Payment::generateInvoiceNumber(),
-                'amount' => $input['payment_amount'] ?? ($packageObj ? $packageObj->price : 0),
+                'amount' => $packageObj->price,
                 'description' => 'Pembayaran registrasi partisipan' . $packageName,
                 'status' => 'uploaded',
                 'payment_proof' => $data['proof_of_payment'],

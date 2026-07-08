@@ -23,6 +23,22 @@ class RateLimitServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureRateLimiting();
+        $this->throttlePublicRoutes();
+    }
+
+    /**
+     * Fortify doesn't expose a configurable limiter for its registration
+     * route (only login/two-factor), so attach the 'register' limiter to
+     * it directly once routes are booted.
+     */
+    protected function throttlePublicRoutes(): void
+    {
+        $this->app->booted(function () {
+            $route = \Illuminate\Support\Facades\Route::getRoutes()->getByName('register.store');
+            if ($route) {
+                $route->middleware('throttle:register');
+            }
+        });
     }
 
     /**

@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Admin;
 
+use App\Helpers\DatabaseBackup;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseManager extends Component
 {
@@ -44,6 +46,7 @@ class DatabaseManager extends Component
         }
 
         $this->importing = true;
+        $backupPath = null;
 
         try {
             $path = $this->importFile->getRealPath();
@@ -56,16 +59,23 @@ class DatabaseManager extends Component
                 return;
             }
 
+            // Safety net: snapshot the current database before running
+            // arbitrary SQL from the uploaded file (it can contain DROP
+            // TABLE etc.), so a bad import can still be restored manually.
+            $backupPath = 'db-backups/' . DatabaseBackup::filename();
+            Storage::disk('local')->put($backupPath, DatabaseBackup::dump());
+
             // Split into individual statements
             $pdo = DB::getPdo();
             $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, true);
 
             DB::unprepared($sql);
 
-            session()->flash('success', 'Database berhasil diimport.');
+            session()->flash('success', 'Database berhasil diimport. Backup sebelum import disimpan di storage/app/private/' . $backupPath . '.');
         } catch (\Throwable $e) {
             \Log::error('Database import error: ' . $e->getMessage());
-            session()->flash('error', 'Import gagal: ' . $e->getMessage());
+            $backupNote = $backupPath ? ' Backup sebelum import tersedia di storage/app/private/' . $backupPath . '.' : '';
+            session()->flash('error', 'Import gagal: ' . $e->getMessage() . $backupNote);
         }
 
         $this->importing = false;

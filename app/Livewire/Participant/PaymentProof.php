@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Participant;
 
+use App\Helpers\FileUploadValidator;
 use App\Models\Payment;
 use App\Models\Conference;
 use App\Models\RegistrationPackage;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
@@ -16,16 +18,23 @@ class PaymentProof extends Component
 
     public $payment;
     public $newProof;
+
+    // Display-only — derived server-side from the selected package/payment
+    // method. Locked so a crafted request can't set it directly; the actual
+    // amount charged is still recomputed from scratch in reupload().
+    #[Locked]
     public $newAmount;
-    
+
     // Package selection
     public $selectedPackageId;
     public $selectedPackage;
     public $packages = [];
-    
+
     // Payment method selection
     public $selectedPaymentMethodIndex;
     public $paymentMethods = [];
+
+    #[Locked]
     public $finalAmount = 0;
 
     public function mount()
@@ -166,16 +175,45 @@ class PaymentProof extends Component
         $this->validate([
             'selectedPackageId' => ['required', 'exists:registration_packages,id'],
             'newProof' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
-            'newAmount' => ['required', 'numeric', 'min:1'],
         ], [
             'selectedPackageId.required' => 'Pilih paket registrasi terlebih dahulu.',
             'selectedPackageId.exists' => 'Paket registrasi tidak valid.',
             'newProof.required' => 'Pilih file bukti pembayaran.',
             'newProof.mimes' => 'Format file harus JPG, PNG, atau PDF.',
             'newProof.max' => 'Ukuran file maksimal 5MB.',
-            'newAmount.required' => 'Nominal pembayaran tidak valid.',
-            'newAmount.min' => 'Nominal harus lebih dari 0.',
         ]);
+
+        // Recompute the authoritative amount/package/method fresh from the
+        // database — never trust $this->newAmount / $this->finalAmount /
+        // $this->selectedPackage for the actual money value. Livewire public
+        // properties can be tampered with independently of what the form
+        // renders, so the only safe source of truth is a fresh DB read keyed
+        // off the validated selectedPackageId.
+        $package = RegistrationPackage::findOrFail($this->selectedPackageId);
+        if ($package->is_free) {
+            $this->addError('selectedPackageId', 'Paket ini gratis, gunakan tombol daftar gratis.');
+            return;
+        }
+
+        $amount = $package->price;
+        $paymentMethodName = null;
+        if ($this->selectedPaymentMethodIndex !== null) {
+            $conference = Conference::find($package->conference_id) ?? Conference::active()->first();
+            $methods = $conference?->payment_methods ?? [];
+            $method = $methods[$this->selectedPaymentMethodIndex] ?? null;
+            if ($method) {
+                if (isset($method['amount']) && $method['amount'] !== null) {
+                    $amount = $method['amount'];
+                }
+                $paymentMethodName = ($method['type'] ?? '') . ' - ' . ($method['name'] ?? '');
+            }
+        }
+
+        $scan = FileUploadValidator::validatePayment($this->newProof);
+        if (!$scan['valid']) {
+            $this->addError('newProof', implode(' ', $scan['errors']));
+            return;
+        }
 
         // Delete old proof if exists
         if ($this->payment && $this->payment->payment_proof) {
@@ -184,18 +222,11 @@ class PaymentProof extends Component
 
         $path = $this->newProof->store('proof-of-payment', 'public');
 
-        // Get selected payment method name
-        $paymentMethodName = null;
-        if ($this->selectedPaymentMethodIndex !== null && isset($this->paymentMethods[$this->selectedPaymentMethodIndex])) {
-            $method = $this->paymentMethods[$this->selectedPaymentMethodIndex];
-            $paymentMethodName = $method['type'] . ' - ' . $method['name'];
-        }
-
         if ($this->payment) {
             $this->payment->update([
                 'registration_package_id' => $this->selectedPackageId,
                 'payment_proof' => $path,
-                'amount' => $this->newAmount,
+                'amount' => $amount,
                 'payment_method' => $paymentMethodName,
                 'status' => 'uploaded',
                 'paid_at' => now(),
@@ -209,8 +240,8 @@ class PaymentProof extends Component
                 'paper_id' => null,
                 'registration_package_id' => $this->selectedPackageId,
                 'invoice_number' => Payment::generateInvoiceNumber(),
-                'amount' => $this->newAmount,
-                'description' => 'Pembayaran registrasi partisipan - ' . $this->selectedPackage->name,
+                'amount' => $amount,
+                'description' => 'Pembayaran registrasi partisipan - ' . $package->name,
                 'status' => 'uploaded',
                 'payment_proof' => $path,
                 'payment_method' => $paymentMethodName,
@@ -222,6 +253,7 @@ class PaymentProof extends Component
         Auth::user()->update(['proof_of_payment' => $path]);
 
         $this->newProof = null;
+        $this->newAmount = $amount;
         session()->flash('success', 'Bukti pembayaran berhasil diupload. Menunggu verifikasi admin.');
     }
 

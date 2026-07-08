@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Author;
 
+use App\Helpers\FileUploadValidator;
 use App\Models\Paper;
 use App\Models\Payment;
 use Livewire\Component;
@@ -33,6 +34,12 @@ class PaymentUpload extends Component
             'proofFile' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'paymentMethod' => 'required|string',
         ]);
+
+        $scan = FileUploadValidator::validatePayment($this->proofFile);
+        if (!$scan['valid']) {
+            $this->addError('proofFile', implode(' ', $scan['errors']));
+            return;
+        }
 
         $path = $this->proofFile->store('payments/' . $this->paper->id, 'public');
 

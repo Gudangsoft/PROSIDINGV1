@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Author;
 
+use App\Helpers\FileUploadValidator;
 use App\Models\Paper;
 use App\Models\Deliverable;
 use Livewire\Component;
@@ -39,6 +40,13 @@ class DeliverableUpload extends Component
         ]);
 
         $file = $this->$fileProperty;
+
+        $scan = FileUploadValidator::validateDeliverable($file);
+        if (!$scan['valid']) {
+            $this->addError($fileProperty, implode(' ', $scan['errors']));
+            return;
+        }
+
         $path = $file->store('deliverables/' . $this->paper->id . '/' . $type, 'public');
 
         // Remove old deliverable of same type
