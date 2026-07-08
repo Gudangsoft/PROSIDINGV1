@@ -6,9 +6,24 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        using: function () {
+            // Central routes first, scoped to each central domain — the SaaS
+            // product site itself (config('tenancy.central_domains')).
+            foreach (config('tenancy.central_domains') as $domain) {
+                \Illuminate\Support\Facades\Route::middleware('web')
+                    ->domain($domain)
+                    ->group(base_path('routes/central.php'));
+            }
+
+            // Tenant routes (the whole Prosiding app) registered after —
+            // routes/tenant.php self-scopes via InitializeTenancyByDomain +
+            // PreventAccessFromCentralDomains, so it only ever resolves for
+            // a domain that belongs to a tenant.
+            \Illuminate\Support\Facades\Route::middleware('web')
+                ->group(base_path('routes/tenant.php'));
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // Register custom middleware aliases
@@ -31,5 +46,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // A domain that doesn't belong to any tenant is a 404 (unrecognized
+        // site), not a 500 (server fault) — matters both for visitor UX and
+        // for not polluting error monitoring with every stray/typo'd Host header.
+        $exceptions->render(function (\Stancl\Tenancy\Contracts\TenantCouldNotBeIdentifiedException $e) {
+            abort(404);
+        });
     })->create();
