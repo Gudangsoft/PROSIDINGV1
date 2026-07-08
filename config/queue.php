@@ -37,7 +37,16 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'connection' => env('DB_QUEUE_CONNECTION'),
+            // Explicitly pinned to the 'mysql' (central) named connection —
+            // per stancl/tenancy's recommendation, one worker polls ONE
+            // central jobs table for every tenant; QueueTenancyBootstrapper
+            // tags each job with the dispatching tenant's id and
+            // re-initializes that tenant right before the job runs, then
+            // reverts after. Do NOT set 'central' => true here — that flag
+            // suppresses the tenant_id tag entirely, which would break that
+            // re-initialization for tenant-dispatched jobs (e.g. queued
+            // Mailables sent while a tenant is active).
+            'connection' => 'mysql',
             'table' => env('DB_QUEUE_TABLE', 'jobs'),
             'queue' => env('DB_QUEUE', 'default'),
             'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
