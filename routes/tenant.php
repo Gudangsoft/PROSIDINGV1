@@ -112,7 +112,11 @@ Route::middleware([
     // ─── Reviewer Registration Route ───
     Route::get('/register/reviewer', \App\Livewire\Auth\ReviewerRegister::class)->name('register.reviewer');
 
-    Route::middleware(['auth', 'verified'])->group(function () {
+    // NOTE: 'verified' temporarily removed while diagnosing a session
+    // persistence issue in production that manifests as a redirect loop
+    // between authenticated routes and the email verification screen.
+    // Re-add 'verified' once that's root-caused and fixed.
+    Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', function () {
             return view('dashboard');
         })->name('dashboard');
