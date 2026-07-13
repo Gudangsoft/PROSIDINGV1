@@ -1,4 +1,4 @@
-<div class="py-2">
+<div class="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
     {{-- Header --}}
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
