@@ -7,6 +7,47 @@
         </div>
     </div>
 
+    {{-- Tutorial / Panduan Penggunaan --}}
+    <div x-data="{ open: false }" class="bg-indigo-50 border border-indigo-200 rounded-xl mb-6 overflow-hidden">
+        <button type="button" @click="open = !open" class="w-full flex items-center justify-between px-5 py-3.5 text-left">
+            <span class="flex items-center gap-2 font-semibold text-indigo-900 text-sm">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                Panduan Penggunaan — Kelola Tenant
+            </span>
+            <svg class="w-5 h-5 text-indigo-500 transition-transform shrink-0" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div x-show="open" x-cloak class="px-5 pb-5 text-sm text-indigo-900 space-y-4">
+            <div>
+                <p class="font-semibold mb-1">1. Membuat tenant baru</p>
+                <p class="text-indigo-800/90">Isi <strong>ID Tenant</strong> (huruf kecil, angka, tanda minus — mis. <code class="bg-white px-1 rounded">kampus-abc</code>) dan <strong>Domain</strong> di form "Tambah Tenant Baru", lalu klik <strong>Buat Tenant</strong>. Sistem otomatis membuat database baru, menjalankan migrasi, dan mendaftarkan domainnya. Proses ini aman dijalankan ulang — kalau ID sudah ada atau sempat gagal di tengah jalan (mis. karena izin database), tinggal klik lagi dan sistem melanjutkan dari langkah yang belum selesai.</p>
+                <p class="text-indigo-800/90 mt-1">Centang <strong>"Salin data dari central"</strong> hanya kalau ini situs lama yang datanya mau dipindah jadi tenant pertama (seperti SINACON kemarin) — untuk tenant baru yang belum punya data, biarkan tidak dicentang.</p>
+            </div>
+            <div>
+                <p class="font-semibold mb-1">2. Verifikasi domain</p>
+                <p class="text-indigo-800/90">Domain baru selalu berstatus <span class="bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full text-xs">pending</span> sampai kepemilikannya terbukti. Sistem menampilkan record <strong>TXT</strong> yang perlu ditambahkan ke DNS domain tersebut (nama record + kode unik). Setelah pemilik domain menambahkan record itu:</p>
+                <ul class="list-disc list-inside text-indigo-800/90 mt-1 space-y-0.5">
+                    <li>Klik <strong>"Cek DNS"</strong> — sistem cek otomatis, langsung verified kalau cocok.</li>
+                    <li>Atau klik <strong>"Verifikasi manual"</strong> kalau yakin domain itu memang sah tanpa perlu menunggu DNS (skip pengecekan).</li>
+                </ul>
+            </div>
+            <div>
+                <p class="font-semibold mb-1">3. Aktifkan HTTPS untuk domain baru</p>
+                <p class="text-indigo-800/90">Verifikasi di sini <strong>belum otomatis mengaktifkan SSL</strong> di server (server ini pakai Apache/aaPanel, bukan Caddy). Setelah domain verified, tambahkan secara manual: aaPanel → <strong>Website → Add Site</strong> dengan domain tsb, arahkan ke folder project yang sama, lalu <strong>SSL → Let's Encrypt</strong> untuk sertifikat gratis.</p>
+            </div>
+            <div>
+                <p class="font-semibold mb-1">4. Menambah domain ke tenant yang sudah ada</p>
+                <p class="text-indigo-800/90">Klik <strong>"+ Tambah domain"</strong> pada baris tenant yang dituju. Berguna kalau satu tenant perlu diakses dari lebih dari satu domain (mis. domain lama & domain baru sekaligus).</p>
+            </div>
+            <div>
+                <p class="font-semibold mb-1">5. Menghapus tenant</p>
+                <p class="text-indigo-800/90 flex items-start gap-1.5">
+                    <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    <span><strong>Ini menghapus database tenant secara permanen</strong> — semua paper, pembayaran, dan user di tenant itu ikut hilang, tidak bisa dikembalikan. Klik "Hapus", lalu ketik persis ID tenant-nya untuk konfirmasi sebelum benar-benar terhapus.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
     @if (session('success'))
         <div class="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 mb-4 text-sm flex items-center gap-2">
             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
