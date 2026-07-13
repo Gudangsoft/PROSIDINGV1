@@ -112,6 +112,13 @@ Route::middleware([
     // ─── Reviewer Registration Route ───
     Route::get('/register/reviewer', \App\Livewire\Auth\ReviewerRegister::class)->name('register.reviewer');
 
+    // ─── Central Admin Login (shared password, separate from tenant auth) ───
+    // Reachable here too so the "Kelola Tenant" link in the tenant's own
+    // admin sidebar (/admin/platform-tenants below) doesn't 404 on redirect.
+    Route::get('/admin/login', [\App\Http\Controllers\Central\CentralAdminAuthController::class, 'showLogin']);
+    Route::post('/admin/login', [\App\Http\Controllers\Central\CentralAdminAuthController::class, 'login']);
+    Route::post('/admin/logout', [\App\Http\Controllers\Central\CentralAdminAuthController::class, 'logout']);
+
     // NOTE: 'verified' temporarily removed while diagnosing a session
     // persistence issue in production that manifests as a redirect loop
     // between authenticated routes and the email verification screen.
@@ -309,6 +316,17 @@ Route::middleware([
             // Database Manager (Backup & Restore)
             Route::get('/database', DatabaseManager::class)->name('admin.database');
             Route::get('/database/export', [DatabaseExportController::class, 'export'])->name('admin.database.export');
+
+            // Platform tenant management — deliberately gated by a SECOND,
+            // separate password (EnsureCentralAdmin) on top of role:admin.
+            // A tenant's own admin must not be able to see/create other
+            // tenants just by having role=admin on THIS tenant; this menu
+            // item is a convenience shortcut to the same central-admin
+            // area reachable from any central domain, not a relaxation of
+            // that boundary.
+            Route::get('/platform-tenants', \App\Livewire\Central\TenantManager::class)
+                ->middleware(\App\Http\Middleware\EnsureCentralAdmin::class)
+                ->name('admin.platform-tenants');
 
             // Impersonate User
             Route::post('/impersonate/{user}', function (\App\Models\User $user) {

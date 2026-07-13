@@ -22,8 +22,10 @@ class EnsureCentralAdmin
             // Plain path, not route(): routes/central.php is registered once
             // per central domain with a domain-specific name prefix
             // (central.{domain}.*), so a single portable route() reference
-            // isn't available here.
-            return redirect('/admin/login');
+            // isn't available here. Carry the intended URL forward so login
+            // can send the user back to it (this route may live on a tenant
+            // domain, e.g. /admin/platform-tenants, not just central ones).
+            return redirect('/admin/login?redirect=' . urlencode($request->fullUrl()));
         }
 
         return $next($request);

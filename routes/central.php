@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Central\CentralAdminAuthController;
 use App\Models\Domain;
 use App\Models\Scopes\VerifiedDomainScope;
 use Illuminate\Support\Facades\Route;
@@ -33,31 +34,9 @@ Route::get('/', function () {
 | central domain with a domain-specific name prefix.
 |
 */
-Route::get('/admin/login', function () {
-    return view('central.admin.login');
-});
-
-Route::post('/admin/login', function (\Illuminate\Http\Request $request) {
-    $request->validate(['password' => 'required|string']);
-
-    $expected = config('central.admin_password');
-
-    if (!$expected || !hash_equals($expected, $request->input('password'))) {
-        return back()->withErrors(['password' => 'Password salah.']);
-    }
-
-    $request->session()->regenerate();
-    $request->session()->put('central_admin_authenticated', true);
-
-    return redirect('/admin/tenants');
-});
-
-Route::post('/admin/logout', function (\Illuminate\Http\Request $request) {
-    $request->session()->forget('central_admin_authenticated');
-    $request->session()->regenerate();
-
-    return redirect('/admin/login');
-});
+Route::get('/admin/login', [CentralAdminAuthController::class, 'showLogin']);
+Route::post('/admin/login', [CentralAdminAuthController::class, 'login']);
+Route::post('/admin/logout', [CentralAdminAuthController::class, 'logout']);
 
 Route::middleware(\App\Http\Middleware\EnsureCentralAdmin::class)->group(function () {
     Route::get('/admin/tenants', \App\Livewire\Central\TenantManager::class);
