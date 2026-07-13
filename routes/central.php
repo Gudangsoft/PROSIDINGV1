@@ -24,6 +24,47 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
+| Central Admin — Tenant Management
+|--------------------------------------------------------------------------
+|
+| Gated by a single shared password (App\Http\Middleware\EnsureCentralAdmin)
+| rather than a full auth system — see that class's docblock. Views use
+| plain paths (not route()) since these routes are registered once per
+| central domain with a domain-specific name prefix.
+|
+*/
+Route::get('/admin/login', function () {
+    return view('central.admin.login');
+});
+
+Route::post('/admin/login', function (\Illuminate\Http\Request $request) {
+    $request->validate(['password' => 'required|string']);
+
+    $expected = config('central.admin_password');
+
+    if (!$expected || !hash_equals($expected, $request->input('password'))) {
+        return back()->withErrors(['password' => 'Password salah.']);
+    }
+
+    $request->session()->regenerate();
+    $request->session()->put('central_admin_authenticated', true);
+
+    return redirect('/admin/tenants');
+});
+
+Route::post('/admin/logout', function (\Illuminate\Http\Request $request) {
+    $request->session()->forget('central_admin_authenticated');
+    $request->session()->regenerate();
+
+    return redirect('/admin/login');
+});
+
+Route::middleware(\App\Http\Middleware\EnsureCentralAdmin::class)->group(function () {
+    Route::get('/admin/tenants', \App\Livewire\Central\TenantManager::class);
+});
+
+/*
+|--------------------------------------------------------------------------
 | Caddy On-Demand TLS "ask" endpoint
 |--------------------------------------------------------------------------
 |
