@@ -118,7 +118,7 @@
                     </td>
                     <td class="px-4 py-3 hidden md:table-cell">
                         @if($tutorial->pdf_path)
-                        <a href="{{ Storage::url($tutorial->pdf_path) }}" target="_blank"
+                        <a href="{{ asset('storage/' . $tutorial->pdf_path) }}" target="_blank"
                            class="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700">
                             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
                             PDF

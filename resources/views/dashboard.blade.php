@@ -80,7 +80,7 @@
         <div class="px-6 py-5 overflow-y-auto flex-1">
             @if($popupAnn->attachment)
             <div class="mb-4">
-                <img src="{{ Storage::url($popupAnn->attachment) }}" alt="Attachment"
+                <img src="{{ asset('storage/' . $popupAnn->attachment) }}" alt="Attachment"
                      class="w-full rounded-lg object-cover max-h-48" onerror="this.style.display='none'">
             </div>
             @endif

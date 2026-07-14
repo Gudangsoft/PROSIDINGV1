@@ -32,7 +32,7 @@ class EmailAsset extends Model
     public function publicUrl(): string
     {
         if ($this->type === 'file') {
-            return Storage::url($this->url);
+            return asset('storage/' . $this->url);
         }
         return $this->url;
     }

@@ -94,7 +94,7 @@
                         {{-- Action buttons --}}
                         @if($cert->file_path)
                         <div class="mt-4 flex items-center gap-2 flex-wrap">
-                            <a href="{{ Storage::url($cert->file_path) }}" target="_blank"
+                            <a href="{{ asset('storage/' . $cert->file_path) }}" target="_blank"
                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs
                                       font-medium rounded-lg hover:bg-blue-700 transition">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

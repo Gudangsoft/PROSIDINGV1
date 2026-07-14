@@ -181,7 +181,7 @@
                 @if($conference->chairman_signature)
                 <div class="mb-4 p-3 bg-gray-50 rounded-lg text-center border">
                     <p class="text-xs text-gray-400 mb-2">Tanda tangan saat ini:</p>
-                    <img src="{{ Storage::url($conference->chairman_signature) }}" alt="Chairman Signature"
+                    <img src="{{ asset('storage/' . $conference->chairman_signature) }}" alt="Chairman Signature"
                          class="max-h-20 mx-auto object-contain">
                     <button type="button" wire:click="deleteSignature('chairman')"
                             wire:confirm="Hapus tanda tangan ketua?"
@@ -233,7 +233,7 @@
                 @if($conference->institute_chairman_signature)
                 <div class="mb-4 p-3 bg-gray-50 rounded-lg text-center border">
                     <p class="text-xs text-gray-400 mb-2">Tanda tangan saat ini:</p>
-                    <img src="{{ Storage::url($conference->institute_chairman_signature) }}" alt="Institute Chairman Signature"
+                    <img src="{{ asset('storage/' . $conference->institute_chairman_signature) }}" alt="Institute Chairman Signature"
                          class="max-h-20 mx-auto object-contain">
                     <button type="button" wire:click="deleteSignature('institute_chairman')"
                             wire:confirm="Hapus tanda tangan ketua institusi?"
@@ -285,7 +285,7 @@
                 @if($conference->secretary_signature)
                 <div class="mb-4 p-3 bg-gray-50 rounded-lg text-center border">
                     <p class="text-xs text-gray-400 mb-2">Tanda tangan saat ini:</p>
-                    <img src="{{ Storage::url($conference->secretary_signature) }}" alt="Secretary Signature"
+                    <img src="{{ asset('storage/' . $conference->secretary_signature) }}" alt="Secretary Signature"
                          class="max-h-20 mx-auto object-contain">
                     <button type="button" wire:click="deleteSignature('secretary')"
                             wire:confirm="Hapus tanda tangan sekretaris?"
@@ -586,7 +586,7 @@
                             <td class="px-4 py-3 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     {{-- Download --}}
-                                    <a href="{{ Storage::url($cert->file_path) }}" target="_blank"
+                                    <a href="{{ asset('storage/' . $cert->file_path) }}" target="_blank"
                                        class="inline-flex items-center gap-1 text-xs px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition font-medium">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
