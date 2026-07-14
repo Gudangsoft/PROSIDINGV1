@@ -109,30 +109,48 @@ class TenancyServiceProvider extends ServiceProvider
 
         $this->makeTenancyMiddlewareHighestPriority();
 
-        $this->patchLivewireUpdateRouteForTenancy();
+        $this->patchLivewireInternalRoutesForTenancy();
     }
 
     /**
-     * Livewire registers its own update route with only 'web' middleware,
-     * independently of routes/central.php and routes/tenant.php (see
-     * App\Http\Middleware\InitializeTenancyForLivewireUpdate for the full
-     * story). It does this synchronously, very early, in its own
-     * ServiceProvider::boot() — before our route files (or any
-     * `$app->booted()` callback registered from our own boot()) run, so
-     * there's no reliable "after Livewire, after routing" hook to patch
-     * the route object once and be done.
+     * Livewire registers several of its own routes with only 'web'
+     * middleware, independently of routes/central.php and routes/tenant.php
+     * (see App\Http\Middleware\InitializeTenancyForLivewireUpdate for the
+     * full story) — not just the update/AJAX route, but also the
+     * file-upload endpoint (livewire.upload-file, used by every
+     * WithFileUploads component) and its preview counterpart
+     * (livewire.preview-file). All three do this synchronously, very
+     * early, in Livewire's own ServiceProvider::boot() — before our route
+     * files (or any `$app->booted()` callback registered from our own
+     * boot()) run, so there's no reliable "after Livewire, after routing"
+     * hook to patch the route object once and be done.
+     *
+     * The upload endpoint in particular writes temporary files to disk
+     * (before the component's own tenant-aware code ever runs) — without
+     * tenancy initialized there, uploads get written to the CENTRAL
+     * storage location, and then the real ->store() call later (which
+     * *is* tenant-aware, since it runs inside the already-fixed
+     * livewire.update request) can't find the temp file where it's
+     * actually looking, surfacing to the user as "failed to upload" or an
+     * upload that spins forever.
      *
      * Instead we hook Illuminate\Routing\Events\RouteMatched, which fires
      * per-request right after the router resolves a route but before its
      * middleware list is gathered — so appending middleware here always
      * takes effect, regardless of provider/route-loading order.
      */
-    protected function patchLivewireUpdateRouteForTenancy()
+    protected function patchLivewireInternalRoutesForTenancy()
     {
-        Event::listen(\Illuminate\Routing\Events\RouteMatched::class, function ($event) {
+        $targetNames = ['livewire.upload-file', 'livewire.preview-file'];
+
+        Event::listen(\Illuminate\Routing\Events\RouteMatched::class, function ($event) use ($targetNames) {
             $name = $event->route->getName();
 
-            if ($name && str($name)->endsWith('livewire.update')) {
+            if (! $name) {
+                return;
+            }
+
+            if (str($name)->endsWith('livewire.update') || in_array($name, $targetNames, true)) {
                 $event->route->middleware(\App\Http\Middleware\InitializeTenancyForLivewireUpdate::class);
             }
         });
