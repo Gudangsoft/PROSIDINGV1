@@ -21,6 +21,7 @@
                 <p class="font-semibold mb-1">1. Membuat tenant baru</p>
                 <p class="text-indigo-800/90">Isi <strong>ID Tenant</strong> (huruf kecil, angka, tanda minus — mis. <code class="bg-white px-1 rounded">kampus-abc</code>) dan <strong>Domain</strong> di form "Tambah Tenant Baru", lalu klik <strong>Buat Tenant</strong>. Sistem otomatis membuat database baru, menjalankan migrasi, dan mendaftarkan domainnya. Proses ini aman dijalankan ulang — kalau ID sudah ada atau sempat gagal di tengah jalan (mis. karena izin database), tinggal klik lagi dan sistem melanjutkan dari langkah yang belum selesai.</p>
                 <p class="text-indigo-800/90 mt-1">Centang <strong>"Salin data dari central"</strong> hanya kalau ini situs lama yang datanya mau dipindah jadi tenant pertama (seperti SINACON kemarin) — untuk tenant baru yang belum punya data, biarkan tidak dicentang.</p>
+                <p class="text-indigo-800/90 mt-1">Isi juga <strong>Nama/Email/Password Admin</strong> kalau mau langsung punya akun admin pertama begitu tenant selesai dibuat — kalau dikosongkan, tenant tetap kebuat tapi belum ada usernya sama sekali (perlu dibuatkan manual belakangan).</p>
             </div>
             <div>
                 <p class="font-semibold mb-1">2. Verifikasi domain</p>
@@ -125,6 +126,29 @@
                     Salin data dari central
                 </label>
             </div>
+
+            <div class="md:col-span-3 pt-2 mt-1 border-t border-gray-100">
+                <p class="text-xs font-medium text-gray-500 mb-3">Akun admin pertama (opsional — kosongkan kalau mau dibuat manual nanti)</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Admin</label>
+                <input type="text" wire:model="adminName" placeholder="mis. Admin Kampus ABC"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 @error('adminName') border-red-400 @enderror">
+                @error('adminName')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Email Admin</label>
+                <input type="email" wire:model="adminEmail" placeholder="admin@kampusabc.ac.id"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 @error('adminEmail') border-red-400 @enderror">
+                @error('adminEmail')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Password Admin</label>
+                <input type="password" wire:model="adminPassword" placeholder="minimal 8 karakter"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 @error('adminPassword') border-red-400 @enderror">
+                @error('adminPassword')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+
             <div class="md:col-span-3 flex items-center gap-3">
                 <button type="submit" wire:loading.attr="disabled" wire:target="create"
                     class="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 text-sm">
@@ -177,7 +201,11 @@
                                 @forelse ($tenant->domains as $domain)
                                     <div>
                                         <div class="flex items-center gap-2 flex-wrap">
-                                            <span class="text-gray-700">{{ $domain->domain }}</span>
+                                            <a href="https://{{ $domain->domain }}" target="_blank" rel="noopener"
+                                                class="text-gray-700 hover:text-indigo-600 hover:underline inline-flex items-center gap-1">
+                                                {{ $domain->domain }}
+                                                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </a>
                                             @if ($domain->verified_at)
                                                 <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">verified</span>
                                             @else
