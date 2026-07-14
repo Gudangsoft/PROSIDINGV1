@@ -73,6 +73,27 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
 
+    // Cross-domain "login as admin" target for the central Kelola Tenant
+    // page (App\Livewire\Central\TenantManager::loginAsAdmin()). The
+    // 'signed' middleware rejects anything without a valid, unexpired
+    // signature — see TenantManager for why a signed URL rather than a
+    // shared session/token store.
+    Route::get('/central/login-as/{user}', function (\Illuminate\Http\Request $request, \App\Models\User $user) {
+        abort_unless($user->role === 'admin', 403);
+
+        \Illuminate\Support\Facades\Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect('/dashboard');
+    })
+        // TenantManager::loginAsAdmin() signs this with absolute: false —
+        // host-independent on purpose, since the target tenant's domain is
+        // never the same as whichever domain generated the link. The plain
+        // 'signed' alias validates in absolute mode by default and would
+        // reject every one of these signatures; ::relative() matches.
+        ->middleware(\Illuminate\Routing\Middleware\ValidateSignature::relative())
+        ->name('tenant.login-as');
+
     Route::get('/', function () {
         $sliders = \App\Models\Slider::active()->get();
         $activeConference = \App\Models\Conference::active()->published()

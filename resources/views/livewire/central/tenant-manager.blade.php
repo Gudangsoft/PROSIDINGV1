@@ -36,11 +36,15 @@
                 <p class="text-indigo-800/90">Verifikasi di sini <strong>belum otomatis mengaktifkan SSL</strong> di server (server ini pakai Apache/aaPanel, bukan Caddy). Setelah domain verified, tambahkan secara manual: aaPanel → <strong>Website → Add Site</strong> dengan domain tsb, arahkan ke folder project yang sama, lalu <strong>SSL → Let's Encrypt</strong> untuk sertifikat gratis.</p>
             </div>
             <div>
-                <p class="font-semibold mb-1">4. Menambah domain ke tenant yang sudah ada</p>
-                <p class="text-indigo-800/90">Klik <strong>"+ Tambah domain"</strong> pada baris tenant yang dituju. Berguna kalau satu tenant perlu diakses dari lebih dari satu domain (mis. domain lama & domain baru sekaligus).</p>
+                <p class="font-semibold mb-1">4. Menambah, mengedit, atau menghapus domain</p>
+                <p class="text-indigo-800/90">Klik <strong>"+ Tambah domain"</strong> pada baris tenant yang dituju. Berguna kalau satu tenant perlu diakses dari lebih dari satu domain (mis. domain lama & domain baru sekaligus). Domain yang sudah ada bisa diedit (klik "Edit") — mengubah nilainya akan meminta verifikasi ulang — atau dihapus (klik "Hapus"), asal bukan satu-satunya domain tenant tsb.</p>
             </div>
             <div>
-                <p class="font-semibold mb-1">5. Menghapus tenant</p>
+                <p class="font-semibold mb-1">5. Mengelola & login sebagai admin tenant</p>
+                <p class="text-indigo-800/90">Klik <strong>"+ Tambah admin"</strong> untuk melihat, menambah, mengedit (termasuk reset password), atau menghapus akun admin tenant tsb. Klik <strong>"Login sebagai Admin"</strong> untuk langsung masuk ke dashboard tenant itu sebagai admin pertamanya tanpa perlu tahu passwordnya — berguna untuk cek/bantu tenant tanpa minta kredensial mereka.</p>
+            </div>
+            <div>
+                <p class="font-semibold mb-1">6. Menghapus tenant</p>
                 <p class="text-indigo-800/90 flex items-start gap-1.5">
                     <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                     <span><strong>Ini menghapus database tenant secara permanen</strong> — semua paper, pembayaran, dan user di tenant itu ikut hilang, tidak bisa dikembalikan. Klik "Hapus", lalu ketik persis ID tenant-nya untuk konfirmasi sebelum benar-benar terhapus.</span>
@@ -199,31 +203,47 @@
                         <td class="px-5 py-4">
                             <div class="space-y-2">
                                 @forelse ($tenant->domains as $domain)
-                                    <div>
-                                        <div class="flex items-center gap-2 flex-wrap">
-                                            <a href="https://{{ $domain->domain }}" target="_blank" rel="noopener"
-                                                class="text-gray-700 hover:text-indigo-600 hover:underline inline-flex items-center gap-1">
-                                                {{ $domain->domain }}
-                                                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                            </a>
-                                            @if ($domain->verified_at)
-                                                <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">verified</span>
-                                            @else
-                                                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">pending</span>
-                                                <button wire:click="checkDomainDns({{ $domain->id }})" wire:loading.attr="disabled"
-                                                    class="text-xs text-indigo-600 hover:underline">Cek DNS</button>
-                                                <button wire:click="verifyDomainNow({{ $domain->id }})"
-                                                    wire:confirm="Tandai domain ini terverifikasi tanpa cek DNS? Cuma lakukan ini kalau Anda yakin domain ini memang milik tenant tsb."
-                                                    class="text-xs text-gray-500 hover:underline">Verifikasi manual</button>
+                                    @if ($editingDomainId === $domain->id)
+                                        <div class="flex items-start gap-2">
+                                            <div>
+                                                <input type="text" wire:model="editDomainValue"
+                                                    class="px-3 py-1.5 border border-gray-300 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 @error('editDomainValue') border-red-400 @enderror">
+                                                @error('editDomainValue')<p class="text-red-500 text-[11px] mt-1">{{ $message }}</p>@enderror
+                                            </div>
+                                            <button wire:click="updateDomain" class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700">Simpan</button>
+                                            <button wire:click="cancelEditDomain" class="text-xs text-gray-500 px-2 py-1.5 hover:underline">Batal</button>
+                                        </div>
+                                    @else
+                                        <div>
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <a href="https://{{ $domain->domain }}" target="_blank" rel="noopener"
+                                                    class="text-gray-700 hover:text-indigo-600 hover:underline inline-flex items-center gap-1">
+                                                    {{ $domain->domain }}
+                                                    <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                </a>
+                                                @if ($domain->verified_at)
+                                                    <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">verified</span>
+                                                @else
+                                                    <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">pending</span>
+                                                    <button wire:click="checkDomainDns({{ $domain->id }})" wire:loading.attr="disabled"
+                                                        class="text-xs text-indigo-600 hover:underline">Cek DNS</button>
+                                                    <button wire:click="verifyDomainNow({{ $domain->id }})"
+                                                        wire:confirm="Tandai domain ini terverifikasi tanpa cek DNS? Cuma lakukan ini kalau Anda yakin domain ini memang milik tenant tsb."
+                                                        class="text-xs text-gray-500 hover:underline">Verifikasi manual</button>
+                                                @endif
+                                                <button wire:click="startEditDomain({{ $domain->id }})" class="text-xs text-gray-500 hover:underline">Edit</button>
+                                                <button wire:click="deleteDomain({{ $domain->id }})"
+                                                    wire:confirm="Hapus domain '{{ $domain->domain }}' dari tenant ini? Tenant tetap ada, tapi domain ini tidak akan bisa diakses lagi."
+                                                    class="text-xs text-red-500 hover:underline">Hapus</button>
+                                            </div>
+                                            @if (!$domain->verified_at)
+                                                <p class="text-[11px] text-gray-400 mt-0.5">
+                                                    TXT record: <code class="bg-gray-100 px-1 rounded">{{ $domain->verificationRecordName() }}</code>
+                                                    = <code class="bg-gray-100 px-1 rounded">{{ $domain->verification_token }}</code>
+                                                </p>
                                             @endif
                                         </div>
-                                        @if (!$domain->verified_at)
-                                            <p class="text-[11px] text-gray-400 mt-0.5">
-                                                TXT record: <code class="bg-gray-100 px-1 rounded">{{ $domain->verificationRecordName() }}</code>
-                                                = <code class="bg-gray-100 px-1 rounded">{{ $domain->verification_token }}</code>
-                                            </p>
-                                        @endif
-                                    </div>
+                                    @endif
                                 @empty
                                     <span class="text-gray-400">—</span>
                                 @endforelse
@@ -247,8 +267,49 @@
                         <td class="px-5 py-4 text-gray-500 whitespace-nowrap">{{ $tenant->created_at->format('d M Y H:i') }}</td>
                         <td class="px-5 py-4 text-right whitespace-nowrap">
                             @if ($addAdminTenantId === $tenant->id)
-                                <div class="text-left bg-indigo-50 border border-indigo-200 rounded-lg p-3 inline-block w-64">
-                                    <p class="text-xs text-indigo-700 mb-2 font-medium">Tambah admin ke '{{ $tenant->id }}':</p>
+                                <div class="text-left bg-indigo-50 border border-indigo-200 rounded-lg p-3 inline-block w-72">
+                                    <p class="text-xs text-indigo-700 mb-2 font-medium">Admin tenant '{{ $tenant->id }}':</p>
+
+                                    @if (!empty($tenantAdmins))
+                                        <div class="space-y-1.5 mb-3">
+                                            @foreach ($tenantAdmins as $admin)
+                                                @if ($editingAdminId === $admin['id'])
+                                                    <div class="bg-white border border-indigo-200 rounded-lg p-2 space-y-1.5">
+                                                        <input type="text" wire:model="editAdminName" placeholder="Nama"
+                                                            class="w-full px-2 py-1 border border-gray-300 rounded text-xs outline-none @error('editAdminName') border-red-400 @enderror">
+                                                        @error('editAdminName')<p class="text-red-500 text-[11px]">{{ $message }}</p>@enderror
+                                                        <input type="email" wire:model="editAdminEmail" placeholder="Email"
+                                                            class="w-full px-2 py-1 border border-gray-300 rounded text-xs outline-none @error('editAdminEmail') border-red-400 @enderror">
+                                                        @error('editAdminEmail')<p class="text-red-500 text-[11px]">{{ $message }}</p>@enderror
+                                                        <input type="password" wire:model="editAdminPassword" placeholder="Password baru (kosongkan jika tidak ganti)"
+                                                            class="w-full px-2 py-1 border border-gray-300 rounded text-xs outline-none @error('editAdminPassword') border-red-400 @enderror">
+                                                        @error('editAdminPassword')<p class="text-red-500 text-[11px]">{{ $message }}</p>@enderror
+                                                        <div class="flex items-center gap-2">
+                                                            <button wire:click="updateAdmin" class="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded hover:bg-indigo-700">Simpan</button>
+                                                            <button wire:click="cancelEditAdmin" class="text-xs text-gray-500 hover:underline">Batal</button>
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <div class="flex items-center justify-between gap-2 bg-white border border-gray-200 rounded-lg px-2.5 py-1.5">
+                                                        <div class="min-w-0">
+                                                            <p class="text-xs font-medium text-gray-700 truncate">{{ $admin['name'] }}</p>
+                                                            <p class="text-[11px] text-gray-400 truncate">{{ $admin['email'] }}</p>
+                                                        </div>
+                                                        <div class="flex items-center gap-2 shrink-0">
+                                                            <button wire:click="startEditAdmin({{ $admin['id'] }})" class="text-[11px] text-indigo-600 hover:underline">Edit</button>
+                                                            <button wire:click="deleteAdmin({{ $admin['id'] }})"
+                                                                wire:confirm="Hapus admin '{{ $admin['email'] }}'?"
+                                                                class="text-[11px] text-red-500 hover:underline">Hapus</button>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <p class="text-[11px] text-gray-400 mb-2">Belum ada admin di tenant ini.</p>
+                                    @endif
+
+                                    <p class="text-[11px] font-medium text-gray-500 mb-1.5">Tambah admin baru:</p>
                                     <div class="space-y-1.5">
                                         <div>
                                             <input type="text" wire:model="addAdminName" placeholder="Nama"
@@ -268,8 +329,8 @@
                                     </div>
                                     <div class="flex items-center gap-2 mt-2">
                                         <button wire:click="addAdmin" wire:loading.attr="disabled" wire:target="addAdmin"
-                                            class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700">Simpan</button>
-                                        <button wire:click="cancelAddAdmin" class="text-xs text-gray-500 px-2 py-1.5 hover:underline">Batal</button>
+                                            class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700">Tambah</button>
+                                        <button wire:click="cancelAddAdmin" class="text-xs text-gray-500 px-2 py-1.5 hover:underline">Tutup</button>
                                     </div>
                                 </div>
                             @elseif ($confirmingDeleteId === $tenant->id)
@@ -285,6 +346,8 @@
                                 </div>
                             @else
                                 <div class="flex items-center justify-end gap-3">
+                                    <button wire:click="loginAsAdmin('{{ $tenant->id }}')" wire:loading.attr="disabled" wire:target="loginAsAdmin('{{ $tenant->id }}')"
+                                        class="text-xs text-green-600 hover:underline">Login sebagai Admin</button>
                                     <button wire:click="startAddAdmin('{{ $tenant->id }}')" class="text-xs text-indigo-600 hover:underline">+ Tambah admin</button>
                                     <button wire:click="confirmDelete('{{ $tenant->id }}')" class="text-xs text-red-600 hover:underline">Hapus</button>
                                 </div>
