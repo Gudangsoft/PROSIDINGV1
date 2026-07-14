@@ -108,6 +108,34 @@ class TenancyServiceProvider extends ServiceProvider
         // $this->mapRoutes();
 
         $this->makeTenancyMiddlewareHighestPriority();
+
+        $this->patchLivewireUpdateRouteForTenancy();
+    }
+
+    /**
+     * Livewire registers its own update route with only 'web' middleware,
+     * independently of routes/central.php and routes/tenant.php (see
+     * App\Http\Middleware\InitializeTenancyForLivewireUpdate for the full
+     * story). It does this synchronously, very early, in its own
+     * ServiceProvider::boot() — before our route files (or any
+     * `$app->booted()` callback registered from our own boot()) run, so
+     * there's no reliable "after Livewire, after routing" hook to patch
+     * the route object once and be done.
+     *
+     * Instead we hook Illuminate\Routing\Events\RouteMatched, which fires
+     * per-request right after the router resolves a route but before its
+     * middleware list is gathered — so appending middleware here always
+     * takes effect, regardless of provider/route-loading order.
+     */
+    protected function patchLivewireUpdateRouteForTenancy()
+    {
+        Event::listen(\Illuminate\Routing\Events\RouteMatched::class, function ($event) {
+            $name = $event->route->getName();
+
+            if ($name && str($name)->endsWith('livewire.update')) {
+                $event->route->middleware(\App\Http\Middleware\InitializeTenancyForLivewireUpdate::class);
+            }
+        });
     }
 
     protected function bootEvents()
@@ -144,6 +172,13 @@ class TenancyServiceProvider extends ServiceProvider
             Middleware\InitializeTenancyByDomainOrSubdomain::class,
             Middleware\InitializeTenancyByPath::class,
             Middleware\InitializeTenancyByRequestData::class,
+
+            // Wraps InitializeTenancyByDomain for Livewire's own update route
+            // (see patchLivewireUpdateRouteForTenancy() below). Needs the same
+            // elevated priority so it runs before StartSession/EncryptCookies —
+            // otherwise the session would already be started against the
+            // wrong (central) storage path by the time tenancy switches it.
+            \App\Http\Middleware\InitializeTenancyForLivewireUpdate::class,
         ];
 
         foreach (array_reverse($tenancyMiddleware) as $middleware) {
