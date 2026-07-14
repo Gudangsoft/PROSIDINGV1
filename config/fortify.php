@@ -101,7 +101,20 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    // Fortify registers its own routes (login, register, password reset,
+    // email verification, two-factor, etc.) completely independently of
+    // routes/central.php and routes/tenant.php — without these, they'd
+    // never run InitializeTenancyByDomain and would always execute against
+    // the CENTRAL database regardless of which domain the request came in
+    // on. That's what caused login to "work" (against a stale central
+    // users table) but the session to appear lost the moment a
+    // properly-tenant-scoped route like /dashboard switched to the
+    // tenant's own (differently-suffixed) session storage path.
+    'middleware' => [
+        'web',
+        \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
+        \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+    ],
 
     /*
     |--------------------------------------------------------------------------
