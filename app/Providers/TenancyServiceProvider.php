@@ -141,17 +141,26 @@ class TenancyServiceProvider extends ServiceProvider
      */
     protected function patchLivewireInternalRoutesForTenancy()
     {
-        $targetNames = ['livewire.upload-file', 'livewire.preview-file'];
+        $tenancyAwareNames = ['livewire.upload-file', 'livewire.preview-file'];
 
-        Event::listen(\Illuminate\Routing\Events\RouteMatched::class, function ($event) use ($targetNames) {
+        Event::listen(\Illuminate\Routing\Events\RouteMatched::class, function ($event) use ($tenancyAwareNames) {
             $name = $event->route->getName();
 
             if (! $name) {
                 return;
             }
 
-            if (str($name)->endsWith('livewire.update') || in_array($name, $targetNames, true)) {
+            if (str($name)->endsWith('livewire.update') || in_array($name, $tenancyAwareNames, true)) {
                 $event->route->middleware(\App\Http\Middleware\InitializeTenancyForLivewireUpdate::class);
+            }
+
+            // stancl/tenancy's own tenant-asset-serving route — see
+            // App\Http\Middleware\NormalizeTenantAssetPath for why this
+            // needs a path fixup (not a tenancy-init problem like the
+            // Livewire routes above; this route already tenant-inits
+            // itself via its own controller).
+            if ($name === 'stancl.tenancy.asset') {
+                $event->route->middleware(\App\Http\Middleware\NormalizeTenantAssetPath::class);
             }
         });
     }
