@@ -73,6 +73,14 @@ class TenantProvisioningService
     private function copyDataFromCentral(Tenant $tenant, string $tenantDb): array
     {
         $log = [];
+
+        // Must be the literal 'mysql' connection, never DB::connection()'s
+        // implicit default — this runs from web requests too (the "Kelola
+        // Tenant" page embedded in a tenant's own dashboard), where the
+        // default connection is whichever tenant is currently active, not
+        // central. Reading through the default here previously copied the
+        // ACTIVE tenant's own data into the new tenant instead of central's.
+        $centralConnection = 'mysql';
         $centralDb = config('database.connections.mysql.database');
         $connectionName = 'tenant_copy_tmp';
 
@@ -87,19 +95,26 @@ class TenantProvisioningService
             ->map(fn ($t) => array_values((array) $t)[0])
             ->reject(fn ($t) => $t === 'migrations');
 
+        // Only tables that actually exist in central have anything to copy —
+        // tenant-only tables (users, papers, payments, ...) have no central
+        // counterpart at all and would otherwise blow up on SHOW COLUMNS.
+        $centralTables = collect(DB::connection($centralConnection)->select('SHOW TABLES'))
+            ->map(fn ($t) => array_values((array) $t)[0]);
+        $tables = $tables->intersect($centralTables);
+
         $ordered = $tables->contains('settings')
             ? collect(['settings'])->merge($tables->reject(fn ($t) => $t === 'settings'))
             : $tables;
 
         foreach ($ordered as $table) {
-            $srcCount = DB::table($table)->count();
+            $srcCount = DB::connection($centralConnection)->table($table)->count();
             $dstCountBefore = DB::connection($connectionName)->table($table)->count();
 
             if ($srcCount === 0 || $dstCountBefore > 0) {
                 continue;
             }
 
-            $mainCols = collect(DB::select("SHOW COLUMNS FROM `{$centralDb}`.`{$table}`"))->pluck('Field');
+            $mainCols = collect(DB::connection($centralConnection)->select("SHOW COLUMNS FROM `{$table}`"))->pluck('Field');
             $tenantCols = collect(DB::connection($connectionName)->select("SHOW COLUMNS FROM `{$table}`"))->pluck('Field');
             $common = $mainCols->intersect($tenantCols)->map(fn ($c) => "`{$c}`")->implode(', ');
 
