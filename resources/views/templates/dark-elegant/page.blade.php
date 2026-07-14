@@ -46,7 +46,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', system-ui, sans-serif; }
-        .prose-content { font-size: 1.0625rem; line-height: 1.85; color: #374151; }
+        .prose-content { font-size: 1.0625rem; line-height: 1.85; color: #374151; overflow-wrap: anywhere; word-break: break-word; }
         .prose-content p { margin-bottom: 1.5em; }
         .prose-content h1 { font-size: 2em; font-weight: 800; margin-top: 1.5em; margin-bottom: 0.75em; color: #111827; line-height: 1.2; }
         .prose-content h2 { font-size: 1.5em; font-weight: 700; margin-top: 2em; margin-bottom: 0.75em; color: #111827; line-height: 1.3; }

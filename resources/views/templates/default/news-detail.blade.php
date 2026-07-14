@@ -29,7 +29,7 @@
     <style>
         body { font-family: 'Inter', system-ui, sans-serif; }
         /* Prose Styling */
-        .prose-content { font-size: 1.0625rem; line-height: 1.85; color: #374151; }
+        .prose-content { font-size: 1.0625rem; line-height: 1.85; color: #374151; overflow-wrap: anywhere; word-break: break-word; }
         .prose-content p { margin-bottom: 1.5em; }
         .prose-content h2 { font-size: 1.5em; font-weight: 700; margin-top: 2em; margin-bottom: 0.75em; color: #111827; line-height: 1.3; }
         .prose-content h3 { font-size: 1.25em; font-weight: 600; margin-top: 1.75em; margin-bottom: 0.5em; color: #1f2937; }
@@ -154,7 +154,7 @@
                     {{-- Cover Image --}}
                     @if($news->cover_image)
                     <div class="mb-8 rounded-xl overflow-hidden">
-                        <img src="{{ asset('storage/' . $news->cover_image) }}" alt="{{ $news->title }}" class="w-full h-auto object-cover">
+                        <img src="{{ asset('storage/' . $news->cover_image) }}" alt="{{ $news->title }}" class="w-full h-auto max-h-[420px] object-cover">
                     </div>
                     @endif
 
