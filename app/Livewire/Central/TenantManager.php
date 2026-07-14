@@ -28,6 +28,12 @@ class TenantManager extends Component
     public ?string $addDomainTenantId = null;
     public string $addDomainValue = '';
 
+    // Add admin user to an existing tenant
+    public ?string $addAdminTenantId = null;
+    public string $addAdminName = '';
+    public string $addAdminEmail = '';
+    public string $addAdminPassword = '';
+
     // Delete confirmation
     public ?string $confirmingDeleteId = null;
     public string $deleteConfirmText = '';
@@ -73,7 +79,9 @@ class TenantManager extends Component
             $this->lastLog = $result['log'];
 
             if ($this->adminEmail !== '') {
-                $this->lastLog = array_merge($this->lastLog, $this->createAdminUser($result['tenant']));
+                $this->lastLog = array_merge($this->lastLog, $this->createAdminUser(
+                    $result['tenant'], $this->adminName, $this->adminEmail, $this->adminPassword
+                ));
             }
 
             session()->flash('success', "Tenant '{$this->newId}' berhasil di-provision.");
@@ -89,7 +97,7 @@ class TenantManager extends Component
     /**
      * @return string[]
      */
-    private function createAdminUser(Tenant $tenant): array
+    private function createAdminUser(Tenant $tenant, string $name, string $email, string $password): array
     {
         $log = [];
 
@@ -100,23 +108,61 @@ class TenantManager extends Component
         // wrong tenant's database afterwards).
         tenancy()->initialize($tenant);
         try {
-            if (User::where('email', $this->adminEmail)->exists()) {
-                $log[] = "  User admin '{$this->adminEmail}' sudah ada — dilewati.";
+            if (User::where('email', $email)->exists()) {
+                $log[] = "  User admin '{$email}' sudah ada — dilewati.";
             } else {
                 User::create([
-                    'name' => $this->adminName,
-                    'email' => $this->adminEmail,
-                    'password' => Hash::make($this->adminPassword),
+                    'name' => $name,
+                    'email' => $email,
+                    'password' => Hash::make($password),
                     'role' => 'admin',
                     'email_verified_at' => now(),
                 ]);
-                $log[] = "  User admin '{$this->adminEmail}' dibuat.";
+                $log[] = "  User admin '{$email}' dibuat.";
             }
         } finally {
             tenancy()->end();
         }
 
         return $log;
+    }
+
+    public function startAddAdmin(string $tenantId)
+    {
+        $this->addAdminTenantId = $tenantId;
+        $this->addAdminName = '';
+        $this->addAdminEmail = '';
+        $this->addAdminPassword = '';
+        $this->resetErrorBag(['addAdminName', 'addAdminEmail', 'addAdminPassword']);
+    }
+
+    public function cancelAddAdmin()
+    {
+        $this->addAdminTenantId = null;
+        $this->addAdminName = '';
+        $this->addAdminEmail = '';
+        $this->addAdminPassword = '';
+    }
+
+    public function addAdmin()
+    {
+        $this->validate([
+            'addAdminName' => ['required', 'string', 'max:255'],
+            'addAdminEmail' => ['required', 'email', 'max:255'],
+            'addAdminPassword' => ['required', 'string', 'min:8'],
+        ], [
+            'addAdminName.required' => 'Nama wajib diisi.',
+            'addAdminEmail.required' => 'Email wajib diisi.',
+            'addAdminPassword.required' => 'Password wajib diisi.',
+            'addAdminPassword.min' => 'Password minimal 8 karakter.',
+        ]);
+
+        $tenant = Tenant::findOrFail($this->addAdminTenantId);
+
+        $log = $this->createAdminUser($tenant, $this->addAdminName, $this->addAdminEmail, $this->addAdminPassword);
+
+        session()->flash('success', trim(implode(' ', $log)) ?: "Admin ditambahkan ke tenant '{$tenant->id}'.");
+        $this->cancelAddAdmin();
     }
 
     public function startAddDomain(string $tenantId)

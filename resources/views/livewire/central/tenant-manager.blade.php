@@ -246,7 +246,33 @@
                         <td class="px-5 py-4 text-gray-500 font-mono text-xs whitespace-nowrap">{{ $tenant->database()->getName() }}</td>
                         <td class="px-5 py-4 text-gray-500 whitespace-nowrap">{{ $tenant->created_at->format('d M Y H:i') }}</td>
                         <td class="px-5 py-4 text-right whitespace-nowrap">
-                            @if ($confirmingDeleteId === $tenant->id)
+                            @if ($addAdminTenantId === $tenant->id)
+                                <div class="text-left bg-indigo-50 border border-indigo-200 rounded-lg p-3 inline-block w-64">
+                                    <p class="text-xs text-indigo-700 mb-2 font-medium">Tambah admin ke '{{ $tenant->id }}':</p>
+                                    <div class="space-y-1.5">
+                                        <div>
+                                            <input type="text" wire:model="addAdminName" placeholder="Nama"
+                                                class="w-full px-2 py-1 border border-gray-300 rounded text-xs outline-none @error('addAdminName') border-red-400 @enderror">
+                                            @error('addAdminName')<p class="text-red-500 text-[11px] mt-0.5">{{ $message }}</p>@enderror
+                                        </div>
+                                        <div>
+                                            <input type="email" wire:model="addAdminEmail" placeholder="Email"
+                                                class="w-full px-2 py-1 border border-gray-300 rounded text-xs outline-none @error('addAdminEmail') border-red-400 @enderror">
+                                            @error('addAdminEmail')<p class="text-red-500 text-[11px] mt-0.5">{{ $message }}</p>@enderror
+                                        </div>
+                                        <div>
+                                            <input type="password" wire:model="addAdminPassword" placeholder="Password (min 8 karakter)"
+                                                class="w-full px-2 py-1 border border-gray-300 rounded text-xs outline-none @error('addAdminPassword') border-red-400 @enderror">
+                                            @error('addAdminPassword')<p class="text-red-500 text-[11px] mt-0.5">{{ $message }}</p>@enderror
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <button wire:click="addAdmin" wire:loading.attr="disabled" wire:target="addAdmin"
+                                            class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700">Simpan</button>
+                                        <button wire:click="cancelAddAdmin" class="text-xs text-gray-500 px-2 py-1.5 hover:underline">Batal</button>
+                                    </div>
+                                </div>
+                            @elseif ($confirmingDeleteId === $tenant->id)
                                 <div class="text-left bg-red-50 border border-red-200 rounded-lg p-3 inline-block">
                                     <p class="text-xs text-red-700 mb-2">Ketik <strong>{{ $tenant->id }}</strong> untuk hapus permanen tenant beserta database-nya:</p>
                                     <div class="flex items-center gap-2">
@@ -258,7 +284,10 @@
                                     @error('deleteConfirmText')<p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>@enderror
                                 </div>
                             @else
-                                <button wire:click="confirmDelete('{{ $tenant->id }}')" class="text-xs text-red-600 hover:underline">Hapus</button>
+                                <div class="flex items-center justify-end gap-3">
+                                    <button wire:click="startAddAdmin('{{ $tenant->id }}')" class="text-xs text-indigo-600 hover:underline">+ Tambah admin</button>
+                                    <button wire:click="confirmDelete('{{ $tenant->id }}')" class="text-xs text-red-600 hover:underline">Hapus</button>
+                                </div>
                             @endif
                         </td>
                     </tr>
