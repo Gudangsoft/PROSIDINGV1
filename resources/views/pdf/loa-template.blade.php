@@ -191,7 +191,7 @@
         {{-- Logo --}}
         @if($headerLogo)
             <div class="header-logos">
-                <img src="{{ public_path('storage/' . $headerLogo) }}" class="logo" alt="Logo">
+                <img src="{{ storage_path('app/public/' . $headerLogo) }}" class="logo" alt="Logo">
             </div>
         @endif
 
@@ -352,10 +352,10 @@
         @php
             $sigImage = $conference->loa_signature_image ?? null;
         @endphp
-        @if($sigImage && file_exists(public_path('storage/' . $sigImage)))
-            <img src="{{ public_path('storage/' . $sigImage) }}" class="signature-image" alt="Signature">
-        @elseif(file_exists(public_path('storage/signatures/chairman.png')))
-            <img src="{{ public_path('storage/signatures/chairman.png') }}" class="signature-image" alt="Signature">
+        @if($sigImage && file_exists(storage_path('app/public/' . $sigImage)))
+            <img src="{{ storage_path('app/public/' . $sigImage) }}" class="signature-image" alt="Signature">
+        @elseif(file_exists(storage_path('app/public/signatures/chairman.png')))
+            <img src="{{ storage_path('app/public/signatures/chairman.png') }}" class="signature-image" alt="Signature">
         @else
             <div style="height: 60px;"></div>
         @endif

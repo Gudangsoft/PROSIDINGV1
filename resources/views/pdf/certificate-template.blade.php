@@ -374,7 +374,7 @@
     {{-- Full Width Banner --}}
     @if($isBanner && $headerLogo)
         <div class="full-width-banner">
-            <img src="{{ public_path('storage/' . $headerLogo) }}" alt="Banner">
+            <img src="{{ storage_path('app/public/' . $headerLogo) }}" alt="Banner">
         </div>
     @endif
 
@@ -409,7 +409,7 @@
         @if(!$isBanner)
         <div class="header">
             @if($headerLogo)
-                <img class="logo" src="{{ public_path('storage/' . $headerLogo) }}" alt="Logo">
+                <img class="logo" src="{{ storage_path('app/public/' . $headerLogo) }}" alt="Logo">
             @endif
             <div class="header-text">
                 <div class="org-name">
@@ -496,8 +496,8 @@
                     <td style="width: {{ $colPct }};">
                         <div class="sig-box">
                             <div class="sig-title">Chairperson</div>
-                            @if($conference && $conference->chairman_signature && file_exists(public_path('storage/' . $conference->chairman_signature)))
-                                <img src="{{ public_path('storage/' . $conference->chairman_signature) }}" class="sig-img" alt="Signature">
+                            @if($conference && $conference->chairman_signature && file_exists(storage_path('app/public/' . $conference->chairman_signature)))
+                                <img src="{{ storage_path('app/public/' . $conference->chairman_signature) }}" class="sig-img" alt="Signature">
                             @else
                                 <div class="sig-spacer"></div>
                             @endif
@@ -513,8 +513,8 @@
                     <td style="width: {{ $colPct }};">
                         <div class="sig-box">
                             <div class="sig-title">Head of Institution</div>
-                            @if($conference && $conference->institute_chairman_signature && file_exists(public_path('storage/' . $conference->institute_chairman_signature)))
-                                <img src="{{ public_path('storage/' . $conference->institute_chairman_signature) }}" class="sig-img" alt="Signature">
+                            @if($conference && $conference->institute_chairman_signature && file_exists(storage_path('app/public/' . $conference->institute_chairman_signature)))
+                                <img src="{{ storage_path('app/public/' . $conference->institute_chairman_signature) }}" class="sig-img" alt="Signature">
                             @else
                                 <div class="sig-spacer"></div>
                             @endif
@@ -543,8 +543,8 @@
                     <td style="width: {{ $colPct }};">
                         <div class="sig-box">
                             <div class="sig-title">Secretary</div>
-                            @if($conference && $conference->secretary_signature && file_exists(public_path('storage/' . $conference->secretary_signature)))
-                                <img src="{{ public_path('storage/' . $conference->secretary_signature) }}" class="sig-img" alt="Signature">
+                            @if($conference && $conference->secretary_signature && file_exists(storage_path('app/public/' . $conference->secretary_signature)))
+                                <img src="{{ storage_path('app/public/' . $conference->secretary_signature) }}" class="sig-img" alt="Signature">
                             @else
                                 <div class="sig-spacer"></div>
                             @endif
