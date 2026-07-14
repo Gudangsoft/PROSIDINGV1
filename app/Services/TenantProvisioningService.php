@@ -23,6 +23,12 @@ class TenantProvisioningService
     {
         $log = [];
 
+        // Domain resolution matches the request's raw Host header exactly
+        // (see DomainTenantResolver) — a value like "https://example.com/"
+        // would register successfully here but then NEVER match any real
+        // request, silently making the tenant unreachable.
+        $domainName = static::normalizeDomain($domainName);
+
         $tenant = Tenant::find($id);
         if ($tenant) {
             $log[] = "Tenant '{$id}' already exists — reusing it.";
@@ -133,5 +139,18 @@ class TenantProvisioningService
         $log[] = 'Data copy from central finished.';
 
         return $log;
+    }
+
+    /**
+     * Strips scheme, path, and trailing slashes so what's stored always
+     * matches the bare host a real request's Host header would contain.
+     */
+    public static function normalizeDomain(string $domain): string
+    {
+        $domain = trim($domain);
+        $domain = preg_replace('#^[a-z][a-z0-9+.-]*://#i', '', $domain);
+        $domain = explode('/', $domain, 2)[0];
+
+        return strtolower(trim($domain));
     }
 }

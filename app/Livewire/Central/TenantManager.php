@@ -186,10 +186,12 @@ class TenantManager extends Component
             'addDomainValue.required' => 'Domain wajib diisi.',
         ]);
 
+        $domainName = TenantProvisioningService::normalizeDomain($this->addDomainValue);
+
         $tenant = Tenant::findOrFail($this->addDomainTenantId);
 
         $exists = Domain::withoutGlobalScope(VerifiedDomainScope::class)
-            ->where('domain', $this->addDomainValue)
+            ->where('domain', $domainName)
             ->exists();
 
         if ($exists) {
@@ -197,9 +199,9 @@ class TenantManager extends Component
             return;
         }
 
-        $tenant->domains()->create(['domain' => $this->addDomainValue]);
+        $tenant->domains()->create(['domain' => $domainName]);
 
-        session()->flash('success', "Domain '{$this->addDomainValue}' ditambahkan ke tenant '{$tenant->id}'. Menunggu verifikasi DNS.");
+        session()->flash('success', "Domain '{$domainName}' ditambahkan ke tenant '{$tenant->id}'. Menunggu verifikasi DNS.");
         $this->cancelAddDomain();
     }
 

@@ -29,10 +29,24 @@ return [
      */
     'bootstrappers' => [
         Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
-        Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
         // Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
+
+        // CacheTenancyBootstrapper isolates Cache:: per tenant by wrapping
+        // every call in Cache::tags([...]) — but CACHE_STORE=file (this
+        // app's driver on every server so far) doesn't support tags at all.
+        // With this enabled, the FIRST Cache::/cache() call anywhere in the
+        // app while a tenant is active throws
+        // "BadMethodCallException: This cache store does not support tagging"
+        // immediately (verified locally). The app doesn't call Cache:: /
+        // cache() anywhere today, so this has no effect either way right
+        // now — but leave it disabled until CACHE_STORE is switched to a
+        // taggable driver (redis, memcached, dynamodb, array), otherwise
+        // the first person to add caching for a performance fix will hit a
+        // very confusing crash. If you do switch to a taggable driver,
+        // re-enable this line for automatic per-tenant cache isolation.
+        // Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class,
     ],
 
     /**
