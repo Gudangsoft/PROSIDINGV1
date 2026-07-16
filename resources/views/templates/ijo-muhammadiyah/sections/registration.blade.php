@@ -94,9 +94,6 @@
                             {{ $method['type'] ?? 'Bank Transfer' }}{{ !empty($method['name']) ? ' — ' . $method['name'] : '' }}
                         </p>
                         <div class="space-y-1 text-sm text-gray-600">
-                            @if(!empty($method['amount']))
-                            <p>Nominal: <strong class="text-teal-700">Rp {{ number_format((float) $method['amount'], 0, ',', '.') }}</strong></p>
-                            @endif
                             @if(!empty($method['account_number']))
                             <p>{{ __('welcome.pricing.no_rekening') }}: <strong class="font-mono">{{ $method['account_number'] }}</strong></p>
                             @endif

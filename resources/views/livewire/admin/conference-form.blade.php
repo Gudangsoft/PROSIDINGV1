@@ -555,37 +555,23 @@
             @endif
         </div>
 
-        {{-- Informasi Pembayaran --}}
-        <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4">
-            <div class="flex items-center gap-2 mb-1">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                <h3 class="font-semibold text-gray-800">Informasi Pembayaran (Legacy)</h3>
+        {{-- Informasi Pembayaran (rekening/metode + kontak umum) --}}
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-sm border-2 border-blue-200 p-6 space-y-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Informasi Pembayaran
+                    </h3>
+                    <p class="text-xs text-gray-500 mt-1">Tambahkan satu atau lebih rekening/metode pembayaran. Nominal tidak diisi di sini — harga sudah ditentukan lewat Paket Biaya di bawah.</p>
+                </div>
+                <button type="button" wire:click="addPaymentMethod" class="text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-1.5 shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    Tambah Rekening/Metode
+                </button>
             </div>
-            <p class="text-xs text-gray-400 -mt-2">Data rekening bank dan kontak pembayaran (gunakan Metode Pembayaran di bawah untuk opsi yang lebih lengkap)</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">
-                        <span class="flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                            Nama Bank
-                        </span>
-                    </label>
-                    <input wire:model="payment_bank_name" type="text" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Bank Mandiri">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">
-                        <span class="flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                            No. Rekening
-                        </span>
-                    </label>
-                    <input wire:model="payment_bank_account" type="text" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="1234567890">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Atas Nama</label>
-                    <input wire:model="payment_account_holder" type="text" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Nama pemegang rekening">
-                </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">
                         <span class="flex items-center gap-1.5">
@@ -593,49 +579,32 @@
                             No. HP Kontak Pembayaran
                         </span>
                     </label>
-                    <input wire:model="payment_contact_phone" type="text" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="+62 812 xxxx xxxx">
+                    <input wire:model="payment_contact_phone" type="text" class="w-full px-3 py-2 border rounded-lg text-sm bg-white focus:ring-blue-500 focus:border-blue-500" placeholder="+62 812 xxxx xxxx">
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Instruksi Pembayaran</label>
-                    <textarea wire:model="payment_instructions" rows="3" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Lakukan transfer ke rekening di atas dan konfirmasi melalui WhatsApp..."></textarea>
-                    <p class="text-xs text-gray-400 mt-1">Instruksi tambahan untuk peserta. Bisa beberapa baris.</p>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Instruksi Pembayaran Umum</label>
+                    <textarea wire:model="payment_instructions" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm bg-white focus:ring-blue-500 focus:border-blue-500" placeholder="Konfirmasi via WhatsApp setelah transfer..."></textarea>
+                    <p class="text-xs text-gray-400 mt-1">Berlaku untuk semua rekening/metode di bawah. Bisa beberapa baris.</p>
                 </div>
-            </div>
-        </div>
-
-        {{-- Metode Pembayaran (Multiple) --}}
-        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-sm border-2 border-blue-200 p-6 space-y-4">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h3 class="font-semibold text-gray-800 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        Metode Pembayaran
-                    </h3>
-                    <p class="text-xs text-gray-500 mt-1">Tambahkan berbagai metode pembayaran dengan nominal masing-masing</p>
-                </div>
-                <button type="button" wire:click="addPaymentMethod" class="text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-1.5 shadow-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                    Tambah Metode
-                </button>
             </div>
 
             <div class="space-y-3">
                 @forelse($paymentMethods as $index => $method)
                 <div class="bg-white rounded-lg border-2 border-gray-200 p-4 space-y-3 shadow-sm">
                     <div class="flex justify-between items-start">
-                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Metode #{{ $index + 1 }}</span>
+                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Rekening/Metode #{{ $index + 1 }}</span>
                         <div class="flex items-center gap-3">
                             <label class="flex items-center gap-1.5 cursor-pointer">
                                 <input type="checkbox" wire:model="paymentMethods.{{ $index }}.is_active" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
                                 <span class="text-xs text-gray-600 font-medium">Aktif</span>
                             </label>
-                            <button type="button" wire:click="removePaymentMethod({{ $index }})" wire:confirm="Hapus metode pembayaran ini?" class="text-red-500 hover:text-red-700">
+                            <button type="button" wire:click="removePaymentMethod({{ $index }})" wire:confirm="Hapus rekening/metode pembayaran ini?" class="text-red-500 hover:text-red-700">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             </button>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Jenis Metode *</label>
                             <select wire:model="paymentMethods.{{ $index }}.type" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
@@ -650,10 +619,6 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Nama Bank/E-Wallet *</label>
                             <input wire:model="paymentMethods.{{ $index }}.name" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="cth: Bank Mandiri, OVO, Dana">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">Nominal (Rp) *</label>
-                            <input wire:model="paymentMethods.{{ $index }}.amount" type="number" min="0" step="1000" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="500000">
                         </div>
                     </div>
 
@@ -670,14 +635,14 @@
 
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Instruksi Khusus <span class="text-gray-400">(opsional)</span></label>
-                        <textarea wire:model="paymentMethods.{{ $index }}.instructions" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Instruksi tambahan untuk metode pembayaran ini..."></textarea>
+                        <textarea wire:model="paymentMethods.{{ $index }}.instructions" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Instruksi tambahan untuk rekening/metode ini..."></textarea>
                     </div>
                 </div>
                 @empty
                 <div class="text-center py-8 bg-white/50 rounded-lg border-2 border-dashed border-gray-300">
                     <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                    <p class="text-gray-500 text-sm">Belum ada metode pembayaran</p>
-                    <p class="text-gray-400 text-xs mt-1">Klik "Tambah Metode" untuk menambahkan opsi pembayaran</p>
+                    <p class="text-gray-500 text-sm">Belum ada rekening/metode pembayaran</p>
+                    <p class="text-gray-400 text-xs mt-1">Klik "Tambah Rekening/Metode" untuk menambahkan</p>
                 </div>
                 @endforelse
             </div>

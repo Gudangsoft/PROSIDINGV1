@@ -114,12 +114,6 @@
                             {{ $method['type'] ?? 'Bank Transfer' }}{{ !empty($method['name']) ? ' — ' . $method['name'] : '' }}
                         </h4>
                         <div class="space-y-2">
-                            @if(!empty($method['amount']))
-                            <div class="flex justify-between">
-                                <span class="text-sm text-gray-500">Nominal</span>
-                                <span class="text-sm font-bold text-blue-700">Rp {{ number_format((float) $method['amount'], 0, ',', '.') }}</span>
-                            </div>
-                            @endif
                             @if(!empty($method['account_number']))
                             <div class="flex justify-between">
                                 <span class="text-sm text-gray-500">{{ __('welcome.pricing.no_rekening') }}</span>

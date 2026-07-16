@@ -219,9 +219,23 @@ class ConferenceForm extends Component
             $this->payment_account_holder = $conference->payment_account_holder ?? '';
             $this->payment_contact_phone = $conference->payment_contact_phone ?? '';
             $this->payment_instructions = $conference->payment_instructions ?? '';
-            
-            // Load payment methods
+
+            // Load payment methods — the old single-bank fields above and this
+            // list used to be two separate, confusing sections in the UI. If a
+            // conference only ever used the old fields, seed the list with one
+            // entry from them so it appears in the same unified place; the old
+            // fields themselves get cleared on next save (see buildData()).
             $this->paymentMethods = $conference->payment_methods ?? [];
+            if (empty($this->paymentMethods) && ($this->payment_bank_name || $this->payment_bank_account)) {
+                $this->paymentMethods = [[
+                    'type' => 'Bank Transfer',
+                    'name' => $this->payment_bank_name,
+                    'account_number' => $this->payment_bank_account,
+                    'account_holder' => $this->payment_account_holder,
+                    'instructions' => '',
+                    'is_active' => true,
+                ]];
+            }
 
             // Load visible sections (default: all visible)
             if (\Illuminate\Support\Facades\Schema::hasColumn('conferences', 'visible_sections')) {
@@ -490,7 +504,6 @@ class ConferenceForm extends Component
             'name' => '',
             'account_number' => '',
             'account_holder' => '',
-            'amount' => '',
             'instructions' => '',
             'is_active' => true,
         ];
@@ -623,9 +636,14 @@ class ConferenceForm extends Component
             'online_url' => $this->online_url ?: null,
             'city' => $this->city ?: null,
             'organizer' => $this->organizer ?: null,
-            'payment_bank_name' => $this->payment_bank_name ?: null,
-            'payment_bank_account' => $this->payment_bank_account ?: null,
-            'payment_account_holder' => $this->payment_account_holder ?: null,
+            // The single-bank fields (payment_bank_name/account/holder) are
+            // superseded by payment_methods — mount() migrates any existing
+            // value into the list on load, so from here on they're always
+            // cleared to avoid the same info showing twice (once as a
+            // "legacy" entry, once in the list) on the public page.
+            'payment_bank_name' => null,
+            'payment_bank_account' => null,
+            'payment_account_holder' => null,
             'payment_contact_phone' => $this->payment_contact_phone ?: null,
             'payment_instructions' => $this->payment_instructions ?: null,
             'payment_methods' => !empty($this->paymentMethods) ? $this->paymentMethods : null,
