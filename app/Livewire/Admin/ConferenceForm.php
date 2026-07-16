@@ -59,6 +59,7 @@ class ConferenceForm extends Component
     public string $payment_contact_phone = '';
     public string $payment_contact_name = '';
     public array $paymentMethods = []; // Multiple payment methods with details
+    public array $paymentContacts = []; // Multiple payment contacts (name + phone)
 
     // Existing image paths (for preview)
     public ?string $existing_cover_image = null;
@@ -234,6 +235,16 @@ class ConferenceForm extends Component
                     'account_holder' => $this->payment_account_holder,
                     'instructions' => '',
                     'is_active' => true,
+                ]];
+            }
+
+            // Same migration pattern for payment contacts: single name/phone
+            // fields -> a list, so multiple contacts can be added/removed.
+            $this->paymentContacts = $conference->payment_contacts ?? [];
+            if (empty($this->paymentContacts) && ($this->payment_contact_name || $this->payment_contact_phone)) {
+                $this->paymentContacts = [[
+                    'name' => $this->payment_contact_name,
+                    'phone' => $this->payment_contact_phone,
                 ]];
             }
 
@@ -515,6 +526,21 @@ class ConferenceForm extends Component
         $this->paymentMethods = array_values($this->paymentMethods);
     }
 
+    // -- Payment Contacts --
+    public function addPaymentContact()
+    {
+        $this->paymentContacts[] = [
+            'name' => '',
+            'phone' => '',
+        ];
+    }
+
+    public function removePaymentContact($index)
+    {
+        unset($this->paymentContacts[$index]);
+        $this->paymentContacts = array_values($this->paymentContacts);
+    }
+
     // -- Journal Publications --
     public function addJournal()
     {
@@ -636,18 +662,20 @@ class ConferenceForm extends Component
             'online_url' => $this->online_url ?: null,
             'city' => $this->city ?: null,
             'organizer' => $this->organizer ?: null,
-            // The single-bank fields (payment_bank_name/account/holder) are
-            // superseded by payment_methods — mount() migrates any existing
-            // value into the list on load, so from here on they're always
+            // The single-bank/contact fields (payment_bank_name/account/holder,
+            // payment_contact_name/phone) are superseded by payment_methods
+            // and payment_contacts — mount() migrates any existing value into
+            // the respective list on load, so from here on they're always
             // cleared to avoid the same info showing twice (once as a
             // "legacy" entry, once in the list) on the public page.
             'payment_bank_name' => null,
             'payment_bank_account' => null,
             'payment_account_holder' => null,
-            'payment_contact_phone' => $this->payment_contact_phone ?: null,
-            'payment_contact_name' => $this->payment_contact_name ?: null,
+            'payment_contact_phone' => null,
+            'payment_contact_name' => null,
             'payment_instructions' => null,
             'payment_methods' => !empty($this->paymentMethods) ? $this->paymentMethods : null,
+            'payment_contacts' => !empty($this->paymentContacts) ? $this->paymentContacts : null,
             'status' => $this->status,
             'loa_generation_mode' => $this->loaGenerationMode,
             'certificate_generation_mode' => $this->certificateGenerationMode,

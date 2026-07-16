@@ -67,8 +67,11 @@
                 $activePaymentMethods = collect($activeConference->payment_methods ?? [])
                     ->filter(fn ($m) => $m['is_active'] ?? true)
                     ->values();
+                $activePaymentContacts = collect($activeConference->payment_contacts ?? [])
+                    ->filter(fn ($c) => !empty($c['name']) || !empty($c['phone']))
+                    ->values();
             @endphp
-            @if($activePaymentMethods->isNotEmpty() || $activeConference->payment_bank_name || $activeConference->payment_bank_account || $activeConference->payment_contact_phone || $activeConference->payment_contact_name)
+            @if($activePaymentMethods->isNotEmpty() || $activePaymentContacts->isNotEmpty() || $activeConference->payment_bank_name || $activeConference->payment_bank_account)
             <div class="mt-12 bg-white rounded-2xl shadow-sm border p-6 md:p-8">
                 <h3 class="text-lg font-bold text-gray-800 mb-6 text-center flex items-center justify-center gap-2">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
@@ -136,26 +139,30 @@
                     </div>
                     @endforeach
 
-                    {{-- Contact --}}
-                    @if($activeConference->payment_contact_phone || $activeConference->payment_contact_name)
+                    {{-- Contacts --}}
+                    @if($activePaymentContacts->isNotEmpty())
                     <div class="bg-green-50 rounded-xl p-5 border border-green-200">
                         <h4 class="text-sm font-bold text-green-800 uppercase tracking-wider mb-3 flex items-center gap-2">
                             <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                             {{ __('welcome.pricing.kontak_pembayaran') }}
                         </h4>
-                        <div class="space-y-2">
-                            @if($activeConference->payment_contact_name)
-                            <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                <span class="text-sm font-bold text-gray-800">{{ $activeConference->payment_contact_name }}</span>
+                        <div class="space-y-3">
+                            @foreach($activePaymentContacts as $contact)
+                            <div class="space-y-1">
+                                @if(!empty($contact['name']))
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    <span class="text-sm font-bold text-gray-800">{{ $contact['name'] }}</span>
+                                </div>
+                                @endif
+                                @if(!empty($contact['phone']))
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                    <span class="text-sm font-bold text-gray-800">{{ $contact['phone'] }}</span>
+                                </div>
+                                @endif
                             </div>
-                            @endif
-                            @if($activeConference->payment_contact_phone)
-                            <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                                <span class="text-sm font-bold text-gray-800">{{ $activeConference->payment_contact_phone }}</span>
-                            </div>
-                            @endif
+                            @endforeach
                         </div>
                     </div>
                     @endif
