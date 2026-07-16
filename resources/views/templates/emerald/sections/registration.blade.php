@@ -56,26 +56,63 @@
             </div>
 
             {{-- Payment Info --}}
-            @if($activeConference->payment_bank_name || $activeConference->payment_bank_account)
+            @php
+                $activePaymentMethods = collect($activeConference->payment_methods ?? [])
+                    ->filter(fn ($m) => $m['is_active'] ?? true)
+                    ->values();
+            @endphp
+            @if($activePaymentMethods->isNotEmpty() || $activeConference->payment_bank_name || $activeConference->payment_bank_account)
             <div class="mt-10 bg-white rounded-2xl border p-6 max-w-2xl mx-auto text-center">
                 <h3 class="font-bold text-gray-800 mb-4 flex items-center justify-center gap-2">
                     <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                     {{ __('welcome.pricing.payment_title') }}
                 </h3>
-                <div class="space-y-1 text-sm text-gray-600">
-                    @if($activeConference->payment_bank_name)
-                    <p>{{ __('welcome.pricing.bank') }}: <strong>{{ $activeConference->payment_bank_name }}</strong></p>
-                    @endif
-                    @if($activeConference->payment_bank_account)
-                    <p>{{ __('welcome.pricing.no_rekening') }}: <strong class="font-mono">{{ $activeConference->payment_bank_account }}</strong></p>
-                    @endif
-                    @if($activeConference->payment_account_holder)
-                    <p>{{ __('welcome.pricing.atas_nama') }}: <strong>{{ $activeConference->payment_account_holder }}</strong></p>
-                    @endif
+
+                @if($activePaymentMethods->isNotEmpty())
+                    {{-- Multiple payment methods (admin: "Metode Pembayaran") --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                        @foreach($activePaymentMethods as $method)
+                        <div class="bg-gray-50 rounded-xl p-4 border">
+                            <p class="text-xs font-bold text-teal-700 uppercase tracking-wider mb-2">
+                                {{ $method['type'] ?? 'Bank Transfer' }}{{ !empty($method['name']) ? ' — ' . $method['name'] : '' }}
+                            </p>
+                            <div class="space-y-1 text-sm text-gray-600">
+                                @if(!empty($method['amount']))
+                                <p>Nominal: <strong class="text-teal-700">Rp {{ number_format((float) $method['amount'], 0, ',', '.') }}</strong></p>
+                                @endif
+                                @if(!empty($method['account_number']))
+                                <p>{{ __('welcome.pricing.no_rekening') }}: <strong class="font-mono">{{ $method['account_number'] }}</strong></p>
+                                @endif
+                                @if(!empty($method['account_holder']))
+                                <p>{{ __('welcome.pricing.atas_nama') }}: <strong>{{ $method['account_holder'] }}</strong></p>
+                                @endif
+                                @if(!empty($method['instructions']))
+                                <p class="mt-2 text-xs text-gray-500">{!! nl2br(e($method['instructions'])) !!}</p>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
                     @if($activeConference->payment_contact_phone)
-                    <p class="mt-2">{{ __('welcome.pricing.kontak_pembayaran') }}: <strong>{{ $activeConference->payment_contact_phone }}</strong></p>
+                    <p class="mt-4 text-sm text-gray-600">{{ __('welcome.pricing.kontak_pembayaran') }}: <strong>{{ $activeConference->payment_contact_phone }}</strong></p>
                     @endif
-                </div>
+                @else
+                    {{-- Legacy single-method fields --}}
+                    <div class="space-y-1 text-sm text-gray-600">
+                        @if($activeConference->payment_bank_name)
+                        <p>{{ __('welcome.pricing.bank') }}: <strong>{{ $activeConference->payment_bank_name }}</strong></p>
+                        @endif
+                        @if($activeConference->payment_bank_account)
+                        <p>{{ __('welcome.pricing.no_rekening') }}: <strong class="font-mono">{{ $activeConference->payment_bank_account }}</strong></p>
+                        @endif
+                        @if($activeConference->payment_account_holder)
+                        <p>{{ __('welcome.pricing.atas_nama') }}: <strong>{{ $activeConference->payment_account_holder }}</strong></p>
+                        @endif
+                        @if($activeConference->payment_contact_phone)
+                        <p class="mt-2">{{ __('welcome.pricing.kontak_pembayaran') }}: <strong>{{ $activeConference->payment_contact_phone }}</strong></p>
+                        @endif
+                    </div>
+                @endif
             </div>
             @endif
         </div>
