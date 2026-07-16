@@ -575,16 +575,20 @@
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">
                         <span class="flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            Nama Kontak Pembayaran
+                        </span>
+                    </label>
+                    <input wire:model="payment_contact_name" type="text" class="w-full px-3 py-2 border rounded-lg text-sm bg-white focus:ring-blue-500 focus:border-blue-500" placeholder="cth: Budi Santoso">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">
+                        <span class="flex items-center gap-1.5">
                             <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                             No. HP Kontak Pembayaran
                         </span>
                     </label>
                     <input wire:model="payment_contact_phone" type="text" class="w-full px-3 py-2 border rounded-lg text-sm bg-white focus:ring-blue-500 focus:border-blue-500" placeholder="+62 812 xxxx xxxx">
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Instruksi Pembayaran Umum</label>
-                    <textarea wire:model="payment_instructions" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm bg-white focus:ring-blue-500 focus:border-blue-500" placeholder="Konfirmasi via WhatsApp setelah transfer..."></textarea>
-                    <p class="text-xs text-gray-400 mt-1">Berlaku untuk semua rekening/metode di bawah. Bisa beberapa baris.</p>
                 </div>
             </div>
 

@@ -61,7 +61,7 @@
                     ->filter(fn ($m) => $m['is_active'] ?? true)
                     ->values();
             @endphp
-            @if($activePaymentMethods->isNotEmpty() || $activeConference->payment_bank_name || $activeConference->payment_bank_account)
+            @if($activePaymentMethods->isNotEmpty() || $activeConference->payment_bank_name || $activeConference->payment_bank_account || $activeConference->payment_contact_phone || $activeConference->payment_contact_name)
             <div class="mt-10 bg-white rounded-2xl border p-6 max-w-2xl mx-auto text-center">
                 <h3 class="font-bold text-gray-800 mb-4 flex items-center justify-center gap-2">
                     <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
@@ -108,14 +108,13 @@
                     @endforeach
                 </div>
 
-                @if($activeConference->payment_contact_phone || $activeConference->payment_instructions)
+                @if($activeConference->payment_contact_phone || $activeConference->payment_contact_name)
                 <div class="mt-4 text-sm text-gray-600">
-                    @if($activeConference->payment_contact_phone)
-                    <p>{{ __('welcome.pricing.kontak_pembayaran') }}: <strong>{{ $activeConference->payment_contact_phone }}</strong></p>
-                    @endif
-                    @if($activeConference->payment_instructions)
-                    <p class="mt-1 text-xs text-gray-500">{!! nl2br(e($activeConference->payment_instructions)) !!}</p>
-                    @endif
+                    <p>{{ __('welcome.pricing.kontak_pembayaran') }}:
+                        @if($activeConference->payment_contact_name)<strong>{{ $activeConference->payment_contact_name }}</strong>@endif
+                        @if($activeConference->payment_contact_name && $activeConference->payment_contact_phone) — @endif
+                        @if($activeConference->payment_contact_phone)<strong>{{ $activeConference->payment_contact_phone }}</strong>@endif
+                    </p>
                 </div>
                 @endif
             </div>

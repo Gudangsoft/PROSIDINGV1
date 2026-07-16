@@ -57,7 +57,7 @@ class ConferenceForm extends Component
     public string $payment_bank_account = '';
     public string $payment_account_holder = '';
     public string $payment_contact_phone = '';
-    public string $payment_instructions = '';
+    public string $payment_contact_name = '';
     public array $paymentMethods = []; // Multiple payment methods with details
 
     // Existing image paths (for preview)
@@ -218,7 +218,7 @@ class ConferenceForm extends Component
             $this->payment_bank_account = $conference->payment_bank_account ?? '';
             $this->payment_account_holder = $conference->payment_account_holder ?? '';
             $this->payment_contact_phone = $conference->payment_contact_phone ?? '';
-            $this->payment_instructions = $conference->payment_instructions ?? '';
+            $this->payment_contact_name = $conference->payment_contact_name ?? '';
 
             // Load payment methods — the old single-bank fields above and this
             // list used to be two separate, confusing sections in the UI. If a
@@ -645,7 +645,8 @@ class ConferenceForm extends Component
             'payment_bank_account' => null,
             'payment_account_holder' => null,
             'payment_contact_phone' => $this->payment_contact_phone ?: null,
-            'payment_instructions' => $this->payment_instructions ?: null,
+            'payment_contact_name' => $this->payment_contact_name ?: null,
+            'payment_instructions' => null,
             'payment_methods' => !empty($this->paymentMethods) ? $this->paymentMethods : null,
             'status' => $this->status,
             'loa_generation_mode' => $this->loaGenerationMode,

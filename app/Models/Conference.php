@@ -15,7 +15,7 @@ class Conference extends Model
         'venue', 'venue_type', 'online_url', 'city',
         'organizer', 'cover_image', 'logo', 'brochure',
         'payment_bank_name', 'payment_bank_account', 'payment_account_holder',
-        'payment_contact_phone', 'payment_instructions', 'payment_methods',
+        'payment_contact_phone', 'payment_contact_name', 'payment_instructions', 'payment_methods',
         'status', 'conference_type', 'is_active', 'created_by',
         'loa_generation_mode', 'certificate_generation_mode',
         'show_register_button', 'registration_open', 'registration_closed_message',
